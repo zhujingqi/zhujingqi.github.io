@@ -1,0 +1,31 @@
+.text{
+	left:100px
+	right:100px
+	top:100px
+}
+.title{
+	color:darkblue;
+	text-align:center;
+}
+.author{
+	text-align:center;
+	color:#00224c;
+}
+body{
+	background-color:#ddd;
+}
+a{
+	text-decoration:none;    /*超链接去掉下划线*/
+}
+a:link{
+	color:#888;
+}
+a:visited{
+	color:#888;
+}
+a:hover{
+	color:#bbb;
+}
+a:active{
+	color:#ffda1c;
+}
