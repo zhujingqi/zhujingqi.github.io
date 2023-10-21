@@ -1,82 +1,148 @@
+<!DOCTYPE html>
+	<html>
+		<head>
+			<title> Zhu Jingqi | Website Home Page </title>
+					<meta charset="UTF-8">
+					<script>
+						function getD1() {
+							var date = new Date();
+							var d1 = date.toLocaleString();
+							document.getElementById("datetime").innerHTML = d1;
+						}
+						setInterval("getD1();", 1000);
+					</script>
+					<link rel="stylesheet" href="bar.css">
+					<link rel="stylesheet" href="main.css">
+					<style>
+						.ad {
+							position: absolute;
+							top: 500px;
+							left: 700px;
+							background-color: #ffff00;
+							text-align: center;
+						}
+					</style>
+		</head>
 
-<!DOCTYPE=html>
-<html>
-<head>
-	<title>ZhuJingqi|Main</title>
-	<meta charset="UTF-8">
-	<script>
-	function  getD1(){
-	var date=new Date();
-	var d1=date.toLocaleString();
-	document.getElementById("datetime").innerHTML =d1; 
-	}
-	setInterval("getD1();",1000);
-	</script>
-	<style>
-		body{
-			background-image:url(background.jpg);
-			background-repeat: no-repeat;      /*background*/
-			background-attachment: scroll;
-			background-size:100% 100%;
-		}
-		a{
-			text-decoration:none;
-		}
-		#ad{
-			position:absolute;      /*ad*/
-			top:350px;
-			left:700px;
-		}
-		a:link{
-			color:darkblue;
-		}
-		a:visited{
-			color:darkblue;
-		}
-		a:hover{
-			color:royalblue;
-		}
-		a:active{
-			color:orangered;
-		}
-	</style>
-</head>
-	
-	
-	
-<body>
-	<h1><a href="https://zhujingqi.com">&ensp;ZJQ</a>&emsp;>&emsp;Main</h1>
-	
-		<h3 style="background-color:white"><body onload=getD1()><div id="datetime"></div></h3><hr>
-		<font color="red">Time↑</font>What are you dping？
-		<a href="https://zhujingqi.com/email">Send emails to me！&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;</a><a href="phone.html">phone edition(Chinese)</a>&emsp;&emsp;</a><a href="https://zhujingqi.com">Chinese中文版</a><hr>
-
-		Hello, I am ZhuJingqi(JackyZhu)！I love to study, like to play, funny and good, is a master of making crafts! I like coding very much, so I made this website.<br><br>
-		<font color="purple"><i>My coding languages: </i></font> C++,HTML,CSS<br><br>
-		<font color="purple"><i>My deveeloping tool: </i></font> Windows10(More in 'ABOUT ME')<br>
-	<hr>
-	<h2 style="background-color:white">Mario's pipe »»» <font color="blue">𝗦<font color="orange">𝘂<font color="red">𝗽<font color="green">𝗲<font color="orange">𝗿<font color="red">𝗠<font color="green">𝗮<font color="orange">𝗿<font color="blue">𝗶<font color="green">𝗼<font color="black"> ¯\_(ツ)_/¯</h2>
-	<h2>
-	<a href="https://zhujingqi.com/a/">ARTICLES</a><br><br>
-	<a href="me.html">ABOUT ME</a><br><br>
-	<a href="email.html">CONNECT ME</a><br><br>
-	<a href="https://note.ms/zhujingqicom">LEAVE MESSAGES</a><br><br>
-	<a href="moments.html">MY MOMENTS</a><br><br>
-	<a href="game.html">GAME TIME</a><br><br>
-	<a href="chatcat.html">CHAT CAT</a><br><br>
-	<a href="bluedeath.html">BLUE DEATH</a><br><br>
-	<a href="money.html">SPONSOR</a><br><br>
-	<a href="thanks.html">THANKS</a><br><br>
-	<a href="v.html">UPDATE TIME</a><br>
-	</h2>
-	<h6>These are like pipes, send you to everywhere!!!</h6>
-	<img src="ad.jpg" id="ad">
-	
-	Want to make friends with me? My email address:97700826@qq.com !
-	
-	<hr>
-	<a href="#">reload</a>
-	<hr>
-	<center style="background-color:gray"><br>freindly：<a href="https://zhujingqi.com/pyy">PangYuyuan's website</a><br>coding:JackyZhu<br>GitHub<br>🅩🅗🅤🅙🅘🅝🅖🅠🅘.🅒🅞🅜<br><br></center>
-</body>
-</html>
+		<body>
+			<div class="bar">
+				<a href="https://zhujingqi.com/" style="background-color: #ffe93e">
+					<b> Zhu Jingqi </b></a>
+							<a href="https://zhujingqi.com/a/"> articles </a>
+								<a href="me.html"> introduction </a>
+										<a href="email.html"> contact </a>
+												<a href="https://note.ms/zhujingqicom"> leave a message </a>
+														<a href="moments.html "> dynamic </a>
+																<a href="activity.html "> activity </a>
+																		<a href="game.html "> game </a>
+																				<a href="chatcat.html "> chat cat </a>
+																						<a href="bluedeath.html "> blue
+																							screen </a>
+																								<a href="html.html">
+																									HTML tutorial </a>
+																										<a
+																											href="tools ">
+																											tools </a>
+																												<a href="money.html ">
+																													sponsorship
+																													</a>
+																														<a
+																															href="thanks.html ">
+																															thank
+																															you
+																															</a>
+																																<a
+																																	href="v.html ">
+																																	update
+																																	</a>
+			</div>
+			<div class="toolsbar">
+				<a href="phone.html "> phone mode </a>
+						<a href="index.html">Chinese</a>
+						<a href="dark.html "> dark mode </a>
+								<a href="simple.html "> minimalist mode </a>
+										<a href="ad.html">! ! ! Look at some advertisements! ! ! </a>
+			</div>
+			<h3 style="background-color:white">
+				<body onload=getD1()>
+					<div id="datetime"></div>
+			</h3>
+			<hr>
+			<font color="red">&emsp; Time = </font> What are you doing now?
+			<a href="https://zhujingqi.com/email"> reply to my email! </a>
+				<hr>
+				<div class="info">
+					<h1>
+						<marquee behavior="alternative" scrollamount="30"> Announcement: My website has been updated
+							again! <br> New features: activities, tools, dark mode
+								and minimalist mode! ! ! </marquee>
+								</h1>
+				</div>
+				<hr>
+				<div class="info">
+					Hello, I'm Zhu Jingqi! I love learning, I like going out to play, I am cheerful and optimistic, I am
+					good at making handicrafts, and I am creative! I like programming best, so I made my own website.
+					<br><br>
+					<font color="purple"><i> The programming languages I study: </i>
+								</font>C++,HTML,CSS (note: HTML and CSS are learning by themselves) <br><br>
+									<font color="purple"><i> My development tool: </i>
+												</font>Windows10 (see my personal introduction for more details) <br>
+				</div>
+				<hr>
+																								<br>
+																								<br>
+																								<br>
+																								<br>
+																								<br>
+																								<br>
+																								<br>
+																								<br>
+																								<br>
+																								<br>
+																								<br>
+																								<br>
+																								<br>
+																								<br>
+																								
+																								If you have any bugs or
+																								suggestions, please give
+																								feedback to
+																								97700826@qq.com. Once
+																								adopted, it will be
+																								included in the
+																								thank-you list!
+																								<br>
+																								<br>
+																								Thanks you, please look
+																								at the advertisement at
+																								last ... <a
+																									href="ad.html">! !
+																									! Look at some
+																									advertisements! ! !</a>
+																									
+				</div>
+				<div class="ad">
+					<h1>
+						<font color="tomato">&emsp; &emsp; &emsp; ADVERTISEMENT&emsp; &emsp; &emsp; </font>
+					</h1>
+					<h1> advertising of mathematics </h1>
+							<h2> Math is my home, <br> Learning depends on everyone!</h2>
+									<h3> Advertised by Liu Zeyu <h3>
+				</div>
+				<hr>
+				&emsp; Interested in me? My mailbox: 97700826@qq.com! See <a href="email.html "> contact information </a> for more details!
+						<hr>
+						<a href="#">&emsp; Back to the top </a>
+								<hr>
+								<center style="background-color:gray">
+									<br>
+									Friendly link: <br>
+										<a href="https://zhujingqi.com/pyy"> Pang Yuyuan's website </a><br>
+												Friendly link: <br>
+													<a href="https://zhujingqi.com/zeyu"> Liu Zeyu website </a><br>
+															Written by Zhu Jingqi <br>
+																Development: GitHub<br>
+																馃厳馃叅馃厵馃厴馃厺馃厲馃厾馃厴.馃厼馃厹<br><br>
+								</center>
+		</body>
+	</html>
