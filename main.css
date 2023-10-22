@@ -1,0 +1,25 @@
+body{
+	margin:0px;
+	background-color:#b7f1d9;
+}
+a{
+	text-decoration:none;    /*超链接去掉下划线*/
+}
+a:link{
+	color:darkblue;
+}
+a:visited{
+	color:darkblue;
+}
+a:hover{
+	color:royalblue;
+}
+a:active{
+	color:orangered;
+}
+.info{
+	padding:10px 10px;
+}
+.information{
+	padding:10px 10px;
+}
