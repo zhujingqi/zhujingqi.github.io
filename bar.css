@@ -1,0 +1,33 @@
+.bar{
+	overflow:hidden;
+	background-color:#69bee5;
+	font-size:20px;
+}
+.bar a{
+	float:left;
+	display:block;
+	color:#000;
+	text-align:center;
+	padding:15px 20px;
+	text-decoration:none;
+}
+.bar a:hover{
+	background-color:#bde5ff;
+	color:black;
+}
+.toolsbar{
+	overflow:hidden;
+	background-color:#69e2e5;
+}
+.toolsbar a{
+	float:left;
+	display:block;
+	color:#000;
+	text-align:center;
+	padding:10px 10px;
+	text-decoration:none;
+}
+.toolsbar a:hover{
+	background-color:#ccffff;
+	color:black;
+}
