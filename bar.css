@@ -31,3 +31,19 @@
 	background-color:#ccffff;
 	color:black;
 }
+.smallbar{
+	overflow:hidden;
+	background-color:#96dabe;
+}
+.smallbar a{
+	float:left;
+	display:block;
+	color:#000;
+	text-align:center;
+	padding:10px 10px;
+	text-decoration:none;
+}
+.smallbar a:hover{
+	background-color:#b7ffe0;
+	color:black;
+}
