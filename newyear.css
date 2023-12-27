@@ -1,0 +1,82 @@
+body{
+	margin:0px;
+	background-color:#d9d919;
+}
+a{
+	text-decoration:none;    /*超链接去掉下划线*/
+}
+a:link{
+	color:darkblue;
+}
+a:visited{
+	color:darkblue;
+}
+a:hover{
+	color:royalblue;
+}
+a:active{
+	color:orangered;
+}
+.info{
+	padding:10px 10px;
+	background-color:#fce918;
+}
+.information{
+	padding:10px 10px;
+	background-color:#fce918;
+}
+hr{
+	border: 5px solid #ffab02;
+	
+}
+.bar{
+	overflow:hidden;
+	background-color:#ff5f37;
+	font-size:20px;
+}
+.bar a{
+	float:left;
+	display:block;
+	color:#000;
+	text-align:center;
+	padding:15px 20px;
+	text-decoration:none;
+}
+.bar a:hover{
+	background-color:#ffbe3a;
+	color:black;
+}
+
+.toolsbar{
+	overflow:hidden;
+	background-color:#e7ce3f;
+}
+.toolsbar a{
+	float:left;
+	display:block;
+	color:#e0e0e0;
+	text-align:center;
+	padding:10px 10px;
+	text-decoration:none;
+}
+.toolsbar a:hover{
+	background-color:#ffe345;
+	color:#e0e0e0;
+}
+
+.smallbar{
+	overflow:hidden;
+	background-color:#96dabe;
+}
+.smallbar a{
+	float:left;
+	display:block;
+	color:#000;
+	text-align:center;
+	padding:10px 10px;
+	text-decoration:none;
+}
+.smallbar a:hover{
+	background-color:#b7ffe0;
+	color:black;
+}
