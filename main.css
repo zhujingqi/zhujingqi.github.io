@@ -23,3 +23,13 @@ a:active{
 .information{
 	padding:10px 10px;
 }
+.text{
+	border-radius:30px;
+	padding:10px 10px;
+	background-color:#defff1;
+	margin:10px;
+	width:500px;
+}
+.text:hover{
+	background-color:#ecfff7;
+}
