@@ -44,6 +44,12 @@
 	</style>
 </head>	
 <body>
+	<script>
+		var a=confirm("为了更好的体验效果，请问你超过18岁了吗？");
+		if(a){
+			window.location.href="https://zhujingqi.com/index_adult.html";
+		}
+	</script>
 	<div class="bar">
 		<a href="https://zhujingqi.com/" style="background-color:#ffe93e"><b>诸璟祺</b></a>
 		<a href="https://zhujingqi.com/a/">文章</a>
@@ -69,22 +75,24 @@
 		<a href="simple.html">极简模式</a>
 		<a href="ad.html">!!!!!𝔸𝔻𝕍𝔼ℝ𝕋𝕀𝕊𝔼𝕄𝔼ℕ𝕋看一些广告!!!!!</a>
 	</div>
-	<span>
-		<h3 style="background-color:white">
-			<body onload=getD1()><div id="datetime"></div>
-		</h3>
-		<font color="red">&emsp;Time↑</font>现在你在干什么呢？
-		<a href="https://zhujingqi.com/email">回复到我的邮箱！</a>
-	</span>
-	<div class="text" style="width:95%;">
-		<h1><marquee behavior="alternate" scrollamount="20">公告：我的网站又更新啦！<br>工具栏添加工具了！(更多更新参见<a href="#new">最近更新</a>)<br></marquee></h1>
+	<div id="main_top">
+		<span>
+			<h3 style="background-color:white">
+				<body onload=getD1()><div id="datetime"></div>
+			</h3>
+			<font color="red">&emsp;Time↑</font>现在你在干什么呢？
+			<a href="https://zhujingqi.com/email">回复到我的邮箱！</a>
+		</span>
+		<div class="text" style="width:95%;">
+			<h1><marquee behavior="alternate" scrollamount="20">公告：我的网站又更新啦！<br>工具栏添加工具了！(更多更新参见<a href="#new">最近更新</a>)<br></marquee></h1>
+		</div>
+		<div class="info">
+			Hello，我是诸璟祺！我热爱学习，喜欢出去玩，性格开朗乐观，最擅长做手工，可有创意了！我最喜欢编程了，为此我自己做了一个专属的网站。<br><br>
+			<i>我学习的编程语言：</i>C++,Python,HTML,CSS,JS(注：HTML、CSS和JS在自学)<br><br>
+			<i>我的开发工具：</i>Windows10(更多详见我的个人介绍!!!<a href="me.html">立即跳转</a>)<br>
+		</div>
 	</div>
-	<div class="info">
-		Hello，我是诸璟祺！我热爱学习，喜欢出去玩，性格开朗乐观，最擅长做手工，可有创意了！我最喜欢编程了，为此我自己做了一个专属的网站。<br><br>
-		<i>我学习的编程语言：</i>C++,Python,HTML,CSS,JS(注：HTML、CSS和JS在自学)<br><br>
-		<i>我的开发工具：</i>Windows10(更多详见我的个人介绍!!!<a href="me.html">立即跳转</a>)<br>
-	</div>
-	<div class="text">
+	<div id="main_left" class="text">
 		<h2>看看每个专题/功能有啥用！\^u^/</h2>
 		快速跳转：
 		<a href="#wenzhang">|文章|</a>
@@ -199,16 +207,44 @@
 			Thanks,最后请你看看广告吧......<a href="ad.html">！！！𝔸𝔻𝕍𝔼ℝ𝕋𝕀𝕊𝔼𝕄𝔼ℕ𝕋看一些广告！！！</a><br><br>
 		</p>
 	</div>
-	<div class="text" style="width:50%;top:800px;left:550px;position:absolute;" id="new">
-		<ul>
-			<h3>最近更新/加入/改进：</h3>
-			<li>3D飞机驾驶模拟器游戏游戏，改进：跳转到40code，加快速度</li>
-			<li>ChatCat，改进：跳转到40code，加快速度</li>
-			<li>工具集，添加了好多新工具，想看看的话点导航栏上的【工具】</li>
-			<marquee scrollamount="10">🚄🚌🚌😀</marquee>
-		</ul>
+	<div id="main_right">
+		<div class="text" style="width:50%;top: 800px;left:550px;position:absolute;" id="new">
+			<ul>	
+				<h3>最近更新/加入/改进：</h3>
+				<li>3D飞机驾驶模拟器游戏游戏，改进：跳转到40code，加快速度</li>
+				<li>ChatCat，改进：跳转到40code，加快速度</li>
+				<li>工具集，添加了好多新工具，想看看的话点导航栏上的【工具】</li>
+				<marquee scrollamount="10">🚄🚌🚌😀</marquee>
+			</ul>
+		</div>
+		<div class="text" style="width:50%;top:1100px;left:550px;position:absolute;" id="ip">
+			<h3>我的网站访问量：</h3>（相同IP算多次访问）从2024/2/1开始<br><br>
+			<img src="https://saobby.pythonanywhere.com/api/webcounter?id=IP28qeMg8he5o0sF">次！
+			<!--    令牌：    A6reJikDucSeUbL4QtV7dmetS0d5iDf4UWEMDfuYq6S4yqnrzKjf8XeiHo3Lt0wg    -->
+			<br>
+			<h3>我的网站访问量：</h3>（相同IP算一次访问）从2024/2/1开始<br><br>
+			<img src="https://saobby.pythonanywhere.com/api/webcounter?id=DHkEgI2oLi12bAaM">次！
+			<!--    令牌：    jfcNYGdGkYQ9cLskHV74oEjOSnaJNLWiJC0BDOBLvaYNxEAkjpDJCootHK5U3cLk    -->
+			<br>
+		</div>
+		<div class="text" style="width:50%;top:1450px;left:550px;position:absolute;" id="zhishi">
+			<h3>奇葩知识</h3>
+			🧀=🦾!!!<br><br>
+			研究明表汉字的序顺并不响影阅读！！！！！<br><br>
+		</div>
+		<div class="text" style="width:50%;top:1700px;left:550px;position:absolute;" id="daohang">
+			<h3>首页的迷你导航栏</h3>
+			点击跳转！这些迷你的链接像马力欧的管道，会帮你定位到首页的锚上面。<br><br>
+			<a href="#main_top">首页顶部区</a>-有时间等等<br><br>
+			<a href="#main_left">首页左边区</a>-每个功能可以干什么<br><br>
+			<a href="#main_right">首页右边区</a>-小知识、访问量、最近更新等<br><br>
+			<a href="#main_bottom">首页底部区</a>-网站信息等<br><br>
+			<a href="#ad">广告</a>-看看吧<br><br>
+			<a href="#">回到顶部</a>-TOP<br><br>
+			<br><br>
+		</div>
 	</div>
-	<div class="ad">
+	<div class="ad" id="ad">
 		<h1><font color="tomato">&emsp;&emsp;&emsp;ADVERTISEMENT&emsp;&emsp;&emsp;</font></h1>
 		<h1>数学的广告</h1>
 		<h2>🔢数学是我家,🔢📕<br>➕➖学习靠大家!-✖➗</h2>
@@ -218,7 +254,7 @@
 		&emsp;对我感兴趣？我的邮箱：97700826@qq.com !更多详见<a href="email.html">联系方式</a>!<hr>
 		<a href="#">&emsp;回到顶部</a><hr>
 	</div>
-	<div style="background-color:gray;text-align:center;" id="footer">
+	<div style="background-color:gray;text-align:center;" id="main_bottom">
 		<br>
 		友情链接：<br><a href="https://zhujingqi.com/pyy">庞宇源的个人主页</a><br>
 		友情链接：<br><a href="https://zhujingqi.com/zeyu">刘泽宇的个人主页</a><br>
