@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>诸璟祺|网站首页</title>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="bar.css">
+		<link rel="stylesheet" href="main.css">
+	<script>
+		function  getD1(){
+			var date=new Date();
+			var d1=date.toLocaleString();
+			document.getElementById("datetime").innerHTML =d1; 
+		}
+		setInterval("getD1();",1000);
+	</script>
+	<style>
+		.ad{
+			position:absolute;
+			top:500px;
+			left:700px;
+			background-color:#ffff00;
+			text-align:center;
+			border-radius:100px 50px 0px 100px;
+		}
+		.ad:hover{
+			background-color:#fff700;
+		}
+		*::selection{
+			background-color:#d4f5f9;
+			color:#5fd179;
+		}
+		i{
+			color:purple;
+		}
+		li{
+			background-color:#86ddc5;
+			border-radius:10px;
+			padding:10px;
+			margin:10px;
+		}
+	</style>
+</head>	
+<body>
+	<div class="bar">
+		<a href="https://zhujingqi.com/" style="background-color:#ffe93e"><b>诸璟祺</b></a>
+		<a href="me.html">介绍</a>
+		<a href="email.html">联系</a>
+		<a href="game.html">游戏</a>
+		<a href="chatcat.html">聊天猫</a>
+		<a href="bluedeath.html">蓝屏</a>
+		<a href="tools">工具</a>
+		<a href="money.html">赞助</a>
+		<a href="v.html">更新</a>
+	</div>
+	<h1>
+	<div id="main_top">
+		<span>
+			<h3 style="background-color:white">
+				<body onload=getD1()><div id="datetime"></div>
+			</h3>
+			<font color="red">&emsp;Time↑</font>现在你在干什么呢？
+		</span>
+		<div class="info">
+			Hello，我是诸璟祺！我热爱学习，喜欢出去玩，性格开朗乐观，最擅长做手工，可有创意了！我最喜欢编程了，为此我自己做了一个专属的网站。<br><br>
+			<i>我学习的编程语言：</i>C++,Python,HTML,CSS,JS(注：HTML、CSS和JS在自学)<br><br>
+			<i>我的开发工具：</i>Windows10(更多详见我的个人介绍!!!<a href="me.html">立即跳转</a>)<br>
+		</div>
+	</div>
+	<div>
+		&emsp;对我感兴趣？我的邮箱：97700826@qq.com !更多详见<a href="email.html">联系方式</a>!<hr>
+		<a href="#">&emsp;回到顶部</a><hr>
+	</div>
+	</h1>
+	<div style="background-color:gray;text-align:center;" id="main_bottom">
+		<br>
+		友情链接：<br><a href="https://zhujingqi.com/pyy">庞宇源的个人主页</a><br>
+		友情链接：<br><a href="https://zhujingqi.com/zeyu">刘泽宇的个人主页</a><br>
+		编写：诸璟祺<br>
+		开发：GitHub<br>
+		🅩🅗🅤🅙🅘🅝🅖🅠🅘.🅒🅞🅜<br><br>
+	</div>
+</body>
+</html>
