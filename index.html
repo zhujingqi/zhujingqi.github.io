@@ -6,28 +6,50 @@
 		<meta name="keywords" content="诸璟祺,诸,Jacky,JackyZhu,jacky,zjq,zhujingqi,小诸,言者">
 		<meta name="description" content="诸璟祺的个人主页，诸璟祺的网站！">
 		<meta name="author" content="诸璟祺(JackyZhu)">
-		<link rel="stylesheet" href="bar.css">
-		<link rel="stylesheet" href="main.css">
+		<link rel="stylesheet" href="https://zhujingqi.com/bar.css">
+		<link rel="stylesheet" href="https://zhujingqi.com/main.css">
 		<link rel="icon" type="image/x-icon" href="zjq.ico">
 	<script>
+		
+		//获取时间
 		function  getD1(){
 			var date=new Date();
 			var d1=date.toLocaleString();
 			document.getElementById("datetime").innerHTML =d1; 
 		}
 		setInterval("getD1();",1000);
+		
+		
+		//判断是否为移动设备
+		function isMobile() {
+		  const userAgentInfo = navigator.userAgent;
+		  const mobileAgents = ['Android', 'iPhone', 'SymbianOS', 'Windows Phone', 'iPad', 'iPod'];
+		  let mobileFlag = false;
+		
+		  for (let i = 0; i < mobileAgents.length; i++) {
+		    if (userAgentInfo.indexOf(mobileAgents[i]) > 0) {
+		      mobileFlag = true;
+		      break;
+		    }
+		  }
+		
+		  return mobileFlag;
+		}
+		
+		if (isMobile()) {
+			alert('当前设备为移动设备,建议用电脑访问!!!');
+		}
 	</script>
 	<style>
 		.ad{
 			position:absolute;
-			top:500px;
-			left:700px;
+			top:450px;
+			right:20px;
 			background-color:#ffff00;
 			text-align:center;
 			border-radius:100px 50px 0px 100px;
-		}
-		.ad:hover{
-			background-color:#fff700;
+			box-shadow: 4px 4px 8px 4px rgba(0,0,0,0.2);
+			z-index: 8;
 		}
 		*::selection{
 			background-color:#d4f5f9;
@@ -42,10 +64,85 @@
 			padding:10px;
 			margin:10px;
 		}
+		
+		.ad-banner {
+		    position: fixed;
+		    top: 100px;
+		    right: 10px;
+		    width: 200px;
+		    padding: 10px;
+		    background-color: #ffc859;
+		    box-shadow: 4px 4px 8px 4px rgba(0,0,0,0.2);
+			border-radius:50px 50px 0px 50px;
+		    text-align: center;
+		    cursor: pointer;
+			z-index: 10;
+			animation: appear 1s ease-in-out;
+		}
+		
+		.close-btn {
+		    font-size: 20px;
+		    color: #000;
+		    cursor: pointer;
+		}
+		
+		@keyframes appear {
+		    0% { opacity: 0; transform: scale(0.5); }
+		    100% { opacity: 1; transform: scale(1); }
+		}
+		
+		.board {
+			width: 700px;
+		}
+		.card {
+		    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+		    transition: 0.3s;
+		    width: 300px;
+		    border-radius: 5px;
+		    background-color: #defff1;
+		    margin: 10px;
+			animation: appear 1s ease-in-out;
+			display: inline-block;
+		}
+		
+		.card:hover {
+		    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+		}
+		
+		.card-content {
+		    padding: 2px 16px;
+		}
+		
+		.card-title {
+		    color: #003aaf;
+		}
+		
+		.card-text {
+		    color: #555;
+		}
+		
+		::-webkit-scrollbar {
+		  display: none; /* 隐藏滚动条 */
+		}
+		
+		.to_a {/*to文章中心*/
+			 top:420px;
+			 left:700px;
+			 position:absolute;
+			 padding:20px;
+			 width: 180px;
+			 box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+			 transition: 0.3s;
+			 border-radius: 5px;
+			 background-color: #defff1;
+			 animation: appear 1s ease-in-out;
+		}
+		.to_a:hover {
+		    box-shadow: 8px 8px 16px 8px rgba(0,0,0,0.2);
+		}
 	</style>
 </head>	
 <body>
-	
 	<div class="bar">
 		<a href="https://zhujingqi.com/" style="background-color:#ffe93e"><b>诸璟祺</b></a>
 		<a href="https://zhujingqi.com/a/">文章</a>
@@ -65,167 +162,275 @@
 	</div>
 	<div class="toolsbar">
 		<a href="phone.html">手机模式</a>
-		<!--<a href="en.html">English</a>-->
-		<a>English(暂未开放)</a>
 		<a href="dark.html">暗黑模式</a>
-		<a href="simple.html">极简模式</a>
 		<a href="ad.html">!!!!!𝔸𝔻𝕍𝔼ℝ𝕋𝕀𝕊𝔼𝕄𝔼ℕ𝕋看一些广告!!!!!</a>
 	</div>
 	<div id="main_top">
 		<span>
 			<h3 style="background-color:white">
-				<body onload=getD1()><div id="datetime"></div>
+				<body onload=getD1()>&emsp;<span id="datetime"></span>
 			</h3>
 			<font color="red">&emsp;Time↑</font>现在你在干什么呢？
 			<a href="https://zhujingqi.com/email">回复到我的邮箱！</a>
 		</span>
 		<div class="text" style="width:95%;">
-			<h1><marquee behavior="alternate" scrollamount="20">公告：网站正在维护中，预<br>计9月底恢复开放，敬<br>请期待！！！😄</marquee></h1>
+			<h1><marquee behavior="alternate" scrollamount="20">公告：网站正在维护中，预计9月底恢复开放，敬请期待！！！😄</marquee></h1>
 		</div>
-
-
-
-<!--
-
-		
+		<div class="ad-banner" id="adBanner">
+		    <h3>你是第一次访问吗？</h3>
+		    <a href="https://zhujingqi.com/a/wiki.html">网站简介/这是什么网站<br>（点击访问）<br></a>
+		    <span class="close-btn" onclick="document.getElementById('adBanner').style.display='none';">&times;</span>
+		</div>
 		<div class="info">
-			Hello，我是诸璟祺！我热爱学习，喜欢出去玩，性格开朗乐观，最擅长做手工，可有创意了！我最喜欢编程了，为此我自己做了一个专属的网站。<br><br>
-			<i>我学习的编程语言：</i>C++,Python,HTML,CSS,JS(注：HTML、CSS和JS在自学)<br><br>
-			<i>我的开发工具：</i>Windows10(更多详见我的个人介绍!!!<a href="me.html">立即跳转</a>)<br>
+			Hello，我是诸璟祺！我热爱学习，喜欢出去玩，性格开朗乐观，擅长做手工，可有创意了！
+			(更多详见我的个人介绍!!!<a href="me.html">立即跳转</a>)<br>
 		</div>
 	</div>
-	<div id="main_left" class="text">
-		<h2>看看每个专题/功能有啥用！\^u^/</h2>
-		快速跳转：
-		<a href="#wenzhang">|文章|</a>
-		<a href="#jieshao">介绍|</a>
-		<a href="#lianxi">联系|</a>
-		<a href="#liuyan">留言|</a>
-		<a href="#dongtai">动态|</a>
-		<a href="#huodong">活动|</a>
-		<a href="#game">游戏|</a>
-		<a href="#liaotianmao">聊天猫|</a>
-		<a href="#lanping">蓝屏|</a>
-		<a href="#htmljiaocheng">HTML教程|</a>
-		<a href="#gongju">工具|</a>
-		<a href="#zanzhu">赞助|</a>
-		<a href="#ganxie">感谢|</a>
-		<a href="#gengxin">更新|</a>
-		<a href="#else">手机模式|</a>
-		<a href="#else">English|</a>
-		<a href="#else">暗黑模式|</a>
-		<a href="#else">极简模式|</a>
-		<p id="wenzhang">
-			<h3>文章|一个看文章的胜地<br></h3>
-			文章中心，你可以随意的看文章！（虽然没有任何文章）站长持续更新！（可能∞年更新一次吧）<br>
-			想看/参与更新计划活动的话，那就<a href="activity.html">点这里</a>！<br>
-			如果你也想写一篇文章，那么通过邮箱发给我或者直接留言吧!!!!!<br>
-			<b>这里也有我的其他作品！！！</b><br>
-		</p>
-		<p id="jieshao">
-			<h3>介绍|快来认识我吧<br></h3>
-			在这里，你可以了解到我的个人信息。我的爱好也在里面！<br>
-			在这里，你也可以看到英文的翻译。<br>
-			还有一些我的照片。（我可是加了水印的，不许盗图啊😄）<br>
-			也许你也想拥有像我一样的花字体？那么看看我的介绍，里面有链接！<br>
-		</p>
-		<p id="lianxi">
-			<h3>联系|和我做朋友&聊天&留言<br></h3>
-			快来联系我吧！我最常用的就是邮箱了。你在“联系”里面可以找到。在这个里面，还有我的电话、英文名等，快去看看吧！<br>
-		</p>
-		<p id="liuyan">
-			<h3>留言|告诉我你的有趣事情<br></h3>
-			快来给我留言吧！我经常会去看留言，可是没有什么人给我留言了。快去留言吧！！！<br>
-			这个留言区还有一个好处，就是你没有邮箱或者觉得用邮箱联系我太麻烦，那么就来用留言功能吧！（记得写名字哦~）<br>
-			你也想搞一个留言板？我用的是note.ms，你可以任意地用！如果不知道怎么用，那么上百度搜吧！！！<br>
-		</p>
-		<p id="dongtai">
-			<h3>动态|我的新鲜事<br></h3>
-			看看我的动态，看看我的新事情，看看我在干什么。<br>
-			目前还在编写测试阶段，如果你想参与的话，请看看【活动】页面，找到“参与动态的编写”，给我留言或者用邮箱告诉我！<br>
-			不需要非常会编程，如果你会HTML+CSS+JS的话，那最好，不会的话也可以提出建议、提供设计方案。<br>
-		</p>
-		<p id="huodong">
-			<h3>活动|参加网站的建设<br></h3>
-			我的网站需要你的支持！最好的支持方法，除了<a href="money.html">赞助</a>，还有参与网站的建设。<br>
-			这里有很多活动，有适合网页建设大师的，也有编程不太行的人也能够参与的。想来参与的话，就来看看【活动】界面吧！<br>
-		</p>
-		<p id="game">
-			<h3>游戏|闲暇时刻玩一玩<br></h3>
-			这里有一个非常好玩的小游戏，跳转到40code编程社区<br>
-			站长正在努力开发，争取写出更好玩的游戏！支持一下吧，点【赞助】功能！<br>
-			你依然可以给一些灵感关于写游戏。<br>
-		</p>
-		<p id="liaotianmao">
-			<h3>聊天猫|ChatCat-Scratch<br></h3>
-			聊天猫，最好的人工“智能”！（可能有时是人工智障）哈哈哈哈哈哈哈哈哈哈哈哈<br>
-			挺“智能”的，没事可以玩玩，和它说说话。它可以打招呼，问问题等。<br>
-			它还可以放音乐！试着跟它说："我要听个音乐"吧！<br>
-			如果你真的非常想看看源代码的话，问我要吧！！！<br>
-		</p>
-		<p id="lanping">
-			<h3>蓝屏|搞笑的可以骗人的蓝屏<br></h3>
-			来用这个功能坑人吧！！！哈哈哈，灵感来自<a href="https://geekprank.com/">GeekPrank</a>，挺好玩的。<br>
-			你肯定好奇，我是怎么编出来的。其实很简单，就是一个背景！哈哈哈哈哈哈哈哈哈哈哈哈哈，被我骗了吧。<br>
-			坑人的方法，打开网页（用电脑）然后F11或fn+F11全屏，就可以坑人了。如果你想看看我网页的代码，右击然后点查看网页源代码！<br>
-		</p>
-		<p id="htmljiaocheng">
-			<h3>HTML教程|来学习HTML<br></h3>
-			免费功能🆓，现在正在编写，预计2024年9月出来。如果你要参与编写，欢迎看【活动】页面。<br>
-		</p>
-		<p id="gongju">
-			<h3>工具|各种有趣的功能<br></h3>
-			有今天吃什么、网盘🆕🆒、猪猪浏览器，还有更多功能！想用一用，那么就看【工具】专栏吧！<br>
-			你也可以写一些代码，发给我，一经采用就会发在我的网站上！！！<br>
-			更多详见【工具】【活动】<br>
-		</p>
-		<p id="zanzhu">
-			<h3>赞助|请我吃鸡腿、喝饮料<br></h3>
-			快来赞助我吧！一旦赞助，就会列入感谢名单哦！更多详见【赞助】，你可以给我0.01！<br>
-			谢谢啦，谢谢啦，就给我一点￥吧！<br>
-			如果你喜欢这个网站，也不要忘了告诉我你的好评，给我加个鸡腿吧<br>
-		</p>
-		<p id="ganxie">
-			<h3>感谢|去看看就知道了<br></h3>
-			<a href="thanks.html">看看</a><br>
-		</p>
-		<p id="gengxin">
-			<h3>更新|去看看就知道了<br></h3>
-			<a href="v.html">看看</a><br>
-		</p>
-		<p id="else">
-			<h3>各种模式|好多功能<br></h3>
-			手机模式：适合手机的版本<br>
-			English：English mode, for people around the world!<br>
-			暗黑模式：适合黑夜偷偷看的模式<br>
-			极简模式：内容少，适合老年人<br>
-		</p>
-		<p>
-			<br>
-			<br>
-			有什么BUG或建议，欢迎反馈到97700826@qq.com，一经采纳会列入感谢名单！
-			<br>
-			<br>
-			Thanks,最后请你看看广告吧......<a href="ad.html">！！！𝔸𝔻𝕍𝔼ℝ𝕋𝕀𝕊𝔼𝕄𝔼ℕ𝕋看一些广告！！！</a><br><br>
-		</p>
+<div class="board">
+
+
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
 	</div>
-
--->
-
-
-
-		
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	</a>
+	<a href="a/index.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">更多内容</h2>
+	        <p class="card-text">点击查看。👉</p>
+	    </div>
+	</div>
+	</a>
+</div>
+	<div class="to_a">
+		<h1><a href="a/index.html">👉···<br><br>点击前往>><br>文章中心>><br><br>GO GO GO<br></a></h1>
+	</div>
 	<div id="main_right">
-		<div class="text" style="width:50%;top: 800px;left:550px;position:absolute;" id="new">
+		<div class="text" style="top:800px;left:700px;position:absolute;" id="new">
 			<ul>	
 				<h3>最近更新/加入/改进：</h3>
-				<li>3D飞机驾驶模拟器游戏游戏，改进：跳转到40code，加快速度</li>
+				<li>网站首页整改</li>
 				<li>ChatCat，改进：跳转到40code，加快速度</li>
 				<li>工具集，添加了好多新工具，想看看的话点导航栏上的【工具】</li>
 				<marquee scrollamount="10">🚄🚌🚌😀</marquee>
 			</ul>
 		</div>
-		<div class="text" style="width:50%;top:1100px;left:550px;position:absolute;" id="ip">
+		<div class="text" style="top:1150px;left:700px;position:absolute;" id="ip">
 			<h3>我的网站访问量：</h3>（相同IP算多次访问）从2024/2/1开始<br><br>
 			<img src="https://saobby.pythonanywhere.com/api/webcounter?id=IP28qeMg8he5o0sF">次！
 			<!--    令牌：    A6reJikDucSeUbL4QtV7dmetS0d5iDf4UWEMDfuYq6S4yqnrzKjf8XeiHo3Lt0wg    -->
@@ -235,12 +440,14 @@
 			<!--    令牌：    jfcNYGdGkYQ9cLskHV74oEjOSnaJNLWiJC0BDOBLvaYNxEAkjpDJCootHK5U3cLk    -->
 			<br>
 		</div>
-		<div class="text" style="width:50%;top:1450px;left:550px;position:absolute;" id="zhishi">
+		<div class="text" style="top:1450px;left:700px;position:absolute;" id="zhishi">
 			<h3>奇葩知识</h3>
-			🧀=🦾!!!<br><br>
-			研究明表汉字的序顺并不响影阅读！！！！！<br><br>
+			🧀=🦾!!! Cheese=Power!!!<br><br>
+			研究明表汉字的序顺并不响影阅读！！！！！<br>
+			<h3>搞笑时刻</h3>
+			螃蟹碰到了海星。海星：你瞎（虾）啊！螃蟹：不我是螃蟹。
 		</div>
-		<div class="text" style="width:50%;top:1700px;left:550px;position:absolute;" id="daohang">
+		<div class="text" style="top:1700px;left:700px;position:absolute;" id="daohang">
 			<h3>首页的迷你导航栏</h3>
 			点击跳转！这些迷你的链接像马力欧的管道，会帮你定位到首页的锚上面。<br><br>
 			<a href="#main_top">首页顶部区</a>-有时间等等<br><br>
@@ -253,10 +460,9 @@
 		</div>
 	</div>
 	<div class="ad" id="ad">
-		<h1><font color="tomato">&emsp;&emsp;&emsp;ADVERTISEMENT&emsp;&emsp;&emsp;</font></h1>
-		<h1>数学的广告</h1>
-		<h2>🔢数学是我家,🔢📕<br>➕➖学习靠大家!-✖➗</h2>
-		<h3>刘泽宇的广告<h3>
+		<h1><font color="tomato">&emsp;&emsp;&emsp;&emsp;广告&emsp;&emsp;&emsp;&emsp;</font></h1>
+		<h1>广告位招租</h1>
+		<h2>内容：暂无<br>作者：Jacky<br>请联系邮箱获得广告位</h2>
 	</div>
 	<div>
 		&emsp;对我感兴趣？我的邮箱：97700826@qq.com !更多详见<a href="email.html">联系方式</a>!<hr>
