@@ -1,0 +1,47 @@
+.back-btn {
+	top:76px;
+	left:20px;
+  display: inline-block;
+  position:absolute;
+  padding: 0px 10px;
+  font-size: 30px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  outline: none;
+  color: #fff;
+  background-color: #4CAF50;
+  border: none;
+  border-radius: 5px;
+  box-shadow: 0 5px 5px 0 #999;
+  transition: all 0.3s;
+}
+
+.back-btn:hover {background-color: #56c65a}
+
+.back-btn:active {
+  background-color: #3e8e41;
+  box-shadow: 0 5px #666;
+  transform: translateY(4px);
+}
+.head {
+	text-align:center;
+	color: #000066;
+	font-size: 30px;
+	font-weight: bold;
+}
+.body {
+	margin:20px;
+}
+img {
+	margin:10px;
+  width: 80%; /* 图像宽度为容器宽度的100% */
+  height: auto; /* 图像高度自动调整 */
+  border: 5px solid #ffff7f;
+}
+.s-img { /*small-image*/
+	margin:10px;
+	width: 30%; /* 图像宽度为容器宽度的100% */
+	height: auto; /* 图像高度自动调整 */
+	border: 5px solid #ffff7f;
+}
