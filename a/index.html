@@ -1,39 +1,354 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>诸璟祺|文章中心&作品集</title>
-	<link rel="stylesheet" href="https://zhujingqi.com/bar.css">
-	<link rel="stylesheet" href="https://zhujingqi.com/main.css">
-</head>
+	<title>诸璟祺|文章中心</title>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" href="https://zhujingqi.com/bar.css">
+		<link rel="stylesheet" href="https://zhujingqi.com/main.css">
+	<script>
+		//判断是否为移动设备
+		function isMobile() {
+		  const userAgentInfo = navigator.userAgent;
+		  const mobileAgents = ['Android', 'iPhone', 'SymbianOS', 'Windows Phone', 'iPad', 'iPod'];
+		  let mobileFlag = false;
+		
+		  for (let i = 0; i < mobileAgents.length; i++) {
+		    if (userAgentInfo.indexOf(mobileAgents[i]) > 0) {
+		      mobileFlag = true;
+		      break;
+		    }
+		  }
+		
+		  return mobileFlag;
+		}
+		
+		if (isMobile()) {
+			alert('当前设备为移动设备,建议用电脑访问!!!');
+		}
+	</script>
+	<style>
+		*::selection{
+			background-color:#d4f5f9;
+			color:#5fd179;
+		}
+		.ad-banner {
+		    position: fixed;
+		    top: 100px;
+		    right: 10px;
+		    width: 200px;
+		    padding: 10px;
+		    background-color: #ffc859;
+		    box-shadow: 4px 4px 8px 4px rgba(0,0,0,0.2);
+			border-radius:50px 50px 0px 50px;
+		    text-align: center;
+		    cursor: pointer;
+			z-index: 10;
+			animation: appear 1s ease-in-out;
+		}
+		
+		.close-btn {
+		    font-size: 20px;
+		    color: #000;
+		    cursor: pointer;
+		}
+		
+		@keyframes appear {
+		    0% { opacity: 0; transform: scale(0.5); }
+		    100% { opacity: 1; transform: scale(1); }
+		}
+		
+		.board {
+			width: 90%;
+		}
+		.card {
+		    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+		    transition: 0.3s;
+		    width: 300px;
+		    border-radius: 5px;
+		    background-color: #defff1;
+		    margin: 10px;
+			animation: appear 1s ease-in-out;
+			display: inline-block;
+		}
+		
+		.card:hover {
+		    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+		}
+		
+		.card-content {
+		    padding: 2px 16px;
+		}
+		
+		.card-title {
+		    color: #003aaf;
+		}
+		
+		.card-text {
+		    color: #555;
+		}
+	</style>
+</head>	
 <body>
 	<div class="bar">
-			<a href="https://zhujingqi.com/" style="background-color:#ffe93e"><b>诸璟祺</b></a>
-			<a href="https://zhujingqi.com/a/">文章</a>
-			<a href="/me.html">介绍</a>
-			<a href="/email.html">联系</a>
-			<a href="/https://note.ms/zhujingqicom">留言</a>
-			<a href="/moments.html">动态</a>
-			<a href="/activity.html">活动</a>
-			<a href="/game.html">游戏</a>
-			<a href="/chatcat.html">聊天猫</a>
-			<a href="/bluedeath.html">蓝屏</a>
-			<a href="/html.html">HTML教程</a>
-			<a href="/tools">工具</a>
-			<a href="/money.html">赞助</a>
-			<a href="/thanks.html">感谢</a>
-			<a href="/v.html">更新</a>
+		<a href="https://zhujingqi.com/" style="background-color:#ffe93e"><b>诸璟祺</b></a>
+		<a href="https://zhujingqi.com/a/">文章</a>
+		<a href="me.html">介绍</a>
+		<a href="email.html">联系</a>
+		<a href="https://note.ms/zhujingqicom">留言</a>
+		<a href="moments.html">动态</a>
+		<a href="activity.html">活动</a>
+		<a href="game.html">游戏</a>
+		<a href="chatcat.html">聊天猫</a>
+		<a href="bluedeath.html">蓝屏</a>
+		<a href="html.html">HTML教程</a>
+		<a href="tools">工具</a>
+		<a href="money.html">赞助</a>
+		<a href="thanks.html">感谢</a>
+		<a href="v.html">更新</a>
 	</div>
-	<div class="info">
-		<h1>欢迎来到文章中心</h1>
-		<div class="text" style="width:95%;">
-			<h2>文章列表</h2>
-				<a href="#">文章中心暂未开放😑</a>|创建时间：🙂/🤓/🙃<br><br>
-		</div>
-		<h1>作品集</h1>
-		<div class="text" style="width:95%;">
-			<h2>作品列表</h2>
-			<a href="https://github.com/zhujingqi/zhujingqi.github.io/">诸璟祺的网站_源代码</a>|创建时间：2020/?/?<br>HTML+CSS,包括媒体文件<br>
-		</div>
+	<div class="ad-banner" id="adBanner">
+		    <h3>你是第一次访问吗？</h3>
+		    <a href="https://zhujingqi.com/a/wiki.html">网站简介/这是什么网站<br>（点击访问）<br></a>
+		    <span class="close-btn" onclick="document.getElementById('adBanner').style.display='none';">&times;</span>
+	</div>
+<div class="board">
+
+
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	<a href="a/2024.8.19.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">【测试】测试发布内容</h2>
+	        <p class="card-text">网站开始发布文章。</p>
+	    </div>
+	</div>
+	</a>
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	</a>
+	<a href="a/index.html">
+	<div class="card">
+	    <div class="card-content">
+	        <h2 class="card-title">更多内容</h2>
+	        <p class="card-text">点击查看。👉</p>
+	    </div>
+	</div>
+	</a>
+</div>
+	<div style="background-color:gray;text-align:center;" id="main_bottom">
+		<br>
+		友情链接：<br><a href="https://zhujingqi.com/pyy">庞宇源的个人主页</a><br>
+		友情链接：<br><a href="https://zhujingqi.com/zeyu">刘泽宇的个人主页</a><br>
+		编写：诸璟祺<br>
+		开发：GitHub<br>
+		🅩🅗🅤🅙🅘🅝🅖🅠🅘.🅒🅞🅜<br><br>
 	</div>
 </body>
 </html>
