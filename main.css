@@ -13,9 +13,11 @@ a:visited{
 }
 a:hover{
 	color:royalblue;
+	text-decoration:underline;
 }
 a:active{
 	color:orangered;
+	text-decoration:underline wavy;
 }
 .info{
 	padding:10px 10px;
