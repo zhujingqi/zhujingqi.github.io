@@ -1,3 +1,0 @@
-* Happy watching!
-
-TV FUN
