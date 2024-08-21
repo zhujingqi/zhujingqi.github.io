@@ -7,8 +7,9 @@
 		<meta name="keywords" content="诸璟祺,诸,Jacky,JackyZhu,jacky,zjq,zhujingqi,小诸,言者,诸,jacky,zhu,璟,祺,个人网站,网站, ,">
 		<meta name="description" content="诸璟祺的个人主页，诸璟祺的网站！">
 		<meta name="author" content="诸璟祺(JackyZhu)">
-		<link rel="stylesheet" href="https://zhujingqi.com/bar.css">
-		<link rel="stylesheet" href="https://zhujingqi.com/main.css">
+		<link id="barcss" rel="stylesheet" href="bar.css">
+		<link id="maincss" rel="stylesheet" href="main.css">
+		<link id="darkcss" rel="stylesheet" href="dark.css" disabled>
 		<link rel="icon" type="image/x-icon" href="zjq.ico">
 	<script>
 		//获取时间
@@ -35,114 +36,33 @@
 		if (isMobile()) {
 			alert('当前设备为移动设备,建议用电脑访问!!!');
 		}
+		
+		//dark-mode
+		document.addEventListener('DOMContentLoaded', function() {
+		  var switchButton = document.getElementById('switch-style');
+		  var a= document.getElementById('maincss');
+		  var b= document.getElementById('barcss');
+		  var dark = document.getElementById('darkcss');
+		
+		  switchButton.addEventListener('click', function() {
+		    if (a.disabled) {
+		      // 如果默认样式表已禁用，则启用它并禁用备选样式表
+		      a.disabled = false;
+			  b.disabled = false;
+		      dark.disabled = true;
+		    } else {
+		      // 如果默认样式表未禁用，则禁用它并启用备选样式表
+		      a.disabled = true;
+			  b.disabled = true;
+		      dark.disabled = false;
+		    }
+		  });
+		});
 	</script>
-	<style>
-		.ad{
-			position:absolute;
-			top:450px;
-			right:20px;
-			background-color:#ffff00;
-			text-align:center;
-			border-radius:100px 50px 0px 100px;
-			box-shadow: 4px 4px 8px 4px rgba(0,0,0,0.2);
-			z-index: 8;
-		}
-		*::selection{
-			background-color:#d4f5f9;
-			color:#5fd179;
-		}
-		i{
-			color:purple;
-		}
-		li{
-			background-color:#86ddc5;
-			border-radius:10px;
-			padding:10px;
-			margin:10px;
-		}
-		
-		.ad-banner {
-		    position: fixed;
-		    top: 100px;
-		    right: 10px;
-		    width: 200px;
-		    padding: 10px;
-		    background-color: #ffc859;
-		    box-shadow: 4px 4px 8px 4px rgba(0,0,0,0.2);
-			border-radius:50px 50px 0px 50px;
-		    text-align: center;
-		    cursor: pointer;
-			z-index: 10;
-			animation: appear 1s ease-in-out;
-		}
-		
-		.close-btn {
-		    font-size: 20px;
-		    color: #000;
-		    cursor: pointer;
-		}
-		
-		@keyframes appear {
-		    0% { opacity: 0; transform: scale(0.5); }
-		    100% { opacity: 1; transform: scale(1); }
-		}
-		
-		.board {
-			margin:10px;
-			width: 700px;
-			height: 1835px;
-		}
-		.card {
-		    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-		    transition: 0.3s;
-		    width: 300px;
-		    border-radius: 5px;
-		    background-color: #defff1;
-		    margin: 10px;
-			animation: appear 1s ease-in-out;
-			display: inline-block;
-		}
-		
-		.card:hover {
-		    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-		}
-		
-		.card-content {
-		    padding: 2px 16px;
-		}
-		
-		.card-title {
-		    color: #003aaf;
-		}
-		
-		.card-text {
-		    color: #555;
-		}
-		
-		::-webkit-scrollbar {
-		  display: none; /* 隐藏滚动条 */
-		}
-		
-		.to_a {/*to文章中心*/
-			 top:420px;
-			 left:700px;
-			 position:absolute;
-			 padding:20px;
-			 width: 180px;
-			 box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-			 transition: 0.3s;
-			 border-radius: 5px;
-			 background-color: #defff1;
-			 animation: appear 1s ease-in-out;
-		}
-		.to_a:hover {
-		    box-shadow: 8px 8px 16px 8px rgba(0,0,0,0.2);
-		}
-	</style>
 </head>	
 <body>
 	<div class="bar">
-		<a href="https://zhujingqi.com/" style="background-color:#ffe93e"><b>诸璟祺</b></a>
+		<a href="https://zhujingqi.com/" class="zjq"><b>诸璟祺</b></a>
 		<a href="https://zhujingqi.com/a/">文章</a>
 		<a href="me.html">介绍</a>
 		<a href="email.html">联系</a>
@@ -160,12 +80,12 @@
 	</div>
 	<div class="toolsbar">
 		<a href="phone.html">手机模式</a>
-		<a href="dark.html">暗黑模式</a>
+		<a id="switch-style">暗黑模式</a>
 		<a href="ad.html">!!!!!𝔸𝔻𝕍𝔼ℝ𝕋𝕀𝕊𝔼𝕄𝔼ℕ𝕋看一些广告!!!!!</a>
 	</div>
 	<div id="main_top">
 		<span>
-			<h3 style="background-color:white">
+			<h3 class="time">
 				<body onload=getD1()>&emsp;<span id="datetime"></span>
 			</h3>
 			<font color="red">&emsp;Time↑</font>现在你在干什么呢？
