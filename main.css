@@ -136,3 +136,6 @@ body div div ul li{
 		.to_a:hover {
 		    box-shadow: 8px 8px 16px 8px rgba(0,0,0,0.2);
 		}
+.time{
+	background-color:white;
+}
