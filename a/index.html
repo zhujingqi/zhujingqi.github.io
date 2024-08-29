@@ -119,13 +119,14 @@
 	<div id="display">这里将显示源网页的内容。</div>
 	
 	    <script>
-	        async function fetchContent() {
+async function fetchContent() {
     try {
-        const response = await fetch('https://zhujingqi.com/index.html');
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const text = await response.text();
+        const response = await fetch('https://zhujingqi.com/index.html', { mode: 'no-cors' });
+        // 注意：由于模式为no-cors，我们不能使用response.ok或response.text()
+        // 我们需要使用其他方式来处理响应，例如使用ArrayBuffer或Blob
+        const buffer = await response.arrayBuffer();
+        const textDecoder = new TextDecoder();
+        const text = textDecoder.decode(buffer);
         
         // 解析获取到的HTML文档
         const parser = new DOMParser();
