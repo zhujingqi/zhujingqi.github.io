@@ -120,29 +120,29 @@
 	
 	    <script>
 	        async function fetchContent() {
-	            try {
-	                const response = await fetch('https://zhujingqi.com/index.html');
-	                if (!response.ok) {
-	                    throw new Error('Network response was not ok');
-	                }
-	                const text = await response.text();
-	                
-	                // 解析获取到的HTML文档
-	                const parser = new DOMParser();
-	                const doc = parser.parseFromString(text, 'text/html');
-	                
-	                // 获取源网页中的指定元素内容
-	                const sourceContent = doc.querySelector('#board').textContent;
-	                
-	                // 更新目标网页的指定元素内容
-	                document.querySelector('#display').textContent = sourceContent;
-	            } catch (error) {
-	                console.error('There has been a problem with your fetch operation:', error);
-	                
-	            }
-	        }
-	        
-	        fetchContent();
+    try {
+        const response = await fetch('https://zhujingqi.com/index.html');
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const text = await response.text();
+        
+        // 解析获取到的HTML文档
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(text, 'text/html');
+        
+        // 获取源网页中的指定元素内容，包括所有子元素的HTML结构
+        const sourceContent = doc.querySelector('#board').innerHTML;
+        
+        // 更新目标网页的指定元素内容
+        document.querySelector('#display').innerHTML = sourceContent;
+    } catch (error) {
+        console.error('There has been a problem with your fetch operation:', error);
+        // 可以在这里添加额外的错误处理逻辑
+    }
+}
+
+fetchContent();
 	    </script>
 </div>
 	<div style="background-color:gray;text-align:center;" id="main_bottom">
