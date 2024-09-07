@@ -1,12 +1,120 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title>诸璟祺|动态</title>
-	<link rel="stylesheet" href="bar.css">
-	<link rel="stylesheet" href="main.css">
-</head>
-<body>
-	<div class="bar">
+	<head>
+		<title>诸璟祺|动态</title>
+		<link rel="stylesheet" href="https://zhujingqi.com/bar.css">
+		<link rel="stylesheet" href="https://zhujingqi.com/main.css">
+		<style>
+			@keyframes slidefromleft {
+				from {
+					left: -200px;
+					opacity: 0;
+				}
+
+				to {
+					left: 0;
+					opacity: 1;
+				}
+			}
+
+			@keyframes slidefromright {
+				from {
+					transform: translateX(50%);
+					opacity: 0;
+				}
+
+				to {
+					transform: translateX(0);
+					opacity: 1;
+				}
+			}
+
+			@keyframes slidefrombottom {
+				from {
+					transform: translateY(100%);
+					opacity: 0;
+				}
+
+				to {
+					transform: translateY(0);
+					opacity: 1;
+				}
+			}
+
+			.dongtai {
+				position: absolute;
+				animation: slidefromleft 1s ease-in-out;
+				top: 150px;
+				margin: 40px;
+				padding: 30px;
+				width: 500px;
+				height: 200px;
+				background-color: rgba(60, 182, 79, 0.5);
+				border-radius: 20px;
+				transition: background-color 0.5s ease;
+			}
+
+			.dongtai:hover {
+				background-color: rgba(60, 182, 79, 0.3);
+				border-radius: 20px;
+				transition: background-color 0.5s ease;
+			}
+
+			.go {
+				position: absolute;
+				animation: slidefromright 1s ease-in-out;
+				top: 150px;
+				left: 600px;
+				margin: 40px;
+				padding: 30px;
+				width: 500px;
+				height: 200px;
+				background-color: rgba(76, 205, 211, 0.5);
+				background-size: cover;
+				border-radius: 20px;
+				transition: background-color 0.5s ease;
+				font-size: 20px;
+			}
+
+			.go:hover {
+				background-color: rgba(76, 205, 211, 0.3);
+				transition: background-color 0.5s ease;
+			}
+
+			.arrow {
+				position: absolute;
+				top: 200px;
+				left: 1200px;
+				width: 0;
+				height: 0;
+				border-style: solid;
+				border-width: 120px 0 120px 50px;
+				border-color: transparent transparent transparent rgba(76, 205, 211, 0.5);
+			}
+
+			.news {
+				position: absolute;
+				animation: slidefrombottom 1s ease-in-out;
+				top: 450px;
+				margin: 40px;
+				padding: 30px;
+				width: 90%;
+				height: 200px;
+				background-color: rgba(255, 255, 0, 0.3);
+				background-size: cover;
+				border-radius: 20px;
+				transition: background-color 0.5s ease;
+				font-size: 20px;
+			}
+
+			.news:hover {
+				background-color: rgba(255, 255, 0, 0.4);
+				transition: background-color 0.5s ease;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="bar">
 			<a href="https://zhujingqi.com/" style="background-color:#ffe93e"><b>诸璟祺</b></a>
 			<a href="https://zhujingqi.com/a/">文章</a>
 			<a href="me.html">介绍</a>
@@ -22,23 +130,35 @@
 			<a href="money.html">赞助</a>
 			<a href="thanks.html">感谢</a>
 			<a href="v.html">更新</a>
-	</div>
-	<div class="info">
-		<h1>
-			动态已与文章合并！<br>
-			<a href="a/index.html">点击前往文章中心！</a>
-		</h1>
-	</div>
-	<hr>
-	<a href="#">&emsp;回到顶部</a>
-	<hr>
-	<center style="background-color:gray">
-		<br>
-		友情链接：<br><a href="https://zhujingqi.com/pyy">庞宇源的网站</a><br>
-		友情链接：<br><a href="https://zhujingqi.com/zeyu">刘泽宇的网站</a><br>
-		编写：诸璟祺<br>
-		开发：GitHub<br>
-		🅩🅗🅤🅙🅘🅝🅖🅠🅘.🅒🅞🅜<br><br>
-	</center>
-</body>
+		</div>
+		<div class="dongtai">
+			<br>
+			思维的涟漪，<br><br>
+			&emsp;&emsp;在知识的海洋中泛起诗意的波光。<br><br>
+			漫步文字间，<br><br>
+			&emsp;&emsp;探寻生活的诗与远方。<br><br>
+		</div>
+		<a href="https://zhujingqi.com/a/index.html">
+			<div class="go">
+				<br>
+				点击此处，<br><br>
+				&emsp;&emsp;步入文字的殿堂，共赏篇章之美。<br><br>
+				&emsp;（跳转到文章中心）<br><br>
+			</div>
+		</a>
+		<a href="./index.html">
+			<div class="news">
+				<br><br>
+				【新闻】我的网站更新了<br><br>
+				&emsp;&emsp;&emsp;&emsp;跳转到首页以了解信息 & 继续访问！<br>
+			</div>
+		</a>
+		<div class="arrow"></div>
+		<center style="background-color:gray;position:absolute;bottom:0%;width:100%;">
+			<br>
+			编写：诸璟祺<br>
+			开发：GitHub<br>
+			🅩🅗🅤🅙🅘🅝🅖🅠🅘.🅒🅞🅜<br><br>
+		</center>
+	</body>
 </html>
