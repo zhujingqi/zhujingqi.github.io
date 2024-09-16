@@ -1,156 +1,118 @@
-
 <!DOCTYPE html>
 <html>
-<head>
-	<title>诸璟祺|文章中心</title>
+	<head>
+		<title>诸璟祺|文章中心</title>
 		<meta charset="UTF-8">
-		<link rel="stylesheet" href="https://zhujingqi.com/bar.css">
-		<link rel="stylesheet" href="https://zhujingqi.com/main.css">
-	<script>
-		//判断是否为移动设备
-		function isMobile() {
-		  const userAgentInfo = navigator.userAgent;
-		  const mobileAgents = ['Android', 'iPhone', 'SymbianOS', 'Windows Phone', 'iPad', 'iPod'];
-		  let mobileFlag = false;
-		
-		  for (let i = 0; i < mobileAgents.length; i++) {
-		    if (userAgentInfo.indexOf(mobileAgents[i]) > 0) {
-		      mobileFlag = true;
-		      break;
-		    }
-		  }
-		
-		  return mobileFlag;
-		}
-		
-		if (isMobile()) {
-			alert('当前设备为移动设备,建议用电脑访问!!!');
-		}
-	</script>
-	<style>
-		*::selection{
-			background-color:#d4f5f9;
-			color:#5fd179;
-		}
-		.ad-banner {
-		    position: fixed;
-		    top: 100px;
-		    right: 10px;
-		    width: 200px;
-		    padding: 10px;
-		    background-color: #ffc859;
-		    box-shadow: 4px 4px 8px 4px rgba(0,0,0,0.2);
-			border-radius:50px 50px 0px 50px;
-		    text-align: center;
-		    cursor: pointer;
-			z-index: 10;
-			animation: appear 1s ease-in-out;
-		}
-		
-		.close-btn {
-		    font-size: 20px;
-		    color: #000;
-		    cursor: pointer;
-		}
-		
-		@keyframes appear {
-		    0% { opacity: 0; transform: scale(0.5); }
-		    100% { opacity: 1; transform: scale(1); }
-		}
-		
-		.board {
-			width: 90%;
-		}
-		.card {
-		    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
-		    transition: 0.3s;
-		    width: 300px;
-		    border-radius: 5px;
-		    background-color: #defff1;
-		    margin: 10px;
-			animation: appear 1s ease-in-out;
-			display: inline-block;
-		}
-		
-		.card:hover {
-		    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
-		}
-		
-		.card-content {
-		    padding: 2px 16px;
-		}
-		
-		.card-title {
-		    color: #003aaf;
-		}
-		
-		.card-text {
-		    color: #555;
-		}
-	</style>
-</head>	
-<body>
-	<div class="bar">
-		<a href="https://zhujingqi.com/" style="background-color:#ffe93e"><b>诸璟祺</b></a>
-		<a href="https://zhujingqi.com/a/">文章</a>
-		<a href="https://zhujingqi.com/me.html">介绍</a>
-		<a href="https://zhujingqi.com/email.html">联系</a>
-		<a href="https://note.ms/zhujingqicom">留言</a>
-		<a href="https://zhujingqi.com/moments.html">动态</a>
-		<a href="https://zhujingqi.com/activity.html">活动</a>
-		<a href="https://zhujingqi.com/game.html">游戏</a>
-		<a href="https://zhujingqi.com/chatcat.html">聊天猫</a>
-		<a href="https://zhujingqi.com/bluedeath.html">蓝屏</a>
-		<a href="https://zhujingqi.com/html.html">HTML教程</a>
-		<a href="https://zhujingqi.com/tools">工具</a>
-		<a href="https://zhujingqi.com/money.html">赞助</a>
-		<a href="https://zhujingqi.com/thanks.html">感谢</a>
-		<a href="https://zhujingqi.com/v.html">更新</a>
-	</div>
-	<div class="ad-banner" id="adBanner">
-		    <h3>你是第一次访问吗？</h3>
-		    <a href="https://zhujingqi.com/a/wiki.html">网站简介/这是什么网站<br>（点击访问）<br></a>
-		    <span class="close-btn" onclick="document.getElementById('adBanner').style.display='none';">&times;</span>
-	</div>
-<div class="board">
-	<h1>&emsp;欢迎来到文章中心！</h1>
-	<h4>&emsp;由于学业繁杂，文章中心的列表可能不与首页同步，请以首页为准。</h4>
+		<link rel="stylesheet" href="./bar.css">
+		<link rel="stylesheet" href="./main.css">
+		<style>
+			.cover-right {
+				width: 500px;
+				height: 95%;
+				position: absolute;
+				top: 100px;
+				left: 655px;
+				z-index: 9;
+				background-color: #b7f1d9;
+			}
 
-	<div id="display">这里将显示源网页的内容。</div>
-	
-	    <script>
-async function fetchContent() {
-    try {
-        const response = await fetch('https://zhujingqi.com/index.html', { mode: 'no-cors' });
-        // 注意：由于模式为no-cors，我们不能使用response.ok或response.text()
-        // 我们需要使用其他方式来处理响应，例如使用ArrayBuffer或Blob
-        const buffer = await response.arrayBuffer();
-        const textDecoder = new TextDecoder();
-        const text = textDecoder.decode(buffer);
-        
-        // 解析获取到的HTML文档
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(text, 'text/html');
-        
-        // 获取源网页中的指定元素内容，包括所有子元素的HTML结构
-        const sourceContent = doc.querySelector('#board').innerHTML;
-        
-        // 更新目标网页的指定元素内容
-        document.querySelector('#display').innerHTML = sourceContent;
-    } catch (error) {
-        console.error('There has been a problem with your fetch operation:', error);
-        // 可以在这里添加额外的错误处理逻辑
-    }
-}
+			.cover-top {
+				width: 100%;
+				height: 415px;
+				position: absolute;
+				top: 100px;
+				left: 0px;
+				z-index: 9;
+				background-color: #b7f1d9;
+				border-bottom: 3px solid #36cb2e;
+			}
 
-fetchContent();
-	    </script>
-</div>
-	<div style="background-color:gray;text-align:center;" id="main_bottom">
-		<br>
-		编写：诸璟祺<br>
-		开发：GitHub<br>
-		🅩🅗🅤🅙🅘🅝🅖🅠🅘.🅒🅞🅜<br><br>
-	</div>
-</body>
+			.topics {
+				padding: 20px;
+				margin: 10px;
+				width: 165%;
+				height: 350px;
+				position: absolute;
+				top: 100px;
+				left: 0px;
+				z-index: 11;
+				background-color: rgba(13, 217, 132, 0.6);
+				border-radius: 20px;
+				border: 5px solid #36cb2e;
+				transition: all 0.5s ease;
+			}
+			
+			.topics:hover {
+				background-color: rgba(13, 217, 132, 0.3);
+				border: 5px solid #00aa00;
+				transition: all 0.5s ease;
+			}
+
+			.right {
+				width: 500px;
+				height: 50%;
+				padding: 20px;
+				position: absolute;
+				top: 515px;
+				left: 655px;
+				z-index: 11;
+				background-color: #36cb2e;
+				border-radius: 0px 20px 20px 20px;
+				color: #3413ba;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="bar">
+			<a href="https://zhujingqi.com/" style="background-color:#ffe93e"><b>诸璟祺</b></a>
+			<a href="https://zhujingqi.com/a/">文章</a>
+			<a href="https://zhujingqi.com/me.html">介绍</a>
+			<a href="https://zhujingqi.com/email.html">联系</a>
+			<a href="https://note.ms/zhujingqicom">留言</a>
+			<a href="https://zhujingqi.com/moments.html">动态</a>
+			<a href="https://zhujingqi.com/activity.html">活动</a>
+			<a href="https://zhujingqi.com/game.html">游戏</a>
+			<a href="https://zhujingqi.com/chatcat.html">聊天猫</a>
+			<a href="https://zhujingqi.com/bluedeath.html">蓝屏</a>
+			<a href="https://zhujingqi.com/html.html">HTML教程</a>
+			<a href="https://zhujingqi.com/tools">工具</a>
+			<a href="https://zhujingqi.com/money.html">赞助</a>
+			<a href="https://zhujingqi.com/thanks.html">感谢</a>
+			<a href="https://zhujingqi.com/v.html">更新</a>
+		</div>
+		<div class="board">
+			<h1>&emsp;欢迎来到文章中心！</h1>
+			<h4>&emsp;😄💻作者已更新技术，与首页同步了！（其实原理很简单，可以问问我哦）💻😄</h4>
+			<iframe src="https://zhujingqi.com/index.html" width="1000px" height="90%"
+				style="border: none; overflow: hidden; position: absolute;">
+			</iframe>
+			<div class="cover-right"></div>
+			<div class="cover-top"></div>
+			<div class="topics">
+				<h3>
+					<br>
+					文章中心-绽放自我的天地<br><br>
+					这里有我的文章、记事、动态！<br><br>
+					快去看看吧！！！<br><br><br><br>
+					<span style="font-size: 50px;">&emsp;&emsp;&emsp;👇</span>
+				</h3>
+			</div>
+			<div class="right">
+				<h3>
+					<br>
+					点击左侧卡片查看详情！<br><br>
+					<br><br>
+					<span style="font-size: 50px;">&emsp;👈</span>
+					<br><br><br><br>
+					在左侧区域即可滑动。
+				</h3>
+			</div>
+		</div>
+		<div style="background-color:gray;text-align:center;" id="main_bottom">
+			<br>
+			编写：诸璟祺<br>
+			开发：GitHub<br>
+			🅩🅗🅤🅙🅘🅝🅖🅠🅘.🅒🅞🅜<br><br>
+		</div>
+	</body>
 </html>
