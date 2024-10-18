@@ -25,6 +25,30 @@
 				animation: appear 1s ease;
 				z-index: 12;
 			}
+
+			#new {
+				position: absolute;
+				right: 20px;
+			}
+
+			#ip {
+				position: absolute;
+				right: 20px;
+			}
+
+			#zhishi {
+				position: absolute;
+				right: 20px;
+			}
+
+			@media (max-width: 900px) {
+
+				#new,
+				#ip,
+				#zhishi {
+					display: none;
+				}
+			}
 		</style>
 	</head>
 	<body>
@@ -133,7 +157,7 @@
 			<h1><a href="a/index.html">👉···<br><br>点击前往>><br>文章中心>><br><br>GO GO GO<br></a></h1>
 		</div>
 		<div id="main_right">
-			<div class="text" style="top:800px;left:700px;position:absolute;" id="new">
+			<div class="text" style="top:800px;" id="new">
 				<ul>
 					<h3>最近更新/加入/改进：</h3>
 					<li>网站首页整改</li>
@@ -142,7 +166,7 @@
 					<marquee scrollamount="10">🚄🚌🚌😀</marquee>
 				</ul>
 			</div>
-			<div class="text" style="top:1150px;left:700px;position:absolute;" id="ip">
+			<div class="text" style="top:1150px;" id="ip">
 				<center>
 					<h3>我的网站访问量：</h3>从2024/2/1开始<br><br>
 					<img src="https://saobby.pythonanywhere.com/api/webcounter?id=IP28qeMg8he5o0sF">次！
@@ -150,7 +174,7 @@
 					<br>
 				</center>
 			</div>
-			<div class="text" style="top:1350px;left:700px;position:absolute;" id="zhishi">
+			<div class="text" style="top:1350px;" id="zhishi">
 				<center>
 					<h3>奇葩知识</h3>
 					🧀=🦾!!! Cheese=Power!!!<br><br>
