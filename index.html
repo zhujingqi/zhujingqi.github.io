@@ -14,6 +14,7 @@
 		<link id="darkcss" rel="stylesheet" href="dark.css" disabled>
 		<link rel="icon" type="image/x-icon" href="zjq.ico">
 		<script src="script.js"></script>
+		<script src="fullscreen.js"></script>
 		<style>
 			.crown {
 				position: absolute;
@@ -26,17 +27,10 @@
 				z-index: 12;
 			}
 
-			#new {
-				position: absolute;
-				right: 20px;
-			}
-
-			#ip {
-				position: absolute;
-				right: 20px;
-			}
-
-			#zhishi {
+			#new,
+			#ip,
+			#zhishi,
+			#daohang {
 				position: absolute;
 				right: 20px;
 			}
@@ -45,7 +39,8 @@
 
 				#new,
 				#ip,
-				#zhishi {
+				#zhishi,
+				#daohang {
 					display: none;
 				}
 			}
@@ -72,6 +67,8 @@
 		<div class="toolsbar">
 			<a href="phone.html">手机模式</a>
 			<a id="switch-style">暗黑模式</a>
+			<a onclick="fullScreen()">全屏沉浸式体验</a>
+			<a onclick="exitScreen()">退出全屏</a>
 			<a href="ad.html">!!!!!𝔸𝔻𝕍𝔼ℝ𝕋𝕀𝕊𝔼𝕄𝔼ℕ𝕋看一些广告!!!!!</a>
 		</div>
 		<div id="main_top">
@@ -180,11 +177,11 @@
 					🧀=🦾!!! Cheese=Power!!!<br><br>
 					研究明表汉字的序顺并不响影阅读！！！！！<br>
 					<h3>搞笑时刻</h3>
-					螃蟹碰到了海星。海星：你瞎（虾）啊！螃蟹：不我是螃蟹。
+					<a href="#">李曙传奇</a>
 				</center>
 				<br>
 			</div>
-			<div class="text" style="top:1650px;left:700px;position:absolute;" id="daohang">
+			<div class="text" style="top:1650px;" id="daohang">
 				<h3>首页的迷你导航栏</h3>
 				点击跳转！这些迷你的链接像马力欧的管道，会帮你定位到首页的锚上面。<br><br>
 				<a href="#main_top">首页顶部区</a>-有时间等等<br><br>
