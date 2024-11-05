@@ -8,7 +8,7 @@ setInterval("getD1();", 1000);
 //判断是否为移动设备
 function isMobile() {
 	const userAgentInfo = navigator.userAgent;
-	const mobileAgents = ['Android', 'iPhone', 'SymbianOS', 'Windows Phone', 'iPad', 'iPod'];
+	const mobileAgents = ['Android', 'iPhone', 'SymbianOS', 'Windows Phone', 'iPod'];
 	let mobileFlag = false;
 	for (let i = 0; i < mobileAgents.length; i++) {
 		if (userAgentInfo.indexOf(mobileAgents[i]) > 0) {
