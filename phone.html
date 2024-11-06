@@ -14,7 +14,25 @@
 		<link id="maincss" rel="stylesheet" href="main.css">
 		<link id="darkcss" rel="stylesheet" href="dark.css" disabled>
 		<link rel="icon" type="image/x-icon" href="zjq.ico">
-		<script src="script.js"></script>
+		<script>
+		document.addEventListener('DOMContentLoaded', function() {
+			var switchButton = document.getElementById('switch-style');
+			var a = document.getElementById('maincss');
+			var b = document.getElementById('barcss');
+			var dark = document.getElementById('darkcss');
+			switchButton.addEventListener('click', function() {
+				if (a.disabled) {
+					a.disabled = false;
+					b.disabled = false;
+					dark.disabled = true;
+				} else {
+					a.disabled = true;
+					b.disabled = true;
+					dark.disabled = false;
+				}
+			});
+		});
+		</script>
 		<style>
 			.bar {
 				font-size: 30px;
