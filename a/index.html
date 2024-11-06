@@ -1,66 +1,9 @@
-<!DOCTYPE html>
 <html>
 	<head>
-		<title>诸璟祺|文章中心</title>
+		<title>诸璟祺|有BUG的文章中心</title>
 		<meta charset="UTF-8">
 		<link rel="stylesheet" href="https://zhujingqi.com/bar.css">
 		<link rel="stylesheet" href="https://zhujingqi.com/main.css">
-		<style>
-			.cover-right {
-				width: 500px;
-				height: 95%;
-				position: absolute;
-				top: 100px;
-				left: 655px;
-				z-index: 9;
-				background-color: #b7f1d9;
-			}
-
-			.cover-top {
-				width: 100%;
-				height: 415px;
-				position: absolute;
-				top: 100px;
-				left: 0px;
-				z-index: 9;
-				background-color: #b7f1d9;
-				border-bottom: 3px solid #36cb2e;
-			}
-
-			.topics {
-				padding: 20px;
-				margin: 10px;
-				width: 165%;
-				height: 350px;
-				position: absolute;
-				top: 100px;
-				left: 0px;
-				z-index: 11;
-				background-color: rgba(13, 217, 132, 0.6);
-				border-radius: 20px;
-				border: 5px solid #36cb2e;
-				transition: all 0.5s ease;
-			}
-
-			.topics:hover {
-				background-color: rgba(13, 217, 132, 0.3);
-				border: 5px solid #00aa00;
-				transition: all 0.5s ease;
-			}
-
-			.right {
-				width: 500px;
-				height: 50%;
-				padding: 20px;
-				position: absolute;
-				top: 515px;
-				left: 655px;
-				z-index: 11;
-				background-color: #36cb2e;
-				border-radius: 0px 20px 20px 20px;
-				color: #3413ba;
-			}
-		</style>
 	</head>
 	<body>
 		<div class="bar">
@@ -81,19 +24,7 @@
 			<a href="/v.html">更新</a>
 		</div>
 		<div class="board">
-			<h1>&emsp;欢迎来到文章中心！（正在测试，请等此字样去除后再访问）</h1>
-			<div id="output"></div>
-			<script>
-				fetch('https://zhujingqi.com/index.html')
-				.then(response => response.text())
-				.then(html => {
-					const parser = new DOMParser();
-					const doc = parser.parseFromString(html, 'text/html');
-					const s = doc.getElementById('board').outerHTML;
-					document.getElementById('output').innerHTML = s;
-				})
-				.catch(error => console.error('ERROR:', error));
-			</script>
+			<h1>&emsp;文章中心有BUG，站长正在火速修理，请等一会儿（亿），或者看看别的页面哦！</h1>
 		</div>
 		<div style="background-color:gray;text-align:center;">
 			<br>
