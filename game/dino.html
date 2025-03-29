@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Dino - Zhujingqi</title>
+		<link rel="stylesheet" href="/css/bar.css">
+		<link rel="stylesheet" href="/css/main.css">
+		<style>
+			body {
+				margin: 0;
+				overflow: hidden;
+			}
+
+			canvas {
+				background: #fff;
+				display: block;
+				margin: 0 auto;
+				border: 2px solid #333;
+			}
+
+			#score {
+				position: absolute;
+				top: 80px;
+				left: 50%;
+				transform: translateX(-50%);
+				font-size: 24px;
+				color: #333;
+			}
+
+			#restart {
+				display: none;
+				position: absolute;
+				top: 120px;
+				left: 50%;
+				transform: translateX(-50%);
+				font-size: 18px;
+				padding: 8px 16px;
+				cursor: pointer;
+				background: #333;
+				color: #fff;
+				border-radius: 5px;
+			}
+		</style>
+		<script>
+			function copyToClipboard(event, text) {
+			    event.preventDefault();
+			    navigator.clipboard.writeText(text).then(() => {
+			        alert("已复制游戏链接：" + text);
+			    }).catch(err => {
+			        console.error("复制失败：", err);
+			    });
+			}
+		</script>
+	</head>
+	<body>
+		<div class="bar">
+			<a href="/index.html" class="zjq"><b>Zhujingqi</b></a>
+			<a href="#">Dino</a>
+		</div>
+		<canvas id="gameCanvas" width="800" height="300"></canvas>
+		<div id="score">Score: 0</div>
+		<button id="restart" onclick="restartGame()">Restart</button>
+		<div class="text">
+			<a href="#" onclick="copyToClipboard(event, 'https://zhujingqi.com/game/dino.html')">分享此游戏</a>
+		</div>
+		<div class="bottom">
+			<a href="/index.html"><b>Zhujingqi</b></a>
+			- by Jacky Zhu
+		</div>
+		<script>
+			const canvas = document.getElementById('gameCanvas');
+			const ctx = canvas.getContext('2d');
+			const scoreDisplay = document.getElementById('score');
+			const restartBtn = document.getElementById('restart');
+
+			let dino = {
+				x: 50,
+				y: 230,
+				width: 40,
+				height: 40,
+				vy: 0,
+				gravity: 1.5,
+				jumpPower: -20,
+				isJumping: false
+			};
+			let obstacles = [];
+			let speed = 6;
+			let score = 0;
+			let gameOver = false;
+
+			function drawDino() {
+				ctx.fillStyle = '#333';
+				ctx.fillRect(dino.x, dino.y, dino.width, dino.height);
+			}
+
+			function drawObstacles() {
+				ctx.fillStyle = '#599c44';
+				obstacles.forEach(ob => ctx.fillRect(ob.x, ob.y, ob.width, ob.height));
+			}
+
+			function spawnObstacle() {
+				const height = Math.random() > 0.5 ? 40 : 20;
+				obstacles.push({
+					x: canvas.width,
+					y: 270 - height,
+					width: 20,
+					height
+				});
+			}
+
+			function update() {
+				if (gameOver) return;
+
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+				dino.y += dino.vy;
+				dino.vy += dino.gravity;
+				if (dino.y > 230) {
+					dino.y = 230;
+					dino.isJumping = false;
+				}
+
+				obstacles.forEach(ob => ob.x -= speed);
+				if (obstacles.length === 0 || obstacles[obstacles.length - 1].x < canvas.width - 200) {
+					spawnObstacle();
+				}
+
+				obstacles = obstacles.filter(ob => ob.x + ob.width > 0);
+
+				obstacles.forEach(ob => {
+					if (dino.x < ob.x + ob.width &&
+						dino.x + dino.width > ob.x &&
+						dino.y < ob.y + ob.height &&
+						dino.y + dino.height > ob.y) {
+						endGame();
+					}
+				});
+
+				score += 1;
+				scoreDisplay.textContent = `Score: ${score}`;
+
+				if (score % 100 === 0) {
+					speed += 0.5;
+				}
+
+				drawDino();
+				drawObstacles();
+
+				requestAnimationFrame(update);
+			}
+
+			function jump() {
+				if (!dino.isJumping) {
+					dino.vy = dino.jumpPower;
+					dino.isJumping = true;
+				}
+			}
+
+			function endGame() {
+				gameOver = true;
+				restartBtn.style.display = 'block';
+				ctx.fillStyle = 'rgba(0,0,0,0.5)';
+				ctx.fillRect(0, 0, canvas.width, canvas.height);
+				ctx.fillStyle = '#fff';
+				ctx.font = '36px Arial';
+				ctx.fillText('Game Over', canvas.width / 2 - 80, canvas.height / 2);
+			}
+
+			function restartGame() {
+				dino.y = 230;
+				dino.vy = 0;
+				dino.isJumping = false;
+				obstacles = [];
+				speed = 6;
+				score = 0;
+				gameOver = false;
+				restartBtn.style.display = 'none';
+				update();
+			}
+
+			document.addEventListener('keydown', (e) => {
+				if (e.code === 'Space' || e.code === 'ArrowUp') {
+					jump();
+				}
+			});
+
+			update();
+		</script>
+	</body>
+</html>
