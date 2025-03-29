@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>游戏中心 - Zhujingqi</title>
+		<meta charset="UTF-8">
+		<link id="maincss" rel="stylesheet" href="/css/main.css">
+		<link id="barcss" rel="stylesheet" href="/css/bar.css">
+		<link rel="stylesheet" herf="card.css">
+		<style>
+			.card {
+				box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.3);
+				transition: 0.3s;
+				width: 300px;
+				overflow: hidden;
+				border-radius: 10px;
+				margin: 10px;
+				padding: 2px 16px;
+				animation: appear 1s ease-in-out;
+				display: inline-block;
+			}
+
+			.card:hover {
+				box-shadow: 0 10px 18px 0 rgba(0, 0, 0, 0.4);
+			}
+
+			.card h2 {
+				color: #003aaf;
+			}
+
+			.card p {
+				color: #555;
+			}
+		</style>
+		<script>
+			document.addEventListener("DOMContentLoaded", function() {
+				document.querySelectorAll("a").forEach(link => {
+					link.setAttribute("target", "_blank");
+				});
+			});
+		</script>
+	</head>
+	<body>
+		<div class="bar">
+			<a href="/index.html" class="zjq"><b>Zhujingqi</b></a>
+			<a href="/me/">介绍</a>
+			<a href="/game/">游戏</a>
+			<a href="/tool/">工具</a>
+		</div>
+		<div class="text">
+			<h2>游戏中心</h2>
+			
+			<a href="dino.html">
+				<div class="card" style="background-color: rgba(80, 232, 136, 0.2)">
+					<h2>Dino</h2>
+					<p>一个低仿的Google小恐龙游戏</p>
+				</div>
+			</a>
+			
+			<a href="tictactoe.html">
+				<div class="card" style="background-color: rgba(64, 160, 232, 0.2)">
+					<h2>井字棋</h2>
+					<p>人机对战，永远不输</p>
+				</div>
+			</a>
+			
+		</div>
+		<div class="bottom">
+			<a href="/index.html"><b>Zhujingqi</b></a>
+			- by Jacky Zhu
+		</div>
+	</body>
+</html>
