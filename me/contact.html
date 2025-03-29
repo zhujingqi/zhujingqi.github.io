@@ -5,6 +5,13 @@
 		<meta charset="UTF-8">
 		<link id="maincss" rel="stylesheet" href="/css/main.css">
 		<link id="barcss" rel="stylesheet" href="/css/bar.css">
+		<script>
+			document.addEventListener("DOMContentLoaded", function() {
+    			document.querySelectorAll("a").forEach(link => {
+        			link.setAttribute("target", "_blank");
+    			});
+		});
+		</script>
 	</head>
 	<body>
 		<div class="bar">
