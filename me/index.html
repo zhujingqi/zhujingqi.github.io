@@ -14,6 +14,13 @@
 				height: auto;
 			}
 		</style>
+		<script>
+			document.addEventListener("DOMContentLoaded", function() {
+				document.querySelectorAll("a").forEach(link => {
+					link.setAttribute("target", "_blank");
+				});
+			});
+		</script>
 	</head>
 	<body>
 		<div class="bar">
