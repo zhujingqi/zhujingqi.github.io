@@ -9,7 +9,7 @@
 	display: block;
 	color: #000;
 	text-align: center;
-	padding: 5px 8px;
+	padding: 10px 15px;
 	text-decoration: none;
 	transition: 0.2s;
 }
@@ -23,7 +23,6 @@
 body {
 	margin: 0px;
 	background-color: #ffffff;
-	font-size: 12px;
 }
 
 *::selection {
@@ -61,8 +60,8 @@ a:active {
 	background-color: #f3f3f3;
 	color: black;
 	border-radius: 20px;
-	padding: 5px;
-	margin: 3px;
+	padding: 10px;
+	margin: 5px;
 	transition: 0.2s;
 }
 
