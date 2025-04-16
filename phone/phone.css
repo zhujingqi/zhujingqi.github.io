@@ -23,6 +23,7 @@
 body {
 	margin: 0px;
 	background-color: #ffffff;
+	font-size: 20px;
 }
 
 *::selection {
