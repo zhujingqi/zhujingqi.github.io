@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<meta charset="UTF-8" />
-		<title>Terminal - Zhujingqi</title>
+		<title>HackyOS - Zhujingqi</title>
 		<style>
 			body {
 				background-color: black;
@@ -45,7 +45,7 @@
 	</head>
 	<body>
 		<div id="terminal">
-Welcome to Zhujingqi Terminal v1.0
+Welcome to HackyOS v1.0
 Press F11 to fullscreen mode.
 Type 'help' for a list of commands.
 		</div>
@@ -60,7 +60,8 @@ Available commands:
 - hack: Start hacking sequence
 - stat: Show system status
 - cls: Clear the terminal
-- exit: Exit the terminal
+- exit: Exit HackyOS
+- sd: Self-destruction
     `,
 				stat: `
 System Status:
@@ -76,6 +77,17 @@ Bypassing security...
 Accessing classified data...
 Decrypting files...
 Hack Successful!
+    `,
+				sd: `
+Preparing to self destruction...
+..........
+3...
+2...
+1...
+
+ERROR!
+
+The self destruct function has been destroyed!
     `,
 				
 			};
@@ -156,4 +168,5 @@ Hack Successful!
 			}
 		</script>
 	</body>
+
 </html>
