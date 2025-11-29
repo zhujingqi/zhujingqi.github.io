@@ -157,6 +157,7 @@
 	height: 20px;
 	border-radius: 50%;
 	bottom: 15px;
+	cursor: pointer;
 }
 
 @keyframes blink {
@@ -194,6 +195,7 @@
 	border-radius: 0 0 20px 20px;
 	margin: 0 auto;
 	position: relative;
+	cursor: pointer;
 }
 
 #stem {
@@ -245,3 +247,4 @@
 	transform: rotate(0deg) scale(0.95);
 	transition: opacity 0.3s ease, transform 0.3s ease;
 }
+
