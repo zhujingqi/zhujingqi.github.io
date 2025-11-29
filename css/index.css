@@ -31,62 +31,23 @@
 	transform: translateX(0);
 }
 
-.scroll-container {
-	position: absolute;
-	left: 50%;
+
+.textright {
 	background-color: #f3f3f3;
 	color: black;
 	border-radius: 20px;
 	padding: 20px;
+	margin: 0;
 	transition: 0.2s;
 	width: 45%;
-	height: 80px;
+	left: 50%;
+	position: absolute;
 	overflow: hidden;
-	border-radius: 20px;
 }
 
-.scroll-list {
-	list-style: none;
-	padding: 0;
-	margin: 0;
-	animation: scroll-up 8s linear infinite;
-}
-
-.scroll-list li {
-	height: 40px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-
-.scroll-list a {
-	color: #000000;
-}
-
-@keyframes scroll-up {
-	0% {
-		transform: translateY(0);
-	}
-
-	20% {
-		transform: translateY(-40px);
-	}
-
-	40% {
-		transform: translateY(-80px);
-	}
-
-	60% {
-		transform: translateY(-120px);
-	}
-
-	80% {
-		transform: translateY(-160px);
-	}
-
-	100% {
-		transform: translateY(0);
-	}
+.textright:hover {
+	background-color: #f6f6f6;
+	transition: 0.2s;
 }
 
 .social-icons {
@@ -121,30 +82,20 @@
 }
 */
 
-/*滚动条样式*/
-/* 自定义滚动条整体样式 */
 ::-webkit-scrollbar {
 	width: 10px;
-	/* 设置滚动条的宽度 */
 	height: 10px;
 }
 
-/* 自定义滚动条轨道样式 */
 ::-webkit-scrollbar-track {
 	background: rgba(0, 0, 0, 0);
-	/* 设置轨道的背景颜色 */
 }
 
-/* 自定义滚动条滑块样式 */
 ::-webkit-scrollbar-thumb {
 	background: #bebebe;
-	/* 设置滑块的背景颜色 */
 	border-radius: 10px;
-	/* 设置滑块的边角半径 */
 }
 
-/* 鼠标悬停时滑块的样式 */
 ::-webkit-scrollbar-thumb:hover {
 	background: #a1a1a1;
-	/* 设置鼠标悬停时滑块的背景颜色 */
 }
