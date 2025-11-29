@@ -1,0 +1,145 @@
+.face {
+	width: 100px;
+	height: 100px;
+	background: #ffe4c4;
+	border-radius: 50%;
+	position: relative;
+	box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.eye {
+	width: 30px;
+	height: 30px;
+	background: white;
+	border-radius: 50%;
+	position: absolute;
+	top: 30px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	overflow: hidden;
+}
+
+.eye.left {
+	left: 15px;
+}
+
+.eye.right {
+	right: 15px;
+}
+
+.pupil {
+	width: 15px;
+	height: 15px;
+	background: black;
+	border-radius: 50%;
+	position: relative;
+	transition: 0.05s linear;
+}
+
+.mouth {
+	width: 45px;
+	height: 4px;
+	background: black;
+	position: absolute;
+	bottom: 25px;
+	left: 50%;
+	transform: translateX(-50%);
+	background: #F00;
+	border-radius: 2px;
+	transition: 0.2s;
+}
+
+.face:hover .mouth {
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	bottom: 15px;
+}
+
+@keyframes blink {
+
+	0%,
+	97%,
+	100% {
+		transform: scaleY(1);
+	}
+
+	98%,
+	99% {
+		transform: scaleY(0.1);
+	}
+}
+
+.eye {
+	animation: blink 4s infinite;
+	transform-origin: center;
+}
+
+#plant-container {
+	position: relative;
+	width: 150px;
+	text-align: center;
+	left: 100px;
+	height: 10px;
+	top: -50px;
+}
+
+#pot {
+	width: 50px;
+	height: 50px;
+	background: #8d6e63;
+	border-radius: 0 0 20px 20px;
+	margin: 0 auto;
+	position: relative;
+}
+
+#stem {
+	width: 10px;
+	height: 50px;
+	background: green;
+	position: absolute;
+	border-radius: 5px;
+	bottom: 50px;
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+.leaf {
+	width: 30px;
+	height: 20px;
+	background: green;
+	border-radius: 50%;
+	position: absolute;
+	top: -40px;
+}
+
+.leaf.left {
+	left: -3px;
+	transform: rotate(30deg);
+}
+
+.leaf.right {
+	right: -3px;
+	transform: rotate(-30deg);
+}
+
+#watered-count {
+	margin-top: -50px;
+	margin-left: 100px;
+	font-size: 16px;
+	width: 200px;
+}
+
+#can {
+	width: 50px;
+	height: 30px;
+	background: #00aaff;
+	border-radius: 0px 10px 10px 0px;
+	position: absolute;
+	top: -90px;
+	left: 70px;
+	opacity: 0;
+	transform: rotate(0deg) scale(0.95);
+	transition: opacity 0.3s ease, transform 0.3s ease;
+}
