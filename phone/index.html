@@ -1,1 +1,394 @@
-我即将重写手机版
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>移动版 - Zhujingqi</title>
+		<style>
+			* {
+				box-sizing: border-box;
+			}
+
+			body {
+				margin: 0;
+				font-family: -apple-system, "Segoe UI",
+					"PingFang SC", sans-serif;
+				background: #fafafa;
+				color: #222;
+				line-height: 1.6;
+				font-size: 16px;
+			}
+
+			.mbar {
+				width: 100%;
+				background-color: #b7f1d9;
+				overflow: hidden;
+				position: sticky;
+				top: 0;
+				z-index: 1000;
+				transition: 0.2s;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+			}
+
+			.mbar-logo {
+				background-color: #ffe93e;
+				color: #000;
+				font-size: 22px;
+				font-weight: bold;
+				padding: 10px 15px;
+				display: flex;
+				align-items: center;
+				height: 100%;
+			}
+
+			.mbar-btn {
+				margin-left: 10px;
+				font-size: 26px;
+				cursor: pointer;
+				user-select: none;
+				padding: 6px 10px;
+				border-radius: 8px;
+				transition: 0.2s;
+			}
+
+			.mbar-btn:hover {
+				background-color: #c2ffe6;
+			}
+
+			@media (max-width: 700px) {
+
+				.mbar-menu {
+					background-color: #b7f1d9;
+					width: 100%;
+					display: flex;
+					flex-direction: column;
+
+					max-height: 0;
+					overflow: hidden;
+					opacity: 0;
+					transform: translateY(-5px);
+					transition: max-height 0.5s ease, opacity 0.5s ease, transform 0.5s ease;
+				}
+
+				.mbar-menu.show {
+					max-height: 300px;
+					opacity: 1;
+					transform: translateY(0);
+				}
+
+				.mbar-menu a {
+					padding: 12px 20px;
+					border-top: 1px solid #a2eacb;
+					color: #000;
+					text-decoration: none;
+					transition: background-color 0.2s;
+				}
+
+				.mbar-menu a:hover {
+					background-color: #c2ffe6;
+				}
+
+				#mBtn {
+					display: block;
+					padding: 10px 15px;
+					background-color: #b7f1d9;
+					cursor: pointer;
+					font-size: 22px;
+					user-select: none;
+				}
+			}
+
+			@media (min-width: 701px) {
+
+				.mbar-menu {
+					display: flex !important;
+					flex-direction: row !important;
+					background-color: #b7f1d9;
+					justify-content: flex-start;
+					align-items: center;
+
+					max-height: none !important;
+					opacity: 1 !important;
+					transform: none !important;
+					overflow: visible !important;
+				}
+
+				.mbar-menu a {
+					padding: 10px 15px;
+					text-decoration: none;
+					color: #000;
+					transition: 0.2s;
+				}
+
+				.mbar-menu a:hover {
+					background-color: #c2ffe6;
+				}
+
+				#mBtn {
+					display: none;
+				}
+			}
+
+
+			.logo {
+				font-size: 20px;
+				font-weight: bold;
+			}
+
+			.container {
+				padding: 16px;
+			}
+
+			.card {
+				background: #fff;
+				padding: 16px;
+				border-radius: 12px;
+				box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+				margin-bottom: 16px;
+			}
+
+			h1 {
+				font-size: 26px;
+				margin-bottom: 12px;
+			}
+
+			h2 {
+				font-size: 20px;
+				margin-bottom: 8px;
+			}
+
+			@media (min-width: 600px) {
+				body {
+					font-size: 17px;
+				}
+
+				h1 {
+					font-size: 32px;
+				}
+
+				h2 {
+					font-size: 24px;
+				}
+			}
+
+			.text {
+				background-color: #f3f3f3;
+				color: black;
+				border-radius: 20px;
+				padding: 10px;
+				margin: 20px 5px;
+				transition: 0.2s;
+			}
+
+			.m-msgbox {
+				width: 100%;
+				max-width: 600px;
+				margin: auto;
+				padding: 16px;
+			}
+
+			.m-title {
+				font-size: 22px;
+				font-weight: bold;
+				margin-bottom: 12px;
+			}
+
+			.m-messages {
+				white-space: pre-wrap;
+				background: #fff;
+				padding: 12px;
+				border-radius: 12px;
+				border: 1px solid #ccc;
+				height: 320px;
+				overflow-y: auto;
+				font-size: 15px;
+				margin-bottom: 16px;
+			}
+
+			.m-label {
+				font-size: 15px;
+				margin-top: 10px;
+				display: block;
+			}
+
+			.m-input,
+			.m-textarea {
+				width: 100%;
+				padding: 10px;
+				font-size: 15px;
+				border-radius: 10px;
+				border: 1px solid #ccc;
+				margin-top: 4px;
+			}
+
+			.m-btn {
+				width: 100%;
+				background: #b7f1d9;
+				border: none;
+				border-radius: 10px;
+				font-size: 16px;
+				padding: 12px 0;
+				margin-top: 14px;
+				cursor: pointer;
+			}
+
+			.m-btn:hover {
+				background: #b7ecec;
+			}
+
+			.m-status {
+				margin-top: 10px;
+				font-size: 14px;
+				color: gray;
+			}
+
+			.bottom {
+				background-color: #f3f3f3;
+				color: #999999;
+				padding: 20px;
+				display: flex;
+				align-items: center;
+				flex-wrap: wrap;
+			}
+
+			.bottom a {
+				color: #999999;
+				text-decoration: none;
+				margin-right: 15px;
+			}
+
+			.bottom a:hover {
+				color: #888888;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="mbar">
+			<div class="mbar-logo">ZJQ</div>
+			<div class="mbar-btn" id="mBtn">☰</div>
+		</div>
+
+		<nav class="mbar-menu" id="mMenu">
+			<a href="#me">介绍</a>
+			<a href="#about">关于</a>
+			<a href="#comment">评论区</a>
+		</nav>
+
+		<main class="container">
+			<div class="text">Hello，我是Jacky！我热爱学习，喜欢出游，开朗乐观，擅长做手工，可有创意了！（更多请使用电脑访问）</div>
+			<div class="text" id="me">
+				<h1>我是 Jacky！</h1>
+				我：<br>
+				● 热爱学习，喜欢出游<br>
+				● 是做手工方面的专家<br>
+				● 就读于 NFLS<br>
+				● 会钢琴和大提琴<br>
+				● 养鱼<br>
+				● 喜欢用HTML+CSS+JS编写网页、小程序<br>
+				● 正在学习 English，Español，Esperanto，français 和中文<br>
+				● 用电脑访问网站，查看我最新的作品！<br>
+				<h2>编写程序</h2>
+				我喜欢编写小游戏和网页。在 <a href="https://github.com/zhujingqi/FunCodes">Fun Codes</a> 仓库中查看作品！<br>
+				我制作的WebOS：<a href="https://jacky.run.place">JackyOS</a><br>
+				你可以看 <a href="https://github.com/zhujingqi/zhujingqi.github.io">网站源代码</a> ！
+				<h2>联系我</h2>
+				邮箱：<br>
+				97700826@qq.com<br>
+				jacky@zhujingqi.com<br>
+				用电脑访问，查看更多联系方式！
+			</div>
+
+			<div class="text" id="about">
+				<h1>关于</h1>
+				本网站是一个融合个人创作与技术创新的平台，致力于展示作者在编程、
+				创意设计及跨文化交流领域的独特视角。网站内容涵盖了多个维度，
+				包括个人介绍以及实用工具的整合。在这里，
+				访客不仅可以深入了解作者的背景与兴趣，还能体验到由其精心开发的
+				各种互动工具和游戏，欢迎各界人士深入探访与交流。
+			</div>
+
+			<div class="text" id="comment">
+				<h1>评论区</h1>
+				<div class="m-msgbox">
+					<div id="mMessages" class="m-messages">Loading...</div>
+					<label class="m-label">名字</label>
+					<input type="text" id="mName" class="m-input" placeholder="你的名字">
+					<label class="m-label">内容</label>
+					<textarea id="mText" class="m-textarea" rows="3" placeholder="评论内容"></textarea>
+					<button class="m-btn" onclick="mSubmit()">发表评论</button>
+					<div id="mStatus" class="m-status"></div>
+				</div>
+			</div>
+
+			<div class="text bottom" id="bottom">
+				<a href="#"><b>Zhujingqi</b></a> - by Jacky &emsp;更多精彩请用电脑访问
+			</div>
+		</main>
+
+		<script>
+			const mBtn = document.getElementById("mBtn");
+			const mMenu = document.getElementById("mMenu");
+			mBtn.onclick = () => mMenu.classList.toggle("show");
+
+			const mKey = 'zhujingqicomtextdbonline';
+			const mRead = 'https://textdb.online/' + mKey;
+			const mWrite = 'https://api.textdb.online/update/';
+
+			const mBox = document.getElementById("mMessages");
+			const mStatus = document.getElementById("mStatus");
+
+			async function mLoad() {
+				try {
+					const res = await fetch(mRead);
+					const text = await res.text();
+					mBox.innerHTML = text || "还没有人留言，快来留言吧！";
+					mStatus.innerText = "✔ 已加载";
+				} catch {
+					mBox.innerHTML = "⚠️ 加载失败";
+					mStatus.innerText = "❌ 网络错误";
+				}
+			}
+
+			async function mSubmit() {
+				const name = document.getElementById("mName").value.trim() || "匿名";
+				const msg = document.getElementById("mText").value.trim();
+
+				if (!msg) {
+					alert("请输入留言内容！");
+					return;
+				}
+
+				const time = new Date().toLocaleString();
+				const entry = `<span style="color:gray;">[${time}]</span><br><b>${name}</b>: ${msg}<br>\n`;
+
+				try {
+					const old = await fetch(mRead).then(r => r.text());
+
+					const params = new URLSearchParams();
+					params.append("key", mKey);
+					params.append("value", old + entry);
+
+					const res = await fetch(mWrite, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/x-www-form-urlencoded"
+						},
+						body: params.toString()
+					});
+
+					const result = await res.json();
+					if (result.status !== 1) throw 0;
+
+					document.getElementById("mText").value = "";
+					mLoad();
+					mStatus.innerText = "✔ 已发送！";
+				} catch {
+					mStatus.innerText = "❌ 发送失败";
+				}
+			}
+
+			mLoad();
+		</script>
+	</body>
+</html>
