@@ -145,8 +145,8 @@
 				border: 0;
 				cursor: pointer
 			}
-			
-			#panel a{
+
+			#panel a {
 				color: var(--text)
 			}
 
@@ -239,7 +239,53 @@
 				}
 			}
 
+			#rankMask {
+				position: fixed;
+				inset: 0;
+				background: rgba(0, 0, 0, .6);
+				display: none;
+				align-items: center;
+				justify-content: center;
+				z-index: 40;
+			}
+
+			#rankPanel {
+				background: #020617;
+				border: 1px solid #334155;
+				border-radius: 16px;
+				padding: 20px;
+				width: 420px;
+				max-width: 90%;
+			}
+
+			.rankItem {
+				display: flex;
+				justify-content: space-between;
+				padding: 10px 14px;
+				border-radius: 10px;
+				margin-bottom: 8px;
+				background: #111827;
+			}
+
 			#achvBtn {
+				background: #111827;
+				color: #facc15;
+				border: 1px solid #374151;
+				border-radius: 10px;
+				padding: 6px 14px;
+				cursor: pointer;
+			}
+
+			#rankBtn {
+				background: #111827;
+				color: #facc15;
+				border: 1px solid #374151;
+				border-radius: 10px;
+				padding: 6px 14px;
+				cursor: pointer;
+			}
+
+			#updateRankBtn {
 				background: #111827;
 				color: #facc15;
 				border: 1px solid #374151;
@@ -342,7 +388,7 @@
 				margin: 10px 0;
 				line-height: 1.6;
 			}
-			
+
 			#ruleContent a {
 				color: var(--text)
 			}
@@ -409,6 +455,8 @@
 			<div id="money"></div>
 			<div id="stock"></div>
 			<button id="achvBtn">🏆 成就</button>
+			<button id="rankBtn">🥇 排行榜</button>
+			<button id="updateRankBtn">⬆️ 提交目前分数至排行榜</button>
 			<button id="ruleBtn">📜 规则</button>
 			<button id="resetBtn" onclick="localStorage.removeItem('achv-final');location.reload()">
 				重置成就
@@ -436,6 +484,15 @@
 			<div id="achvPanel">
 				<h2>🏆 成就</h2>
 				<div id="achvList"></div>
+				<h6>
+					<center>点击空白处关闭</center>
+				</h6>
+			</div>
+		</div>
+		<div id="rankMask">
+			<div id="rankPanel">
+				<h2>🏅 排行榜</h2>
+				<div id="rankList"></div>
 				<h6>
 					<center>点击空白处关闭</center>
 				</h6>
@@ -487,7 +544,6 @@
 				<button onclick="location.reload()">重新开始</button>
 			</div>
 		</div>
-
 		<script>
 			/* ===== config ===== */
 			const W = 900,
@@ -859,6 +915,86 @@
 			document.addEventListener('contextmenu', e => {
 				e.preventDefault();
 			});
+
+			/*****RANK TEXTDB.ONLINE*****/
+
+			setInterval(() => {
+				updateRankBtn.textContent = `⬆️ 提交目前金额($${money.toFixed(0)})至排行榜 `;
+			}, 1000);
+
+			const RANK_KEY = 'zhujingqistockgamerank';
+			const RANK_API = 'https://api.textdb.online/update/';
+
+			async function loadRank() {
+				try {
+					const r = await fetch(`https://textdb.online/${RANK_KEY}`);
+					if (r.ok) {
+						const t = await r.text();
+						return t ? JSON.parse(t) : [];
+					}
+				} catch (e) {}
+				return [];
+			}
+
+			async function saveRank(list) {
+				await fetch(
+					`${RANK_API}?key=${RANK_KEY}&value=${encodeURIComponent(JSON.stringify(list))}`
+				);
+			}
+
+			const updateRankBtn = document.getElementById('updateRankBtn');
+
+			updateRankBtn.onclick = async () => {
+				if (!alive) {
+					return;
+				}
+				const name = prompt('请输入你的名字：');
+				if (!name) return;
+				let list = await loadRank();
+				const old = list.find(i => i.name === name);
+				if (old) {
+					if (old.max >= money) {
+						return;
+					}
+					old.max = money;
+					old.time = new Date().toLocaleString();
+				} else {
+					list.push({
+						name,
+						max: money,
+						time: new Date().toLocaleString()
+					});
+				}
+				list.sort((a, b) => b.max - a.max);
+				list = list.slice(0, 20);
+				await saveRank(list);
+			};
+
+			const rankBtn = document.getElementById('rankBtn');
+			const rankMask = document.getElementById('rankMask');
+			const rankList = document.getElementById('rankList');
+
+			rankBtn.onclick = async () => {
+				rankList.innerHTML = '加载中...';
+				rankMask.style.display = 'flex';
+
+				const list = await loadRank();
+				rankList.innerHTML = '';
+
+				list.forEach((r, i) => {
+					const d = document.createElement('div');
+					d.className = 'rankItem';
+					d.innerHTML = `
+						<div>${i+1}. ${r.name}</div>
+						<div>$${r.max.toFixed(2)}</div>
+					`;
+					rankList.appendChild(d);
+				});
+			};
+
+			rankMask.onclick = e => {
+				if (e.target === rankMask) rankMask.style.display = 'none';
+			};
 		</script>
 	</body>
 </html>
