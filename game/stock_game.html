@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Stock Game</title>
+		<style>
+			:root {
+				--bg: #020617;
+				--panel: #020617dd;
+				--line: #38bdf8;
+				--grid: #1e293b;
+				--text: #eee;
+				--green: #22c55e;
+				--red: #ef4444;
+				--news: #fde047;
+			}
+
+			body {
+				margin: 0;
+				background: radial-gradient(circle at top, #020617, #000);
+				color: var(--text);
+			}
+
+			#start {
+				position: fixed;
+				inset: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background:
+					radial-gradient(circle at top, #333 0%, #000 70%);
+				z-index: 10;
+			}
+
+			#start.fade-out {
+				animation: start-fade-out 0.6s ease forwards;
+			}
+
+			@keyframes start-fade-out {
+				to {
+					opacity: 0;
+					transform: translateY(-20px) scale(0.96);
+				}
+			}
+
+			.start-panel {
+				text-align: center;
+				padding: 48px 60px;
+				animation: start-fade-in 0.8s ease;
+			}
+
+			.start-panel h1 {
+				margin: 0;
+				font-size: 56px;
+				letter-spacing: 4px;
+				font-weight: 700;
+			}
+
+			.start-panel .subtitle {
+				margin-top: 10px;
+				font-size: 14px;
+				letter-spacing: 2px;
+				color: #b9b9b9;
+				text-transform: uppercase;
+			}
+
+			#start button {
+				margin-top: 36px;
+				font-size: 20px;
+				padding: 14px 48px;
+				border-radius: 999px;
+				border: 0;
+				background: linear-gradient(135deg, #b7f1d9, #00aaff);
+				color: #000;
+				font-weight: 600;
+				cursor: pointer;
+				box-shadow:
+					0 10px 30px rgba(69, 248, 228, 0.3);
+				transition: transform 0.15s ease, box-shadow 0.15s ease;
+			}
+
+			#start button:hover {
+				transform: translateY(-5px);
+				transform: scale(1.05);
+				box-shadow:
+					0 20px 40px rgba(69, 248, 228, 0.6);
+			}
+
+			#start button:active {
+				transform: scale(0.96);
+			}
+
+			.start-panel .tip {
+				margin-top: 22px;
+				font-size: 13px;
+				color: #b9b9b9;
+				opacity: 0.9;
+			}
+
+			.start-panel a {
+				color: #b9b9b9;
+			}
+
+			@keyframes start-fade-in {
+				from {
+					opacity: 0;
+					transform: translateY(20px) scale(0.96);
+				}
+
+				to {
+					opacity: 1;
+					transform: none;
+				}
+			}
+
+			#top {
+				display: flex;
+				justify-content: space-between;
+				padding: 12px 20px;
+				font-size: 18px
+			}
+
+			#chartWrap {
+				width: 900px;
+				margin: 0 auto;
+				background: #020617;
+				border-radius: 14px;
+				box-shadow: inset 0 0 0 1px var(--grid)
+			}
+
+			svg {
+				display: block
+			}
+
+			#panel {
+				text-align: center;
+				margin: 16px
+			}
+
+			#panel button {
+				font-size: 18px;
+				padding: 10px 28px;
+				margin: 0 12px;
+				border-radius: 14px;
+				border: 0;
+				cursor: pointer
+			}
+			
+			#panel a{
+				color: var(--text)
+			}
+
+			#buy {
+				background: var(--green)
+			}
+
+			#sell {
+				background: var(--red)
+			}
+
+			button:active {
+				transform: scale(.95)
+			}
+
+			.toast {
+				position: fixed;
+				right: 30px;
+				top: 30px;
+				background: var(--panel);
+				border: 1px solid var(--news);
+				padding: 16px 16px;
+				border-radius: 20px;
+				animation:
+					toast-impact .6s cubic-bezier(.2, 1.8, .4, 1),
+					toast-out .6s ease 3.6s forwards;
+			}
+
+			.news {
+				position: fixed;
+				left: 50%;
+				bottom: 24px;
+				transform: translateX(-50%);
+				background: #020617ee;
+				border: 1px solid var(--news);
+				padding: 20px 20px;
+				border-radius: 20px;
+				color: var(--news);
+				font-size: 16px;
+				pointer-events: none;
+				animation:
+					news-in .6s cubic-bezier(.2, 1.4, .4, 1),
+					news-out .8s ease 4.2s forwards;
+			}
+
+			@keyframes news-in {
+				from {
+					opacity: 0;
+					transform: translateX(-50%) translateY(20px) scale(.95);
+				}
+
+				to {
+					opacity: 1;
+					transform: translateX(-50%) translateY(0) scale(1);
+				}
+			}
+
+			@keyframes news-out {
+				to {
+					opacity: 0;
+					transform: translateX(-50%) translateY(-20px) scale(.9);
+				}
+			}
+
+			@keyframes toast-impact {
+				0% {
+					opacity: 0;
+					transform: scale(0.5) translateX(40px);
+					box-shadow: 0 0 0 rgba(56, 189, 248, 0);
+					border-color: transparent;
+				}
+
+				35% {
+					opacity: 1;
+					transform: scale(1.2);
+					box-shadow: 0 0 30px rgba(56, 189, 248, 1);
+					border-color: var(--line);
+				}
+
+				100% {
+					transform: scale(1);
+					box-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+				}
+			}
+
+			@keyframes toast-out {
+				to {
+					opacity: 0;
+					transform: translateY(-10px) scale(.95);
+				}
+			}
+
+			#achvBtn {
+				background: #111827;
+				color: #facc15;
+				border: 1px solid #374151;
+				border-radius: 10px;
+				padding: 6px 14px;
+				cursor: pointer;
+			}
+
+			#achvMask {
+				position: fixed;
+				inset: 0;
+				background: rgba(0, 0, 0, .6);
+				display: none;
+				align-items: center;
+				justify-content: center;
+				z-index: 20;
+			}
+
+			#achvPanel {
+				background: #020617;
+				border: 1px solid #334155;
+				border-radius: 16px;
+				padding: 20px;
+				width: 420px;
+				max-width: 90%;
+			}
+
+			#achvPanel h2 {
+				margin: 0 0 12px;
+				text-align: center;
+			}
+
+			#achvList {
+				display: grid;
+				grid-template-columns: 1fr 1fr;
+				gap: 10px;
+			}
+
+			.achvItem {
+				padding: 12px;
+				border-radius: 12px;
+				text-align: center;
+				font-size: 14px;
+			}
+
+			.achvItem.locked {
+				background: #1f2933;
+				color: #6b7280;
+			}
+
+			.achvItem.unlocked {
+				background: linear-gradient(135deg, #facc15, #f59e0b);
+				color: #000;
+				font-weight: 600;
+			}
+
+			#resetBtn {
+				background: #111827;
+				color: #facc15;
+				border: 1px solid #374151;
+				border-radius: 10px;
+				padding: 6px 14px;
+				cursor: pointer;
+			}
+
+			#ruleBtn {
+				background: #111827;
+				color: #facc15;
+				border: 1px solid #374151;
+				border-radius: 10px;
+				padding: 6px 14px;
+				cursor: pointer;
+			}
+
+			#ruleMask {
+				position: fixed;
+				inset: 0;
+				background: rgba(0, 0, 0, .6);
+				display: none;
+				align-items: center;
+				justify-content: center;
+				z-index: 25;
+			}
+
+			#rulePanel {
+				background: #020617;
+				border: 1px solid #334155;
+				border-radius: 16px;
+				padding: 22px;
+				width: 460px;
+				max-width: 90%;
+			}
+
+			#rulePanel h2 {
+				margin: 0 0 12px;
+				text-align: center;
+			}
+
+			#ruleContent p {
+				margin: 10px 0;
+				line-height: 1.6;
+			}
+			
+			#ruleContent a {
+				color: var(--text)
+			}
+
+			#deadMask {
+				position: fixed;
+				inset: 0;
+				background: rgba(0, 0, 0, .75);
+				display: none;
+				align-items: center;
+				justify-content: center;
+				z-index: 30;
+			}
+
+			#deadPanel {
+				background: #020617;
+				border: 1px solid #7f1d1d;
+				border-radius: 20px;
+				padding: 26px 34px;
+				text-align: center;
+			}
+
+			#deadPanel h1 {
+				margin: 0 0 12px;
+				color: #ef4444;
+			}
+
+			#deadPanel button {
+				margin-top: 14px;
+				padding: 10px 28px;
+				border-radius: 14px;
+				border: 0;
+				background: #ef4444;
+				color: #000;
+				font-size: 16px;
+				cursor: pointer;
+			}
+
+			#overviewSvg {
+				width: 180px;
+				height: 120px;
+				position: absolute;
+				right: 20px;
+				top: 59px;
+				background: #020617cc;
+				border-radius: 10px;
+				box-shadow: 0 0 0 1px var(--grid);
+				filter: blur(1px);
+			}
+		</style>
+	</head>
+	<body>
+		<div id="start">
+			<div class="start-panel">
+				<h1>股市游戏</h1>
+				<p class="subtitle">在极端变化的市场中生存</p>
+				<button onclick="startGame()">进入市场</button>
+				<p class="tip">Game made by <a href="https://github.com/zhujingqi">Jacky</a> · <a
+						href="https://zhujingqi.com">zhujingqi.com</a></p>
+			</div>
+		</div>
+
+		<div id="top">
+			<div id="money"></div>
+			<div id="stock"></div>
+			<button id="achvBtn">🏆 成就</button>
+			<button id="ruleBtn">📜 规则</button>
+			<button id="resetBtn" onclick="localStorage.removeItem('achv-final');location.reload()">
+				重置成就
+			</button>
+		</div>
+
+		<div id="chartWrap" style="display:flex;gap:12px;padding:12px">
+			<svg id="mainSvg" width="900" height="360">
+				<g id="grid"></g>
+				<g id="axis"></g>
+				<polyline id="line" fill="none" stroke="var(--line)" stroke-width="2" />
+				<g id="trades"></g>
+			</svg>
+
+			<svg id="overviewSvg">
+				<polyline id="overviewLine" fill="none" stroke="var(--line)" stroke-width="1.5" opacity="0.9" />
+			</svg>
+		</div>
+
+		<div id="panel">
+			<button id="buy">BUY</button>
+			<button id="sell">SELL</button>
+		</div>
+		<div id="achvMask">
+			<div id="achvPanel">
+				<h2>🏆 成就</h2>
+				<div id="achvList"></div>
+				<h6>
+					<center>点击空白处关闭</center>
+				</h6>
+			</div>
+		</div>
+		<div id="ruleMask">
+			<div id="rulePanel">
+				<h2>📜 游戏规则</h2>
+				<div id="ruleContent">
+					<p><b>🎯 目标</b><br>在极端波动的市场中存活并积累资产。</p>
+
+					<p><b>💰 初始状态</b><br>
+						初始资金：$500<br>
+						初始股票：0<br>
+						初始价格：$100
+					</p>
+
+					<p><b>📈 市场机制</b><br>
+						- 价格每 300ms 变化一次<br>
+						- 随机发生高波动事件（极端行情）<br>
+						- 价格不会跌破 $1
+					</p>
+
+					<p><b>🛒 交易规则</b><br>
+						- BUY：用当前价格买入 1 股<br>
+						- SELL：按当前价格卖出 1 股<br>
+					</p>
+
+					<p><b>☠️ 破产判定</b><br>
+						当现金不足以买入 1 股，且持股为 0 时，游戏结束。
+					</p>
+
+					<p>
+						Game made by
+						<a href="https://github.com/zhujingqi">Jacky</a> ·
+						<a href="https://zhujingqi.com">zhujingqi.com</a>
+					</p>
+
+					<h6>
+						<center>点击空白处关闭</center>
+					</h6>
+				</div>
+			</div>
+		</div>
+		<div id="deadMask">
+			<div id="deadPanel">
+				<h1>💀 破产</h1>
+				<p id="deadInfo"></p>
+				<button onclick="location.reload()">重新开始</button>
+			</div>
+		</div>
+
+		<script>
+			/* ===== config ===== */
+			const W = 900,
+				H = 360,
+				maxPoints = 120,
+				tickInterval = 300;
+
+			/* ===== state ===== */
+			let money = 500,
+				stock = 0,
+				price = 100,
+				alive = false;
+			let data = [],
+				trades = [],
+				shock = 1;
+			let smoothCenter = price;
+			let lastTradeTime = Date.now();
+			let tradeTimes = [];
+
+			/* ===== dom ===== */
+			const moneyDiv = document.getElementById('money');
+			const stockDiv = document.getElementById('stock');
+			const lineEl = document.getElementById('line');
+			const axisG = document.getElementById('axis');
+			const gridG = document.getElementById('grid');
+			const tradesG = document.getElementById('trades');
+			const deadMask = document.getElementById('deadMask');
+			const deadInfo = document.getElementById('deadInfo');
+			const overviewLine = document.getElementById('overviewLine');
+			const OW = 180;
+			const OH = 120;
+
+			/* ===== achievements ===== */
+			const achv = {
+				first: false,
+				banker: false,
+				senior: false,
+				survivor: false,
+				rich: false,
+				alive: false,
+			};
+			Object.assign(achv, JSON.parse(localStorage.getItem('achv-final') || '{}'));
+
+			function saveAchv() {
+				localStorage.setItem('achv-final', JSON.stringify(achv));
+			}
+
+			function toast(t) {
+				const d = document.createElement('div');
+				d.className = 'toast';
+				d.textContent = '🏆 ' + t;
+				document.body.appendChild(d);
+				setTimeout(() => d.remove(), 5000);
+			}
+
+			function unlock(k, name) {
+				if (!achv[k]) {
+					achv[k] = true;
+					saveAchv();
+					toast(name);
+				}
+			}
+
+			/* ===== start ===== */
+			function startGame() {
+				start.classList.add('fade-out');
+				setTimeout(() => {
+					start.style.display = 'none';
+				}, 600);
+				alive = true;
+				data = [];
+				smoothCenter = price;
+				for (let i = 0; i < maxPoints; i++) data.push(price);
+			}
+
+			/* ===== ui ===== */
+			function ui() {
+				moneyDiv.textContent = '💰 $' + money.toFixed(2);
+				stockDiv.textContent = '📦 ' + stock;
+			}
+
+			/* ===== draw ===== */
+			function draw() {
+				const cur = data.length - 1;
+				const startIndex = Math.max(0, cur - Math.floor(maxPoints / 2));
+				const view = data.slice(startIndex, startIndex + maxPoints);
+
+				smoothCenter = smoothCenter * 0.9 + price * 0.1;
+				const range = 50;
+				const minY = smoothCenter - range;
+				const maxY = smoothCenter + range;
+
+				gridG.innerHTML = '';
+				axisG.innerHTML = '';
+
+				for (let p = Math.floor(minY / 10) * 10; p <= maxY; p += 10) {
+					const y = (maxY - p) / (maxY - minY) * H;
+
+					const gl = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+					gl.setAttribute('x1', 0);
+					gl.setAttribute('x2', W);
+					gl.setAttribute('y1', y);
+					gl.setAttribute('y2', y);
+					gl.setAttribute('stroke', 'var(--grid)');
+					gridG.appendChild(gl);
+
+					const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+					t.setAttribute('x', 6);
+					t.setAttribute('y', y + 4);
+					t.setAttribute('fill', '#94a3b8');
+					t.textContent = p;
+					axisG.appendChild(t);
+				}
+
+				lineEl.setAttribute('points',
+					view.map((p, i) => `${i*(W/(maxPoints-1))},${(maxY-p)/(maxY-minY)*H}`).join(' ')
+				);
+
+				tradesG.innerHTML = '';
+				trades.forEach(t => {
+					if (t.i < startIndex || t.i >= startIndex + maxPoints) return;
+					const i = t.i - startIndex;
+					const x = i * (W / (maxPoints - 1));
+					const y = (maxY - t.p) / (maxY - minY) * H;
+
+					const l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+					l.setAttribute('x1', x);
+					l.setAttribute('x2', x);
+					l.setAttribute('y1', y);
+					l.setAttribute('y2', H);
+					l.setAttribute('stroke', t.type === 'buy' ? 'var(--green)' : 'var(--red)');
+					l.setAttribute('stroke-width', 2);
+					tradesG.appendChild(l);
+				});
+			}
+
+			function drawOverview() {
+				if (data.length < 2) return;
+
+				const center = price;
+				const range = 300;
+				const min = center - range;
+				const max = center + range;
+
+				overviewLine.setAttribute(
+					'points',
+					data.map((p, i) => {
+						const x = i / (data.length - 1) * OW;
+						const y = (max - p) / (max - min) * OH;
+						return `${x},${y}`;
+					}).join(' ')
+				);
+			}
+
+			/* ===== market ===== */
+			function simulate() {
+				let vol = 50;
+				if (Math.random() < 0.03) {
+					vol = 150;
+					shock = 2.5;
+				}
+				price = Math.max(1, price + (Math.random() - 0.5) * vol * shock);
+				shock *= 0.9;
+				data.push(price);
+			}
+
+			/* ===== tick ===== */
+			function tick() {
+				if (!alive) return;
+				simulate();
+
+				if (money >= 2000) unlock('banker', '银行家');
+				if (money >= 5000) unlock('senior', '资深银行家');
+				if (!achv.still && Date.now() - lastTradeTime >= 30000) unlock('still', '不动如山');
+
+				checkBankrupt();
+				ui();
+			}
+
+			/* ===== render ===== */
+			function render() {
+				if (alive) {
+					draw();
+					drawOverview();
+				}
+				requestAnimationFrame(render);
+			}
+			render();
+
+			/* ===== trade ===== */
+			buy.onclick = () => {
+				lastTradeTime = Date.now();
+				if (money < price) return;
+				if (!alive) return;
+				money -= price;
+				stock++;
+				trades.push({
+					i: data.length - 1,
+					p: price,
+					type: 'buy'
+				});
+				if (price > 400) unlock('rich', '有钱人');
+
+				const now = Date.now();
+				tradeTimes.push(now);
+				tradeTimes = tradeTimes.filter(t => now - t <= 5000);
+				if (!achv.fast && tradeTimes.length >= 10) {
+					unlock('fast', '手速飞快');
+				}
+
+				unlock('first', '第一次交易');
+				ui();
+			};
+
+			sell.onclick = () => {
+				lastTradeTime = Date.now();
+				if (!alive || stock <= 0) return;
+				money += price;
+				stock--;
+				const lastBuy = [...trades].reverse().find(t => t.type === 'buy');
+				if (lastBuy && lastBuy.p - price >= 100 && money >= 0) {
+					unlock('survivor', '生存者');
+				}
+				trades.push({
+					i: data.length - 1,
+					p: price,
+					type: 'sell'
+				});
+				const now = Date.now();
+				tradeTimes.push(now);
+				tradeTimes = tradeTimes.filter(t => now - t <= 5000);
+				if (!achv.fast && tradeTimes.length >= 10) {
+					unlock('fast', '手速飞快');
+				}
+
+				unlock('first', '第一次交易');
+				ui();
+			};
+
+			/* ===== news ===== */
+			const newsList = [
+				'⚠️ 巨量资金瞬间撤离市场，流动性急剧枯竭',
+				'💥 系统性风险爆发，市场进入失控状态',
+				'🌍 全球资本恐慌性重配，避险情绪飙升',
+				'📉 连锁清算触发，市场出现瀑布式下跌',
+				'📈 政策核弹级刺激释放，资金疯狂涌入',
+				'🏦 多家大型机构紧急调整头寸，方向不明',
+				'⚡ 算法交易全面接管市场，人类交易员退场',
+				'🚨 监管突发声明，市场进入高度不确定期',
+				'🧠 有交易员声称“这不是随机波动”',
+				'🧪 随机函数表示：我也没想到会这样',
+				'🍀 市场共识被重新定义为“运气”',
+				'😕 著名经济学家杰基表示，当前股市已无可救药'
+			];
+
+			setInterval(() => {
+				if (!alive) return;
+				const d = document.createElement('div');
+				d.className = 'news';
+				d.textContent = newsList[Math.floor(Math.random() * newsList.length)];
+				document.body.appendChild(d);
+				shock = 3;
+				setTimeout(() => d.remove(), 5000);
+			}, 15000);
+
+			ui();
+			setInterval(tick, tickInterval);
+
+			const achvMeta = [{
+					k: 'first',
+					name: '第一次交易',
+					desc: '进行一次买入'
+				},
+				{
+					k: 'banker',
+					name: '银行家',
+					desc: '资产达到 $2000'
+				},
+				{
+					k: 'senior',
+					name: '资深银行家',
+					desc: '资产达到 $5000'
+				},
+				{
+					k: 'survivor',
+					name: '生存者',
+					desc: '单次买卖亏损 ≥ $100，且未破产'
+				},
+				{
+					k: 'rich',
+					name: '有钱人',
+					desc: '在价格 > $400 时买入'
+				},
+				{
+					k: 'still',
+					name: '不动如山',
+					desc: '超过30秒未进行任何交易'
+				},
+				{
+					k: 'fast',
+					name: '手速飞快',
+					desc: '5秒内完成10次交易'
+				}, {
+					k: 'alive',
+					name: '居然活到现在',
+					desc: '破产'
+				}
+			];
+			const achvMask = document.getElementById('achvMask');
+			const achvList = document.getElementById('achvList');
+			const achvBtn = document.getElementById('achvBtn');
+
+			function renderAchv() {
+				achvList.innerHTML = '';
+				achvMeta.forEach(a => {
+					const ok = achv[a.k];
+					const d = document.createElement('div');
+					d.className = 'achvItem ' + (ok ? 'unlocked' : 'locked');
+					d.innerHTML = `
+			      <div style="font-size:16px;margin-bottom:4px">
+			        ${ok ? '🏆' : '🔒'} ${a.name}
+			      </div>
+			      <div style="
+			        font-size:12px;
+			        opacity:.8;
+			        line-height:1.4
+			      ">
+			        ${a.desc}
+			      </div>
+			    `;
+					achvList.appendChild(d);
+				});
+			}
+
+			achvBtn.onclick = () => {
+				renderAchv();
+				achvMask.style.display = 'flex';
+			};
+
+			achvMask.onclick = e => {
+				if (e.target === achvMask) {
+					achvMask.style.display = 'none';
+				}
+			};
+
+			const ruleBtn = document.getElementById('ruleBtn');
+			const ruleMask = document.getElementById('ruleMask');
+
+			ruleBtn.onclick = () => {
+				ruleMask.style.display = 'flex';
+			};
+
+			ruleMask.onclick = e => {
+				if (e.target === ruleMask) {
+					ruleMask.style.display = 'none';
+				}
+			};
+
+			function checkBankrupt() {
+				if (money < price && stock === 0) {
+					alive = false;
+					deadInfo.textContent =
+						`最终资产：$${money.toFixed(2)}`;
+					deadMask.style.display = 'flex';
+					unlock('alive', '居然活到现在');
+				}
+			}
+
+			document.addEventListener('contextmenu', e => {
+				e.preventDefault();
+			});
+		</script>
+	</body>
+</html>
