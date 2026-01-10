@@ -798,7 +798,7 @@
 							});
 						}
 						list.sort((a, b) => b.max - a.max);
-						list = list.slice(0, 20);
+						list = list.slice(0, 50);
 						await saveRank(list);
 						resolve();
 					};
