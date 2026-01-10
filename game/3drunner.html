@@ -269,9 +269,9 @@
 		</div>
 		<div id="ruleScreen" class="overlayScreen fade" style="display:none">
 			<h1>RULE</h1>
-			<p>← → Move</p>
-			<p>↑ Jump</p>
-			<p>↓ Crouch to pass a sign</p>
+			<p>←/A →/D Move</p>
+			<p>↑/W/Space Jump</p>
+			<p>↓/S Crouch to pass a sign</p>
 			<p><span style="background: #33f; border-radius: 15px;">&emsp;</span>&emsp;Player</p>
 			<p><span style="background: #f00; border-radius: 15px;">&emsp;</span>&emsp;Train</p>
 			<p><span style="background: #fa0; border-radius: 15px;">&emsp;</span>&emsp;Block</p>
@@ -798,7 +798,7 @@
 							});
 						}
 						list.sort((a, b) => b.max - a.max);
-						list = list.slice(0, 10);
+						list = list.slice(0, 20);
 						await saveRank(list);
 						resolve();
 					};
@@ -839,6 +839,22 @@
 			document.addEventListener("contextmenu", e => {
 				e.preventDefault();
 			});
+			function isMobile() {
+				const user = navigator.userAgent;
+				const agents = ['Android', 'iPhone', 'SymbianOS', 'Windows Phone', 'iPod'];
+				let flag = false;
+				for (let i = 0; i < agents.length; i++) {
+					if (user.indexOf(agents[i]) > 0) {
+						flag = true;
+						break;
+					}
+				}
+			return flag;
+			}
+			if (isMobile()) {
+				alert('由于需要键盘操作，3D Runner游戏暂不支持手机操作，请用PC以游玩！');
+				location.reload();
+			}
 		</script>
 	</body>
 </html>
