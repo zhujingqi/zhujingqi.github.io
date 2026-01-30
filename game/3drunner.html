@@ -274,7 +274,9 @@
 			<p>↓/S Crouch to pass a sign</p>
 			<p><span style="background: #33f; border-radius: 15px;">&emsp;</span>&emsp;Player</p>
 			<p><span style="background: #f00; border-radius: 15px;">&emsp;</span>&emsp;Train</p>
+			<p><span style="background: #d33; border-radius: 15px;">&emsp;</span>&emsp;Moving Train</p>
 			<p><span style="background: #fa0; border-radius: 15px;">&emsp;</span>&emsp;Block</p>
+			<p><span style="background: #a0f; border-radius: 15px;">&emsp;</span>&emsp;Moving Block</p>
 			<p><span style="background: #f80; border-radius: 15px;">&emsp;</span>&emsp;Sign</p>
 			<p><span style="background: #0f0; border-radius: 15px;">&emsp;</span>&emsp;Jump Pad (onto a train)</p>
 			<p><span style="background: #0cf; border-radius: 15px;">&emsp;</span>&emsp;Jump Boost (Let's jump high in
@@ -374,6 +376,8 @@
 				const r = Math.random();
 				let type = "block";
 				if (r < 0.02) type = "supershoe";
+				else if (r < 0.12) type = "mover";
+				else if (r < 0.22) type = "mtrain";
 				else if (r < 0.4) type = "train";
 				else if (r < 0.6) type = "sign";
 				if (type === "supershoe") {
@@ -390,6 +394,23 @@
 					scene.add(shoe);
 					obstacles.push(shoe);
 					return;
+				} else if (type === "mover") {
+					const mover = new THREE.Mesh(
+						new THREE.BoxGeometry(1.4, 1.4, 1.4),
+						new THREE.MeshStandardMaterial({
+							color: 0xaa00ff
+						})
+					);
+					mover.position.x = 0;
+					mover.position.y = 0.7;
+					mover.position.z = zPos;
+					mover.userData = {
+						type: "mover",
+						dir: Math.random() < 0.5 ? -1 : 1,
+						speed: 0.05 + Math.random() * 0.03
+					};
+					scene.add(mover);
+					obstacles.push(mover);
 				} else if (type === "train") {
 					const TRAIN_SAFE_DISTANCE = 18;
 					const laneIndex = Math.floor(Math.random() * 3);
@@ -430,6 +451,28 @@
 						zStart -= 8;
 					}
 					zPos += TRAIN_SAFE_DISTANCE;
+				} else if (type === "mtrain") {
+					const sections = Math.floor(Math.random() * 4) + 2;
+					const laneIndex = Math.floor(Math.random() * 3);
+					let zStart = zPos;
+					for (let i = 0; i < sections; i++) {
+						const train = new THREE.Mesh(
+							new THREE.BoxGeometry(2, 2.5, 8),
+							new THREE.MeshStandardMaterial({
+								color: 0xdd3333
+							})
+						);
+						train.position.x = lanes[laneIndex];
+						train.position.y = 1.25;
+						train.position.z = zStart;
+						train.userData = {
+							type: "mtrain",
+							driveSpeed: 0.4 + Math.random() * 0.15
+						};
+						scene.add(train);
+						obstacles.push(train);
+						zStart -= 8;
+					}
 				} else if (type === "sign") {
 					const sign = new THREE.Group();
 					const mat = new THREE.MeshStandardMaterial({
@@ -618,22 +661,39 @@
 					isGrounded = true;
 				}
 				obstacles.forEach(o => o.position.z += speed);
+				for (const o of obstacles) {
+					if (o.userData.type === "mover") {
+						o.position.x += o.userData.dir * o.userData.speed;
+						if (o.position.x > 3) {
+							o.position.x = 3;
+							o.userData.dir = -1;
+						}
+						if (o.position.x < -3) {
+							o.position.x = -3;
+							o.userData.dir = 1;
+						}
+					} else if (o.userData.type === "mtrain") {
+						o.position.z += o.userData.driveSpeed;
+					}
+				}
 				coins.forEach(c => c.position.z += speed);
 				trees.forEach(t => t.position.z += speed);
 				for (const o of obstacles) {
 					const dx = Math.abs(o.position.x - player.position.x);
 					const dz = Math.abs(o.position.z - player.position.z);
 					const dy = player.position.y - o.position.y;
-					if (o.userData.type === "train") {
+					if (o.userData.type === "train" || o.userData.type === "mtrain") {
 						const topY = o.position.y + 2.3;
 						if (dx < 1 && dz < 4) {
-							if (ySpeed <= 0 && player.position.y >= topY - 0.05 && player.position.y <= topY + 0.5) {
+							if (
+								ySpeed <= 0 &&
+								player.position.y >= topY - 0.05 &&
+								player.position.y <= topY + 0.5
+							) {
 								player.position.y = topY;
 								isGrounded = true;
 								ySpeed = 0;
 								onTrain = true;
-							} else if (player.position.y > topY + 0.05) {
-								/*Do nothing*/
 							} else if (player.position.y < topY - 0.05) {
 								gameOver("Hit a train");
 							}
@@ -651,6 +711,10 @@
 						}
 					} else if (o.userData.type === "block") {
 						if (dx < 1 && dz < 1.5 && Math.abs(dy) < 1.5) gameOver("Hit a block");
+					} else if (o.userData.type === "mover") {
+						if (dx < 1 && dz < 1.5 && Math.abs(dy) < 1.5) {
+							gameOver("Hit a moving block");
+						}
 					} else if (o.userData.type === "supershoe") {
 						if (dx < 1 && dz < 1.5) {
 							boostmsg();
@@ -839,6 +903,7 @@
 			document.addEventListener("contextmenu", e => {
 				e.preventDefault();
 			});
+
 			function isMobile() {
 				const user = navigator.userAgent;
 				const agents = ['Android', 'iPhone', 'SymbianOS', 'Windows Phone', 'iPod'];
@@ -849,7 +914,7 @@
 						break;
 					}
 				}
-			return flag;
+				return flag;
 			}
 			if (isMobile()) {
 				alert('由于需要键盘操作，3D Runner游戏暂不支持手机操作，请用PC以游玩！');
