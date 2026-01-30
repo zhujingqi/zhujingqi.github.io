@@ -661,8 +661,8 @@
 					delisted = true; // 标记为下市
 					delistMask.style.display = 'flex'; // 显示下市面板
 
-					const delistDuration = 5000 + Math.random() * 10000; // 下市时间
-					let remaining = Math.ceil(delistDuration / 1000); // 秒数倒计时
+					//const delistDuration = 5000 + Math.random() * 10000; // 下市时间
+					let remaining = 3; // 秒数倒计时
 
 					// 每秒更新倒计时显示
 					const timer = setInterval(() => {
@@ -907,3 +907,4 @@
 
 	</body>
 </html>
+
