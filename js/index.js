@@ -32,6 +32,14 @@ document.addEventListener('DOMContentLoaded', function() {
 		}
 	});
 });
+const c = document.getElementById("bgt");
+const s = Array.from(c.children);
+for (let i = s.length - 1; i > 0; i--) {
+	const j = Math.floor(Math.random() * (i + 1));
+	[s[i], s[j]] = [s[j], s[i]];
+}
+c.innerHTML = "";
+s.forEach(span => c.appendChild(span));
 
 const pupils = document.querySelectorAll(".pupil");
 document.addEventListener("mousemove", (e) => {
@@ -58,54 +66,56 @@ const countDiv = document.getElementById("watered-count");
 let wateredTimes = 0;
 
 async function loadWateredTimes() {
-    try {
-        const res = await fetch(dbReadURL);
-        const text = await res.text();
-        wateredTimes = parseInt(text) || 0;
-        countDiv.innerText = `已被浇水${wateredTimes}次！`;
-    } catch {
-        countDiv.innerText = "未被浇水。";
-    }
+	try {
+		const res = await fetch(dbReadURL);
+		const text = await res.text();
+		wateredTimes = parseInt(text) || 0;
+		countDiv.innerText = `已被浇水${wateredTimes}次！`;
+	} catch {
+		countDiv.innerText = "未被浇水。";
+	}
 }
 
 async function waterPlant() {
-    wateredTimes += 1;
+	wateredTimes += 1;
 	can();
-    countDiv.innerText = `已被浇水${wateredTimes}次！`;
-    const params = new URLSearchParams();
-    params.append('db', dbName);
-    params.append('key', dbKey);
-    params.append('value', wateredTimes);
-    try {
-        await fetch(dbWriteURL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: params.toString()
-        });
-    } catch (err) {
-        console.error(err);
-    }
+	countDiv.innerText = `已被浇水${wateredTimes}次！`;
+	const params = new URLSearchParams();
+	params.append('db', dbName);
+	params.append('key', dbKey);
+	params.append('value', wateredTimes);
+	try {
+		await fetch(dbWriteURL, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/x-www-form-urlencoded'
+			},
+			body: params.toString()
+		});
+	} catch (err) {
+		console.error(err);
+	}
 }
 
 loadWateredTimes();
 plant.addEventListener("click", waterPlant);
 
 function can() {
-    const can = document.getElementById("can");
-    can.style.display = "block";
-    can.style.opacity = "1";
-    can.style.transform = "rotate(0deg) scale(1)";
-    setTimeout(() => {
-        can.style.transform = "rotate(-30deg) scale(1)";
-    }, 100);
-    setTimeout(() => {
-        can.style.transform = "rotate(0deg) scale(1)";
-    }, 600);
-    setTimeout(() => {
-        can.style.opacity = "0";
-        can.style.transform = "rotate(0deg) scale(0.95)";
-    }, 1000);
-    setTimeout(() => {
-        can.style.display = "none";
-    }, 1200);
+	const can = document.getElementById("can");
+	can.style.display = "block";
+	can.style.opacity = "1";
+	can.style.transform = "rotate(0deg) scale(1)";
+	setTimeout(() => {
+		can.style.transform = "rotate(-30deg) scale(1)";
+	}, 100);
+	setTimeout(() => {
+		can.style.transform = "rotate(0deg) scale(1)";
+	}, 600);
+	setTimeout(() => {
+		can.style.opacity = "0";
+		can.style.transform = "rotate(0deg) scale(0.95)";
+	}, 1000);
+	setTimeout(() => {
+		can.style.display = "none";
+	}, 1200);
 }
