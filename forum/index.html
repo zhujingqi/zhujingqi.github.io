@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title>Jacky 论坛 - Zhujingqi</title>
+		<link rel="icon" type="image/png" href="forum.png">
+		<style>
+			:root {
+				--bg: #eee;
+				--card: #fff;
+				--text: #111;
+				--sub: #666;
+				--green: #0a0;
+				--grad: #0a0;
+				--active: #0a0;
+				font-size: 18px;
+			}
+
+			body.dark {
+				--bg: #111;
+				--card: #222;
+				--text: #eee;
+				--sub: #aaa;
+			}
+
+			body {
+				margin: 0;
+				background: var(--bg);
+				color: var(--text);
+			}
+
+			body::-webkit-scrollbar {
+				width: 10px;
+			}
+
+			body::-webkit-scrollbar-thumb {
+				background-color: #ccc;
+				border-radius: 5px;
+			}
+
+			body.dark::-webkit-scrollbar-thumb {
+				background-color: #333;
+			}
+
+			button {
+				border: 0;
+				padding: 0 12px;
+				border-radius: 20px;
+				cursor: pointer;
+				background: var(--card);
+				color: var(--text);
+				transition: .2s;
+				box-sizing: border-box;
+				height: 42px;
+				font-size: 18px;
+			}
+
+			button:hover {
+				background: var(--grad);
+				color: #fff;
+			}
+
+			input,
+			textarea {
+				width: 100%;
+				padding: 12px;
+				margin: 6px 0;
+				border-radius: 20px;
+				border: 1px solid #ccc;
+				background: var(--card);
+				color: var(--text);
+				box-sizing: border-box;
+				height: 42px;
+				font-size: 18px;
+				overflow: auto;
+			}
+
+			textarea {
+				height: 120px;
+				resize: none;
+			}
+
+			a {
+				color: var(--green);
+			}
+
+			.center {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+				height: 100vh;
+			}
+
+			.card {
+				background: var(--card);
+				padding: 30px;
+				border-radius: 20px;
+				box-shadow: 0 10px 40px rgba(0, 0, 0, .15);
+				width: 340px;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.big {
+				font-size: 36px;
+				font-weight: bold;
+				margin-bottom: 20px;
+				text-align: center;
+			}
+
+			.hidden {
+				display: none !important;
+			}
+
+			#main,
+			#profilePage,
+			#userListPage {
+				margin-top: 0px;
+				padding-bottom: 0;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				width: 100%;
+				height: 100vh;
+			}
+
+			#posts,
+			#userPosts {
+				width: 100%;
+				max-width: 800px;
+				overflow-y: auto;
+				overflow-x: hidden;
+				flex: 1;
+				padding-bottom: 20px;
+			}
+
+			#logo {
+				font-size: 40px;
+				font-weight: bold;
+				padding: 20px;
+				text-align: center;
+				color: var(--green);
+			}
+
+			#pname {
+				font-size: 40px;
+			}
+
+			.post {
+				background: var(--card);
+				margin: 14px auto;
+				padding: 20px;
+				border-radius: 20px;
+				box-shadow: 0 8px 15px rgba(0, 0, 0, .1);
+				width: 80%;
+				max-width: 800px;
+				word-wrap: break-word;
+				font-size: 20px;
+				white-space: pre-wrap;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.postHeader {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 8px;
+			}
+
+			.time {
+				font-size: 14px;
+				color: var(--sub);
+				margin-left: 6px;
+			}
+
+			.like {
+				cursor: pointer;
+				color: var(--sub);
+			}
+
+			.like.liked {
+				color: #f66;
+				margin-left: 6px;
+			}
+
+			.comment {
+				margin-top: 10px;
+				padding-top: 8px;
+				border-top: 1px solid #ddd;
+				font-size: 16px;
+				white-space: pre-wrap;
+			}
+
+			.commentRow {
+				display: flex;
+				margin-top: 5px;
+			}
+
+			.commentRow input {
+				flex: 1;
+				margin-right: 5px;
+				height: 40px;
+				margin: 0;
+			}
+
+			.commentRow button {
+				margin-left: 5px;
+				height: 40px;
+			}
+
+			.deleteBtn {
+				margin-left: 15px;
+			}
+
+			.bottom {
+				position: fixed;
+				bottom: 0;
+				left: 0;
+				right: 0;
+				display: flex;
+				height: 40px;
+				margin: 0;
+			}
+
+			.bottom button {
+				flex: 1;
+				text-align: center;
+				padding: 0px;
+				font-size: 18px;
+				border-radius: 0;
+				border-top: 3px solid transparent;
+			}
+
+			.bottom button.active {
+				background: var(--active);
+				color: #fff;
+				border-top-color: var(--green);
+			}
+
+			.modal {
+				position: fixed;
+				inset: 0;
+				background: rgba(0, 0, 0, .4);
+				display: flex;
+				justify-content: center;
+				align-items: center;
+			}
+
+			.modalBox {
+				background: var(--card);
+				padding: 30px;
+				border-radius: 20px;
+				width: 300px;
+				text-align: center;
+			}
+
+			.moreMenu {
+				position: absolute;
+				bottom: 80px;
+				right: -110px;
+				transform: translateX(-50%);
+				background: var(--card);
+				padding: 15px;
+				border-radius: 20px;
+				box-shadow: 0 5px 20px rgba(0, 0, 0, .2);
+				width: 240px;
+				text-align: center;
+			}
+
+			.moreMenu div {
+				padding: 8px;
+				cursor: pointer;
+			}
+
+			.moreMenu div:hover {
+				color: var(--green);
+			}
+
+			.userLink {
+				cursor: pointer;
+				color: var(--green);
+			}
+
+			.userItem {
+				width: 500px;
+				padding: 20px;
+				border-bottom: 1px solid #aaa;
+				font-size: 20px;
+				cursor: pointer;
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+
+			.userItem:last-child {
+				border-bottom: none;
+			}
+
+			.tagBar {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 8px;
+				margin-bottom: 10px;
+			}
+
+			.tag {
+				padding: 4px 12px;
+				border-radius: 20px;
+				background: var(--bg);
+				cursor: pointer;
+				font-size: 14px;
+				border: 1px solid #ccc;
+				transition: .2s;
+			}
+
+			.tag:hover {
+				background: var(--green);
+				color: #fff;
+			}
+
+			.tag.active {
+				background: var(--green);
+				color: #fff;
+				border-color: var(--green);
+			}
+
+			.postHeaderTop {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+
+			.postTags {
+				display: flex;
+				flex-wrap: wrap;
+				font-size: 15px;
+			}
+
+			.postTag {
+				background: var(--green);
+				color: #fff;
+				padding: 4px 10px;
+				border-radius: 20px;
+				margin: 5px;
+				display: inline-block;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="bottom hidden" id="nav">
+			<button id="homeBtn">首页</button>
+			<button id="editorBtn">发布</button>
+			<button id="showUsersBtn">用户</button>
+			<button id="profileBtn">我的</button>
+			<button id="moreBtn">更多</button>
+		</div>
+		<div id="welcomePage" class="center">
+			<div class="big">
+				<img src="forum.png" />
+				Jacky 论坛
+			</div>
+			<div class="card">
+				<input id="loginUser" placeholder="用户名" autofocus>
+				<input id="loginPass" type="password" placeholder="密码">
+				<button id="loginBtn">登录</button>
+				<div style="text-align:center;margin-top:10px">
+					<span style="color:var(--green);cursor:pointer" id="goRegister">没有账号？点击注册</span>
+				</div>
+				<span style="text-align:center; color:#aaa; font-size: 12px;">
+					<br>
+					<a href="#">Jacky 论坛</a> ·
+					<a href="https://zhujingqi.com">Zhujingqi</a>
+					<br>
+					© Jacky Forum. All rights reserved.
+				</span>
+			</div>
+		</div>
+		<div id="registerPage" class="center hidden">
+			<div class="big">注册</div>
+			<div class="card">
+				<input id="regUser" placeholder="用户名">
+				<input id="regPass" type="password" placeholder="密码">
+				<input id="regPass2" type="password" placeholder="再次输入密码">
+				<button id="registerBtn">注册</button>
+				<h6>注：请牢记用户名和密码，注册后你将无法修改密码或注销！</h6>
+				<div style="text-align:center;margin-top:10px">
+					<span style="color:var(--green);cursor:pointer" id="backLogin">已有帐号？返回登录</span>
+				</div>
+			</div>
+		</div>
+		<div id="main" class="hidden">
+			<div id="logo">
+				<img src="forum.png" style="width: 100px; height: 100px;" />
+				Jacky 论坛
+			</div>
+			<div id="posts"></div>
+		</div>
+		<div id="editorPage" class="hidden center">
+			<div class="card" style="width:95%;max-width:600px;">
+				<textarea id="text" placeholder="发布新鲜事（最多5000字符）" style="width:100%;" maxlength="5000"></textarea>
+				<div class="tagBarContainer"
+					style="display:flex;align-items:center;gap:6px;flex-wrap:nowrap;margin-top:8px;">
+					<div class="tagBar" id="tagBar" style="display:flex;gap:6px;flex-shrink:1;overflow-x:auto;"></div>
+					<input id="customTag" placeholder="自定义标签（你也可以不选择任何标签）"
+						style="height:36px;font-size:14px;flex-shrink:0;width:300px;" maxlength="10">
+				</div>
+				<button id="sendBtn">发布</button>
+			</div>
+		</div>
+		<div id="userListPage" class="hidden" style="display:flex;flex-direction:column;height:100vh;">
+			<div style="padding:20px;flex:1;overflow-y:auto;">
+				<h2 style="color:var(--green);">用户列表</h2>
+				<div style="display:flex;font-weight:bold;padding:8px 0;border-bottom:1px solid #ccc;width:500px;">
+					<div style="flex:1;">用户名</div>
+					<div style="width:150px;text-align:right;">注册时间</div>
+				</div>
+				<div id="userItems"></div>
+			</div>
+		</div>
+		<div id="profilePage" class="hidden" style="display:flex;flex-direction:column;height:100vh;">
+			<div class="postHeader" style="justify-content:flex-start;align-items:center;">
+				<h2 id="pname"></h2>
+				<button id="logoutBtn" style="margin-left:20px;">登出</button>
+			</div>
+			<div id="regTime" class="time"></div>
+			<br>
+			<div id="userPosts"></div>
+		</div>
+		<div id="moreMenu" class="moreMenu hidden">
+			<div id="aboutBtn">关于</div>
+			<hr>
+			<div id="sponsorBtn">赞助</div>
+			<hr>
+			<p>主题</p>
+			<div id="sysTheme">跟随系统</div>
+			<div id="lightTheme">浅色模式</div>
+			<div id="darkTheme">深色模式</div>
+		</div>
+		<div id="modal" class="modal hidden">
+			<div class="modalBox">
+				<div id="modalText"></div>
+				<div style="margin-top:20px"><button id="closeModal">确定</button></div>
+			</div>
+		</div>
+		<script>
+			document.addEventListener("DOMContentLoaded", () => {
+				const USER_KEY = "zhujingqi_forum_users",
+					POST_KEY = "zhujingqi_forum_posts";
+				const READ = k => "https://textdb.online/" + k;
+				const WRITE = "https://api.textdb.online/update/";
+				const $ = id => document.getElementById(id);
+				let currentUser = "";
+				let currentPage = "home";
+				const defaultTags = ["学习", "日常", "搞笑", "游戏", "提问"];
+				let selectedTags = [];
+
+				function initTags() {
+					const bar = $("tagBar");
+					bar.innerHTML = "";
+					selectedTags = [];
+					defaultTags.forEach(t => {
+						let div = document.createElement("div");
+						div.className = "tag";
+						div.innerText = t;
+						div.onclick = () => {
+							$("customTag").value = "";
+							if (selectedTags.includes(t)) {
+								selectedTags = [];
+								div.classList.remove("active");
+							} else {
+								document.querySelectorAll('#tagBar .tag.active').forEach(el => el.classList
+									.remove('active'));
+								selectedTags = [t];
+								div.classList.add("active");
+							}
+						};
+						bar.appendChild(div);
+					});
+				}
+				initTags();
+				$("customTag").addEventListener("input", () => {
+					if ($("customTag").value.trim() !== "") {
+						document.querySelectorAll('#tagBar .tag.active').forEach(el => el.classList.remove(
+							'active'));
+						selectedTags = [];
+					}
+				});
+
+				function show(p) {
+					["welcomePage", "registerPage", "main", "editorPage", "profilePage", "userListPage"].forEach(id => $(
+							id).classList
+						.add("hidden"));
+					$(p).classList.remove("hidden");
+					updateNav();
+				}
+
+				function modal(t) {
+					$("modalText").innerHTML = t;
+					$("modal").classList.remove("hidden")
+				}
+
+				function hideModal() {
+					$("modal").classList.add("hidden");
+					document.querySelector(".modalBox").style.width = "300px";
+				}
+
+				function updateNav() {
+					["homeBtn", "editorBtn", "profileBtn", "moreBtn", "showUsersBtn"].forEach(b => $(b).classList.remove(
+						"active"));
+					if (currentPage === "home") $("homeBtn").classList.add("active");
+					if (currentPage === "editor") $("editorBtn").classList.add("active");
+					if (currentPage === "profile") $("profileBtn").classList.add("active");
+					if (currentPage === "list") $("showUsersBtn").classList.add("active");
+				}
+				async function hash(text) {
+					const encoder = new TextEncoder();
+					const data = encoder.encode(text);
+					const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+					const hashArray = Array.from(new Uint8Array(hashBuffer));
+					return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+				}
+				async function dbLoad(k) {
+					try {
+						let r = await fetch(READ(k));
+						let t = await r.text();
+						return t ? JSON.parse(t) : {}
+					} catch {
+						return {}
+					}
+				}
+				async function dbSave(k, v) {
+					let p = new URLSearchParams();
+					p.append("key", k);
+					p.append("value", JSON.stringify(v));
+					await fetch(WRITE, {
+						method: "POST",
+						headers: {
+							"Content-Type": "application/x-www-form-urlencoded"
+						},
+						body: p
+					})
+				}
+				async function loadPosts(container = $("posts")) {
+					let posts = await dbLoad(POST_KEY);
+					container.innerHTML = "";
+					Object.values(posts).sort((a, b) => b.id - a.id).forEach(p => {
+						let d = document.createElement("div");
+						d.className = "post";
+						let liked = p.likes.includes(currentUser) ? "liked" : "";
+						d.innerHTML = `
+<div><span class="userLink" data-user="${p.user}"><b>${p.user}</b></span> <span class="time">${p.time}</span></div>
+${p.tags && p.tags.length ? `<div class="postTags">${p.tags.map(t=>`<span class="postTag">${t}</span>`).join('')}</div>` : ''}
+<div>${p.text}</div>
+<div style="margin-top:6px;display:flex;align-items:center;">
+<div class="like ${liked}" data-id="${p.id}">❤ ${p.likes.length}</div>
+${p.user===currentUser?'<button class="deleteBtn" data-del="'+p.id+'">删除</button>':""}
+</div>
+<div class="commentRow">
+<input placeholder="写评论..." data-cinput="${p.id}">
+<button data-cbtn="${p.id}">评论</button>
+</div>
+<div id="comments-${p.id}"></div>`;
+						d.querySelector(".like").onclick = () => likePost(p.id);
+						if (p.user === currentUser) d.querySelector(".deleteBtn")?.addEventListener("click",
+							() => deletePost(p.id));
+						const input = d.querySelector(`[data-cinput="${p.id}"]`);
+						input.addEventListener("keydown", e => {
+							if (e.key === "Enter" && !e.shiftKey) {
+								addComment(p.id, input.value, container);
+								input.value = "";
+								e.preventDefault();
+							}
+						});
+						d.querySelector(`[data-cbtn="${p.id}"]`).onclick = () => {
+							addComment(p.id, input.value, container);
+							input.value = "";
+						};
+						container.appendChild(d);
+						renderComments(p, container);
+					});
+					document.querySelectorAll(".userLink").forEach(el => el.onclick = () => viewUser(el.dataset
+						.user));
+				}
+
+				function renderComments(p, container) {
+					let box = $(container === $("posts") ? "comments-" + p.id : "comments-" + p.id);
+					if (!box) return;
+					box.innerHTML = "";
+					(p.comments || []).sort((a, b) => b.id - a.id).forEach(c => {
+						let div = document.createElement("div");
+						div.className = "comment";
+						div.style.display = "flex";
+						div.style.alignItems = "center";
+						div.style.justifyContent = "space-between";
+						let span = document.createElement("span");
+						span.innerHTML =
+							`<span class="userLink" data-user="${c.user}"><b>${c.user}</b></span>: ${c.text}`;
+						div.appendChild(span);
+						if (c.user === currentUser) {
+							let btn = document.createElement("button");
+							btn.innerText = "删除";
+							btn.style.marginLeft = "10px";
+							btn.style.height = "24px";
+							btn.style.fontSize = "12px";
+							btn.onclick = async () => {
+								let posts = await dbLoad(POST_KEY);
+								let comments = posts[p.id].comments;
+								posts[p.id].comments = comments.filter(x => x.id !== c.id);
+								await dbSave(POST_KEY, posts);
+								loadPosts(container === $("posts") ? $("posts") : $("userPosts"));
+							};
+							div.appendChild(btn);
+						}
+						box.appendChild(div);
+					});
+					document.querySelectorAll(".userLink").forEach(el => el.onclick = () => viewUser(el.dataset.user));
+				}
+				$("goRegister").onclick = () => show("registerPage");
+				$("backLogin").onclick = () => show("welcomePage");
+				$("closeModal").onclick = hideModal;
+				$("registerBtn").onclick = async () => {
+					let u = $("regUser").value.trim(),
+						p1 = $("regPass").value.trim(),
+						p2 = $("regPass2").value.trim();
+					if (!u || !p1 || !p2) return modal("请输入用户名和密码");
+					if (p1 !== p2) return modal("两次输入密码不一致");
+					let users = await dbLoad(USER_KEY);
+					if (users[u]) return modal("用户已存在");
+					users[u] = {
+						pass: await hash(p1),
+						time: new Date().toLocaleString()
+					};
+					await dbSave(USER_KEY, users);
+					modal("注册成功");
+					show("welcomePage");
+				};
+				$("loginBtn").onclick = async () => {
+					let u = $("loginUser").value.trim(),
+						p = $("loginPass").value.trim();
+					let users = await dbLoad(USER_KEY);
+					if (!users[u] || users[u].pass !== await hash(p)) return modal("用户名或密码错误");
+					currentUser = u;
+					localStorage.setItem("loginUser", u);
+					$("nav").classList.remove("hidden");
+					currentPage = "home";
+					show("main");
+					loadPosts();
+					modal(`欢迎 ${u} 来到 Jacky 论坛！`)
+				};
+				$("sendBtn").onclick = async () => {
+					let txt = $("text").value.trim();
+					if (!txt) return;
+					let posts = await dbLoad(POST_KEY),
+						id = Date.now();
+					let custom = $("customTag").value.trim();
+					let tagsToSave = [...selectedTags];
+					if (custom) {
+						tagsToSave = [custom];
+						document.querySelectorAll('#tagBar .tag.active').forEach(el => el.classList.remove(
+							'active'));
+						selectedTags = [];
+					} else if (selectedTags.length > 0) {
+						tagsToSave = [selectedTags[0]];
+					}
+					if (custom && !tagsToSave.includes(custom)) tagsToSave.push(custom);
+					posts[id] = {
+						id,
+						user: currentUser,
+						text: txt,
+						time: new Date().toLocaleString(),
+						tags: tagsToSave,
+						likes: [],
+						comments: []
+					};
+					await dbSave(POST_KEY, posts);
+					$("text").value = "";
+					$("customTag").value = "";
+					initTags();
+					currentPage = "home";
+					show("main");
+					loadPosts();
+				};
+				$("homeBtn").onclick = () => {
+					currentPage = "home";
+					show("main");
+					loadPosts();
+					updateNav();
+				}
+				$("editorBtn").onclick = () => {
+					currentPage = "editor";
+					show("editorPage");
+					updateNav();
+				}
+				$("profileBtn").onclick = () => {
+					currentPage = "profile";
+					viewUser(currentUser);
+					updateNav();
+				}
+				$("showUsersBtn").onclick = () => {
+					currentPage = "list";
+					show("userListPage");
+					loadUserList();
+					updateNav();
+				};
+				$("logoutBtn").onclick = () => {
+					currentUser = "";
+					localStorage.removeItem("loginUser");
+					$("nav").classList.add("hidden");
+					show("welcomePage");
+				}
+				const moreBtn = $("moreBtn"),
+					moreMenu = $("moreMenu");
+				moreBtn.onclick = e => {
+					moreMenu.classList.toggle("hidden");
+					e.stopPropagation();
+				}
+				document.addEventListener("click", e => {
+					if (!moreMenu.contains(e.target) && e.target !== moreBtn) moreMenu.classList.add("hidden");
+				});
+				$("aboutBtn").onclick = () => {
+					document.querySelector(".modalBox").style.width = "800px";
+					modal(`
+<h2>关于</h2>
+<div style="text-align: left;">
+<b>Jacky 论坛</b>是一款基于前端的网页论坛，使用 HTML、CSS 与 JavaScript 编写。<br>
+<br>
+<b>【原理】</b>用户数据与帖子数据存储在 textdb.online，通过 API 读取和更新内容。<br>
+<b>【功能】</b>用户系统、发帖和评论、点赞和删除、个人主页、用户列表、主题切换。<br>
+<b>【提醒】</b>本论坛不保证长期稳定运行。请勿发布重要内容，请勿滥用。<br>
+<br>
+如遇BUG，欢迎汇报至 <a href="mailto:jacky@zhujingqi.com">jacky@zhujingqi.com</a> 或 <a href="https://zhujingqi.com/me/contact.html">联系</a><br>
+</div>
+<h6><a href="#">Jacky 论坛</a> · <a href="https://zhujingqi.com">Zhujingqi</a></h6>
+<h6>© Jacky Forum. All rights reserved.</h6>
+`);
+				}
+				$("sponsorBtn").onclick = () => {
+					window.open("https://zhujingqi.com/money.html", "_blank");
+				};
+				$("sysTheme").onclick = () => document.body.classList.remove("dark");
+				$("lightTheme").onclick = () => document.body.classList.remove("dark");
+				$("darkTheme").onclick = () => document.body.classList.add("dark");
+				async function viewUser(u) {
+					let users = await dbLoad(USER_KEY);
+					let posts = await dbLoad(POST_KEY);
+					show("profilePage");
+					$("pname").innerText = u;
+					$("regTime").innerText = "注册时间：" + (users[u]?.time || "未知");
+					$("userPosts").innerHTML = "";
+					Object.values(posts).filter(p => p.user === u).sort((a, b) => b.id - a.id).forEach(p => {
+						let d = document.createElement("div");
+						d.className = "post";
+						let liked = p.likes.includes(currentUser) ? "liked" : "";
+						d.innerHTML = `
+<div><span class="userLink" data-user="${p.user}"><b>${p.user}</b></span> <span class="time">${p.time}</span></div>
+${p.tags && p.tags.length ? `<div class="postTags">${p.tags.map(t=>`<span class="postTag">${t}</span>`).join('')}</div>` : ''}
+<div>${p.text}</div>
+<div style="margin-top:6px;display:flex;align-items:center;">
+<div class="like ${liked}" data-id="${p.id}">❤ ${p.likes.length}</div>
+</div>
+<div class="commentRow" style="display:none">
+<input placeholder="写评论..." data-cinput="${p.id}">
+<button data-cbtn="${p.id}">评论</button>
+</div>`;
+						$("userPosts").appendChild(d);
+						renderComments(p, $("userPosts"));
+						const input = d.querySelector(`[data-cinput="${p.id}"]`);
+						input.addEventListener("keydown", e => {
+							if (e.key === "Enter" && !e.shiftKey) {
+								addComment(p.id, input.value, $("userPosts"));
+								input.value = "";
+								e.preventDefault();
+							}
+						});
+						d.querySelector(`[data-cbtn="${p.id}"]`).onclick = () => {
+							addComment(p.id, input.value, $("userPosts"));
+							input.value = "";
+						};
+					});
+					$("logoutBtn").style.display = (u === currentUser) ? "inline-block" : "none";
+				}
+				async function likePost(id) {
+					let posts = await dbLoad(POST_KEY);
+					let p = posts[id];
+					if (!p.likes.includes(currentUser)) p.likes.push(currentUser);
+					else p.likes = p.likes.filter(u => u !== currentUser);
+					await dbSave(POST_KEY, posts);
+					loadPosts();
+					if (currentPage === "profile") viewUser(currentUser);
+				}
+				async function deletePost(id) {
+					let posts = await dbLoad(POST_KEY);
+					delete posts[id];
+					await dbSave(POST_KEY, posts);
+					loadPosts();
+					if (currentPage === "profile") viewUser(currentUser);
+				}
+				async function addComment(id, text, container) {
+					if (!text) return;
+					let posts = await dbLoad(POST_KEY);
+					let cId = Date.now();
+					posts[id].comments.push({
+						id: cId,
+						user: currentUser,
+						text
+					});
+					await dbSave(POST_KEY, posts);
+					loadPosts(container === $("posts") ? $("posts") : $("userPosts"));
+				}
+
+				function hideUserListPage() {
+					show("main");
+				}
+				async function loadUserList() {
+					let users = await dbLoad(USER_KEY);
+					let itemsContainer = $("userItems");
+					itemsContainer.innerHTML = "";
+					Object.entries(users).sort((a, b) => new Date(b[1].time) - new Date(a[1].time))
+						.forEach(([username, info]) => {
+							let div = document.createElement("div");
+							div.className = "userItem";
+							div.innerHTML =
+								`<span class="userLink">${username}</span><span style="font-size:14px;">${info.time}</span>`;
+							div.querySelector(".userLink").onclick = () => viewUser(username);
+							itemsContainer.appendChild(div);
+						});
+				}
+				const autoUser = localStorage.getItem("loginUser");
+				if (autoUser) {
+					currentUser = autoUser;
+					$("nav").classList.remove("hidden");
+					currentPage = "home";
+					show("main");
+					loadPosts();
+					updateNav();
+				}
+
+			});
+		</script>
+	</body>
+</html>
