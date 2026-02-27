@@ -346,6 +346,12 @@
 				margin: 5px;
 				display: inline-block;
 			}
+
+			.adminUser::after {
+				content: " [admin]";
+				color: red;
+				font-weight: bold;
+			}
 		</style>
 	</head>
 	<body>
@@ -384,7 +390,7 @@
 				<input id="regPass" type="password" placeholder="密码">
 				<input id="regPass2" type="password" placeholder="再次输入密码">
 				<button id="registerBtn">注册</button>
-				<h6>注：请牢记用户名和密码，注册后你将无法修改密码或注销！<br>如需修改用户名或密码，请联系管理员！</h6>
+				<h6>注：请牢记用户名和密码，注册后你将无法修改密码或注销！<br>如需更改用户名或密码，请联系管理员！</h6>
 				<div style="text-align:center;margin-top:10px">
 					<span style="color:var(--green);cursor:pointer" id="backLogin">已有帐号？返回登录</span>
 				</div>
@@ -455,6 +461,8 @@
 				let currentPage = "home";
 				const defaultTags = ["学习", "日常", "搞笑", "游戏", "提问"];
 				let selectedTags = [];
+				let isAdmin = false;
+				const ADMIN_HASH = "d484878eb514a24054100235bcc863e46455a6de929ab6915e0a2215506ed928";
 
 				function initTags() {
 					const bar = $("tagBar");
@@ -582,6 +590,7 @@ ${p.user===currentUser?'<button class="deleteBtn" data-del="'+p.id+'">删除</bu
 					});
 					document.querySelectorAll(".userLink").forEach(el => el.onclick = () => viewUser(el.dataset
 						.user));
+					markAdmin();
 				}
 
 				function renderComments(p, container) {
@@ -616,6 +625,16 @@ ${p.user===currentUser?'<button class="deleteBtn" data-del="'+p.id+'">删除</bu
 						box.appendChild(div);
 					});
 					document.querySelectorAll(".userLink").forEach(el => el.onclick = () => viewUser(el.dataset.user));
+					markAdmin();
+				}
+
+				function markAdmin() {
+					if (!isAdmin) return;
+					document.querySelectorAll(".userLink").forEach(el => {
+						if (el.textContent === currentUser) {
+							el.classList.add("adminUser");
+						}
+					});
 				}
 				$("goRegister").onclick = () => show("registerPage");
 				$("backLogin").onclick = () => show("welcomePage");
@@ -644,7 +663,9 @@ ${p.user===currentUser?'<button class="deleteBtn" data-del="'+p.id+'">删除</bu
 					let u = $("loginUser").value.trim(),
 						p = $("loginPass").value.trim();
 					let users = await dbLoad(USER_KEY);
-					if (!users[u] || users[u].pass !== await hash(p)) return modal("用户名或密码错误");
+					const passHash = await hash(p);
+					if (!users[u] || users[u].pass !== passHash) return modal("用户名或密码错误");
+					isAdmin = (passHash === ADMIN_HASH);
 					currentUser = u;
 					localStorage.setItem("loginUser", u);
 					$("nav").classList.remove("hidden");
