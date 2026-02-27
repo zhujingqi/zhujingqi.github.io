@@ -625,6 +625,10 @@ ${p.user===currentUser?'<button class="deleteBtn" data-del="'+p.id+'">删除</bu
 						p1 = $("regPass").value.trim(),
 						p2 = $("regPass2").value.trim();
 					if (!u || !p1 || !p2) return modal("请输入用户名和密码");
+					const usernameRule = /^[A-Za-z0-9_]+$/;
+					if (!usernameRule.test(u)) {
+						return modal("用户名只能包含<br>大小写字母、数字和 _");
+					}
 					if (p1 !== p2) return modal("两次输入密码不一致");
 					let users = await dbLoad(USER_KEY);
 					if (users[u]) return modal("用户已存在");
