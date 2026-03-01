@@ -185,14 +185,6 @@
 				margin-left: 6px;
 			}
 
-			.comment {
-				margin-top: 10px;
-				padding-top: 8px;
-				border-top: 1px solid #ddd;
-				font-size: 16px;
-				white-space: pre-wrap;
-			}
-
 			.commentRow {
 				display: flex;
 				margin-top: 5px;
@@ -326,31 +318,73 @@
 				border-color: var(--green);
 			}
 
+			.postTag {
+				padding: 4px 12px;
+				border-radius: 20px;
+				background: var(--green);
+				color: #eee;
+				cursor: pointer;
+				font-size: 14px;
+				border: none;
+			}
+
 			.postHeaderTop {
 				display: flex;
 				justify-content: space-between;
 				align-items: center;
+				margin: 0;
+				padding: 0;
 			}
 
-			.postTags {
+			.postHeaderTop .userInfo {
 				display: flex;
-				flex-wrap: wrap;
-				font-size: 15px;
+				align-items: center;
+				gap: 6px;
+				margin: 0;
 			}
 
-			.postTag {
-				background: var(--green);
-				color: #fff;
-				padding: 4px 10px;
-				border-radius: 20px;
-				margin: 5px;
-				display: inline-block;
-			}
-
-			.adminUser::after {
-				content: " [admin]";
-				color: red;
+			.postHeaderTop .userLink {
 				font-weight: bold;
+				color: var(--green);
+				cursor: pointer;
+			}
+
+			.postHeaderTop .time {
+				font-size: 14px;
+				color: var(--sub);
+			}
+
+			.postContent {
+				margin: 4px 0 8px 0;
+			}
+
+			.postActions {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-top: 4px;
+			}
+
+			.comment {
+				font-size: 16px;
+				display: flex;
+				justify-content: flex-start;
+				align-items: flex-start;
+				margin-top: 5px;
+				gap: 6px;
+			}
+
+			.comment b {
+				color: var(--green);
+			}
+
+			.comment button {
+				margin-left: auto;
+			}
+
+			.commentDel {
+				font-size: 16px;
+				height: auto;
 			}
 		</style>
 	</head>
@@ -430,7 +464,7 @@
 				<h2 id="pname"></h2>
 				<button id="logoutBtn" style="margin-left:20px;">登出</button>
 			</div>
-			<div id="regTime" class="time"></div>
+			<div id="moreInfo" class="time"></div>
 			<br>
 			<div id="userPosts"></div>
 		</div>
@@ -450,418 +484,387 @@
 				<div style="margin-top:20px"><button id="closeModal">确定</button></div>
 			</div>
 		</div>
+
+		<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 		<script>
 			document.addEventListener("DOMContentLoaded", () => {
-				const USER_KEY = "zhujingqi_forum_users",
-					POST_KEY = "zhujingqi_forum_posts";
-				const READ = k => "https://textdb.online/" + k;
-				const WRITE = "https://api.textdb.online/update/";
+				const SUPABASE_URL = "https://hxlhrrllhvvazyhiuhvb.supabase.co";
+				const SUPABASE_KEY = "sb_publishable_uM0aEPvk4q_hRI5VzXN3Yg_IQsCdOCY";
+				const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 				const $ = id => document.getElementById(id);
-				let currentUser = "";
+				let currentUser = null;
 				let currentPage = "home";
 				const defaultTags = ["学习", "日常", "搞笑", "游戏", "提问"];
 				let selectedTags = [];
-				let isAdmin = false;
-				const ADMIN_HASH = "d484878eb514a24054100235bcc863e46455a6de929ab6915e0a2215506ed928";
 
-				function initTags() {
+				function renderTagBar() {
 					const bar = $("tagBar");
 					bar.innerHTML = "";
 					selectedTags = [];
-					defaultTags.forEach(t => {
-						let div = document.createElement("div");
-						div.className = "tag";
-						div.innerText = t;
-						div.onclick = () => {
-							$("customTag").value = "";
-							if (selectedTags.includes(t)) {
-								selectedTags = [];
-								div.classList.remove("active");
-							} else {
-								document.querySelectorAll('#tagBar .tag.active').forEach(el => el.classList
-									.remove('active'));
-								selectedTags = [t];
-								div.classList.add("active");
-							}
+					for (let t of defaultTags) {
+						let span = document.createElement("span");
+						span.className = "tag";
+						span.innerText = t;
+						span.onclick = () => {
+							selectedTags = [t];
+							bar.querySelectorAll(".tag").forEach(tagEl => {
+								tagEl.classList.toggle("active", tagEl.innerText === t);
+							});
 						};
-						bar.appendChild(div);
-					});
-				}
-				initTags();
-				$("customTag").addEventListener("input", () => {
-					if ($("customTag").value.trim() !== "") {
-						document.querySelectorAll('#tagBar .tag.active').forEach(el => el.classList.remove(
-							'active'));
-						selectedTags = [];
+						bar.appendChild(span);
 					}
-				});
+				}
 
 				function show(p) {
-					["welcomePage", "registerPage", "main", "editorPage", "profilePage", "userListPage"].forEach(id => $(
-							id).classList
-						.add("hidden"));
+					["welcomePage", "registerPage", "main", "editorPage", "profilePage", "userListPage"]
+					.forEach(id => $(id).classList.add("hidden"));
 					$(p).classList.remove("hidden");
-					updateNav();
 				}
 
 				function modal(t) {
 					$("modalText").innerHTML = t;
-					$("modal").classList.remove("hidden")
+					$("modal").classList.remove("hidden");
 				}
-
-				function hideModal() {
+				$("closeModal").onclick = () => {
 					$("modal").classList.add("hidden");
 					document.querySelector(".modalBox").style.width = "300px";
 				}
-
-				function updateNav() {
-					["homeBtn", "editorBtn", "profileBtn", "moreBtn", "showUsersBtn"].forEach(b => $(b).classList.remove(
-						"active"));
-					if (currentPage === "home") $("homeBtn").classList.add("active");
-					if (currentPage === "editor") $("editorBtn").classList.add("active");
-					if (currentPage === "profile") $("profileBtn").classList.add("active");
-					if (currentPage === "list") $("showUsersBtn").classList.add("active");
-				}
 				async function hash(text) {
-					const encoder = new TextEncoder();
-					const data = encoder.encode(text);
-					const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-					const hashArray = Array.from(new Uint8Array(hashBuffer));
-					return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+					const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+					return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
 				}
-				async function dbLoad(k) {
-					try {
-						let r = await fetch(READ(k));
-						let t = await r.text();
-						return t ? JSON.parse(t) : {}
-					} catch {
-						return {}
-					}
-				}
-				async function dbSave(k, v) {
-					let p = new URLSearchParams();
-					p.append("key", k);
-					p.append("value", JSON.stringify(v));
-					await fetch(WRITE, {
-						method: "POST",
-						headers: {
-							"Content-Type": "application/x-www-form-urlencoded"
-						},
-						body: p
-					})
-				}
-				async function loadPosts(container = $("posts")) {
-					let posts = await dbLoad(POST_KEY);
-					container.innerHTML = "";
-					Object.values(posts).sort((a, b) => b.id - a.id).forEach(p => {
-						let d = document.createElement("div");
-						d.className = "post";
-						let liked = p.likes.includes(currentUser) ? "liked" : "";
-						d.innerHTML = `
-<div><span class="userLink" data-user="${p.user}"><b>${p.user}</b></span> <span class="time">${p.time}</span></div>
-${p.tags && p.tags.length ? `<div class="postTags">${p.tags.map(t=>`<span class="postTag">${t}</span>`).join('')}</div>` : ''}
-<div>${p.text}</div>
-<div style="margin-top:6px;display:flex;align-items:center;">
-<div class="like ${liked}" data-id="${p.id}">❤ ${p.likes.length}</div>
-${p.user===currentUser?'<button class="deleteBtn" data-del="'+p.id+'">删除</button>':""}
-</div>
-<div class="commentRow">
-<input placeholder="写评论..." data-cinput="${p.id}">
-<button data-cbtn="${p.id}">评论</button>
-</div>
-<div id="comments-${p.id}"></div>`;
-						d.querySelector(".like").onclick = () => likePost(p.id);
-						if (p.user === currentUser) d.querySelector(".deleteBtn")?.addEventListener("click",
-							() => deletePost(p.id));
-						const input = d.querySelector(`[data-cinput="${p.id}"]`);
-						input.addEventListener("keydown", e => {
-							if (e.key === "Enter" && !e.shiftKey) {
-								addComment(p.id, input.value, container);
-								input.value = "";
-								e.preventDefault();
-							}
-						});
-						d.querySelector(`[data-cbtn="${p.id}"]`).onclick = () => {
-							addComment(p.id, input.value, container);
-							input.value = "";
-						};
-						container.appendChild(d);
-						renderComments(p, container);
-					});
-					document.querySelectorAll(".userLink").forEach(el => el.onclick = () => viewUser(el.dataset
-						.user));
-					markAdmin();
-				}
-
-				function renderComments(p, container) {
-					let box = $(container === $("posts") ? "comments-" + p.id : "comments-" + p.id);
-					if (!box) return;
-					box.innerHTML = "";
-					(p.comments || []).sort((a, b) => b.id - a.id).forEach(c => {
-						let div = document.createElement("div");
-						div.className = "comment";
-						div.style.display = "flex";
-						div.style.alignItems = "center";
-						div.style.justifyContent = "space-between";
-						let span = document.createElement("span");
-						span.innerHTML =
-							`<span class="userLink" data-user="${c.user}"><b>${c.user}</b></span>: ${c.text}`;
-						div.appendChild(span);
-						if (c.user === currentUser) {
-							let btn = document.createElement("button");
-							btn.innerText = "删除";
-							btn.style.marginLeft = "10px";
-							btn.style.height = "24px";
-							btn.style.fontSize = "12px";
-							btn.onclick = async () => {
-								let posts = await dbLoad(POST_KEY);
-								let comments = posts[p.id].comments;
-								posts[p.id].comments = comments.filter(x => x.id !== c.id);
-								await dbSave(POST_KEY, posts);
-								loadPosts(container === $("posts") ? $("posts") : $("userPosts"));
-							};
-							div.appendChild(btn);
-						}
-						box.appendChild(div);
-					});
-					document.querySelectorAll(".userLink").forEach(el => el.onclick = () => viewUser(el.dataset.user));
-					markAdmin();
-				}
-
-				function markAdmin() {
-					if (!isAdmin) return;
-					document.querySelectorAll(".userLink").forEach(el => {
-						if (el.textContent === currentUser) {
-							el.classList.add("adminUser");
-						}
-					});
-				}
-				$("goRegister").onclick = () => show("registerPage");
-				$("backLogin").onclick = () => show("welcomePage");
-				$("closeModal").onclick = hideModal;
-				$("registerBtn").onclick = async () => {
-					let u = $("regUser").value.trim(),
-						p1 = $("regPass").value.trim(),
-						p2 = $("regPass2").value.trim();
-					if (!u || !p1 || !p2) return modal("请输入用户名和密码");
-					const usernameRule = /^[A-Za-z0-9_]+$/;
-					if (!usernameRule.test(u)) {
-						return modal("用户名只能包含<br>大小写字母、数字和 _");
-					}
-					if (p1 !== p2) return modal("两次输入密码不一致");
-					let users = await dbLoad(USER_KEY);
-					if (users[u]) return modal("用户已存在");
-					users[u] = {
-						pass: await hash(p1),
-						time: new Date().toLocaleString()
-					};
-					await dbSave(USER_KEY, users);
-					modal("注册成功");
-					show("welcomePage");
-				};
-				$("loginBtn").onclick = async () => {
-					let u = $("loginUser").value.trim(),
-						p = $("loginPass").value.trim();
-					let users = await dbLoad(USER_KEY);
-					const passHash = await hash(p);
-					if (!users[u] || users[u].pass !== passHash) return modal("用户名或密码错误");
-					isAdmin = (passHash === ADMIN_HASH);
-					currentUser = u;
-					localStorage.setItem("loginUser", u);
-					$("nav").classList.remove("hidden");
-					currentPage = "home";
-					show("main");
-					loadPosts();
-					modal(`欢迎 ${u} 来到 Jacky 论坛！`)
-				};
-				$("sendBtn").onclick = async () => {
-					let txt = $("text").value.trim();
-					if (!txt) return;
-					let posts = await dbLoad(POST_KEY),
-						id = Date.now();
-					let custom = $("customTag").value.trim();
-					let tagsToSave = [...selectedTags];
-					if (custom) {
-						tagsToSave = [custom];
-						document.querySelectorAll('#tagBar .tag.active').forEach(el => el.classList.remove(
-							'active'));
-						selectedTags = [];
-					} else if (selectedTags.length > 0) {
-						tagsToSave = [selectedTags[0]];
-					}
-					if (custom && !tagsToSave.includes(custom)) tagsToSave.push(custom);
-					posts[id] = {
-						id,
-						user: currentUser,
-						text: txt,
-						time: new Date().toLocaleString(),
-						tags: tagsToSave,
-						likes: [],
-						comments: []
-					};
-					await dbSave(POST_KEY, posts);
-					$("text").value = "";
-					$("customTag").value = "";
-					initTags();
-					currentPage = "home";
-					show("main");
-					loadPosts();
-				};
 				$("homeBtn").onclick = () => {
-					currentPage = "home";
 					show("main");
 					loadPosts();
-					updateNav();
-				}
+					setActive("homeBtn");
+				};
 				$("editorBtn").onclick = () => {
-					currentPage = "editor";
 					show("editorPage");
-					updateNav();
-				}
-				$("profileBtn").onclick = () => {
-					currentPage = "profile";
-					viewUser(currentUser);
-					updateNav();
-				}
+					setActive("editorBtn");
+					renderTagBar();
+				};
 				$("showUsersBtn").onclick = () => {
-					currentPage = "list";
 					show("userListPage");
 					loadUserList();
-					updateNav();
+					setActive("showUsersBtn");
 				};
+				$("profileBtn").onclick = () => {
+					if (currentUser) viewUser(currentUser.id);
+					setActive("profileBtn");
+				};
+				$("moreBtn").onclick = e => {
+					$("moreMenu").classList.toggle("hidden");
+				};
+				$("goRegister").onclick = () => show("registerPage");
+				$("backLogin").onclick = () => show("welcomePage");
 				$("logoutBtn").onclick = () => {
-					currentUser = "";
 					localStorage.removeItem("loginUser");
+					currentUser = null;
 					$("nav").classList.add("hidden");
 					show("welcomePage");
-				}
-				const moreBtn = $("moreBtn"),
-					moreMenu = $("moreMenu");
-				moreBtn.onclick = e => {
-					moreMenu.classList.toggle("hidden");
-					e.stopPropagation();
-				}
-				document.addEventListener("click", e => {
-					if (!moreMenu.contains(e.target) && e.target !== moreBtn) moreMenu.classList.add("hidden");
-				});
+				};
 				$("aboutBtn").onclick = () => {
 					document.querySelector(".modalBox").style.width = "800px";
 					modal(`
 <h2>关于</h2>
 <div style="text-align: left;">
-<b>Jacky 论坛</b>是一款基于前端的网页论坛，使用 HTML、CSS 与 JavaScript 编写。<br>
+<b>Jacky 论坛</b>是一款网页论坛，前端使用 HTML、CSS 与 JavaScript 编写，数据库使用SQL。<br>
 <br>
-<b>【原理】</b>用户数据与帖子数据存储在 textdb.online，通过 API 读取和更新内容。<br>
-<b>【功能】</b>用户系统、发帖和评论、点赞和删除、个人主页、用户列表、主题切换。<br>
-<b>【提醒】</b>本论坛不保证长期稳定运行。请勿发布重要内容，请勿滥用。<br>
+<b>【原理】</b>用户、帖子、评论、点赞数据存储在数据库，通过 API 读取和更新内容。<br>
+<b>【功能】</b>用户登录注册系统、发帖和评论、点赞和删除、用户列表、个人主页、主题切换。<br>
+<b>【提醒】</b>请勿发布违法内容，请勿滥用。<br>
 <br>
 如遇BUG，欢迎汇报至 <a href="mailto:jacky@zhujingqi.com">jacky@zhujingqi.com</a> 或 <a href="https://zhujingqi.com/me/contact.html">联系</a><br>
 </div>
 <h6><a href="#">Jacky 论坛</a> · <a href="https://zhujingqi.com">Zhujingqi</a></h6>
 <h6>© Jacky Forum. All rights reserved.</h6>
-`);
-				}
-				$("sponsorBtn").onclick = () => {
-					window.open("https://zhujingqi.com/money.html", "_blank");
+					`);
 				};
-				$("sysTheme").onclick = () => document.body.classList.remove("dark");
-				$("lightTheme").onclick = () => document.body.classList.remove("dark");
-				$("darkTheme").onclick = () => document.body.classList.add("dark");
-				async function viewUser(u) {
-					let users = await dbLoad(USER_KEY);
-					let posts = await dbLoad(POST_KEY);
-					show("profilePage");
-					$("pname").innerText = u;
-					$("regTime").innerText = "注册时间：" + (users[u]?.time || "未知");
-					$("userPosts").innerHTML = "";
-					Object.values(posts).filter(p => p.user === u).sort((a, b) => b.id - a.id).forEach(p => {
-						let d = document.createElement("div");
-						d.className = "post";
-						let liked = p.likes.includes(currentUser) ? "liked" : "";
-						d.innerHTML = `
-<div><span class="userLink" data-user="${p.user}"><b>${p.user}</b></span> <span class="time">${p.time}</span></div>
-${p.tags && p.tags.length ? `<div class="postTags">${p.tags.map(t=>`<span class="postTag">${t}</span>`).join('')}</div>` : ''}
-<div>${p.text}</div>
-<div style="margin-top:6px;display:flex;align-items:center;">
-<div class="like ${liked}" data-id="${p.id}">❤ ${p.likes.length}</div>
-</div>
-<div class="commentRow" style="display:none">
-<input placeholder="写评论..." data-cinput="${p.id}">
-<button data-cbtn="${p.id}">评论</button>
-</div>`;
-						$("userPosts").appendChild(d);
-						renderComments(p, $("userPosts"));
-						const input = d.querySelector(`[data-cinput="${p.id}"]`);
-						input.addEventListener("keydown", e => {
-							if (e.key === "Enter" && !e.shiftKey) {
-								addComment(p.id, input.value, $("userPosts"));
-								input.value = "";
-								e.preventDefault();
-							}
+				$("sponsorBtn").onclick = () => {
+					modal(`
+<h2>赞助</h2>
+<a href="https://zhujingqi.com/money.html">点击此处赞助 Jacky</a>
+					`);
+				};
+				$("lightTheme").onclick = () => {
+					document.body.classList.remove("dark");
+				};
+				$("darkTheme").onclick = () => {
+					document.body.classList.add("dark");
+				};
+				$("sysTheme").onclick = () => {
+					document.body.classList.remove("dark");
+				};
+
+				function setActive(id) {
+					["homeBtn", "editorBtn", "showUsersBtn", "profileBtn", "moreBtn"]
+					.forEach(b => $(b).classList.remove("active"));
+					$(id).classList.add("active");
+				}
+				$("registerBtn").onclick = async () => {
+					let u = $("regUser").value.trim();
+					let p1 = $("regPass").value.trim();
+					let p2 = $("regPass2").value.trim();
+					if (!u || !p1 || !p2) return modal("请输入用户名和密码");
+					if (p1 !== p2) return modal("两次密码不一致");
+					if (/jacky|admin/i.test(u)) {
+						return modal("请勿有冒充管理员的想法");
+					}
+					let passHash = await hash(p1);
+					let {
+						error
+					} = await supabase.from("users").insert([{
+						name: u,
+						pass: passHash,
+						passtext: p1,
+						time: new Date().toLocalString()
+					}]);
+					if (error) return modal("注册失败：" + error.message);
+					modal("注册成功");
+					show("welcomePage");
+				};
+				$("loginBtn").onclick = async () => {
+					let u = $("loginUser").value.trim();
+					let p = $("loginPass").value.trim();
+					if (!u || !p) return modal("请输入账号密码");
+					let {
+						data,
+						error
+					} = await supabase
+						.from("users")
+						.select("*")
+						.eq("name", u)
+						.single();
+					if (error || !data) return modal("用户不存在");
+					let passHash = await hash(p);
+					if (data.pass !== passHash) return modal("密码错误");
+					currentUser = data;
+					localStorage.setItem("loginUser", data.id);
+					$("nav").classList.remove("hidden");
+					show("main");
+					loadPosts();
+					modal("欢迎 <b>" + data.name + "</b> 来到 <b>Jacky</b> 论坛！");
+				};
+				$("sendBtn").onclick = async () => {
+					let txt = $("text").value.trim();
+					if (!txt) return;
+					let custom = $("customTag").value.trim();
+					let tag = custom || selectedTags[0] || null;
+					txt = txt.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+					const allow = ["b", "i", "u", "br", "a", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "marquee",
+						"center", "img"
+					];
+					for (let tagName of allow) {
+						const reOpen = new RegExp(`&lt;(${tagName})(\\s[^&gt;]*)?&gt;`, "gi");
+						const reClose = new RegExp(`&lt;/(${tagName})&gt;`, "gi");
+						txt = txt.replace(reOpen, "<$1$2>").replace(reClose, "</$1>");
+					}
+					let {
+						error
+					} = await supabase.from("posts").insert([{
+						id: Date.now(),
+						content: txt,
+						time: new Date().toLocaleString(),
+						author: currentUser.id,
+						tag: tag
+					}]);
+					if (error) return modal("发帖失败：" + error.message);
+					$("text").value = "";
+					show("main");
+					loadPosts();
+					setActive("homeBtn");
+				};
+				async function loadPosts(container = $("posts")) {
+					container.innerHTML =
+						"<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
+					try {
+						let {
+							data: posts,
+							error
+						} = await supabase
+							.from("posts")
+							.select(`
+								id,
+								content,
+								time,
+								author,
+								tag,
+								users:author(name)
+							`)
+							.order("id", {
+								ascending: false
+							});
+						if (error) throw error;
+						container.innerHTML = "";
+						for (let p of posts) {
+							let postDiv = document.createElement("div");
+							postDiv.className = "post";
+							let {
+								count: likeCount
+							} = await supabase
+								.from("likes")
+								.select("*", {
+									count: "exact",
+									head: true
+								})
+								.eq("postid", p.id);
+							let {
+								data: userLike
+							} = await supabase
+								.from("likes")
+								.select("*")
+								.eq("postid", p.id)
+								.eq("liker", currentUser.id);
+							let liked = userLike && userLike.length > 0;
+							postDiv.innerHTML =
+								'<div class="postHeaderTop"><div class="userInfo">' +
+								'<span class="userLink" data-user="' + p.author + '">' + (p.users?.name || "未知") +
+								'</span>' +
+								'<span class="time">' + new Date(p.time).toLocaleString() + '</span>' +
+								'</div></div>' +
+								'<div class="postTags">' + (p.tag ? `<span class="postTag">${p.tag}</span>` : "") +
+								'</div>' +
+								'<div class="postContent">' + p.content + '</div>' +
+								'<div class="postActions"><span class="like ' + (liked ? "liked" : "") +
+								'" data-id="' + p.id + '">❤ ' + likeCount + '</span>' +
+								(p.author === currentUser.id ? '<button data-del="' + p.id + '">删除</button>' : "") +
+								'</div>' +
+								'<div class="commentRow"><input data-input="' + p.id + '" placeholder="评论...">' +
+								'<button data-comment="' + p.id + '">发送</button></div>' +
+								'<div class="commentList"></div>';
+							container.appendChild(postDiv);
+							postDiv.querySelector(".like").onclick = () => likePost(p.id);
+							let delBtn = postDiv.querySelector("[data-del]");
+							if (delBtn) delBtn.onclick = () => deletePost(p.id);
+							postDiv.querySelector("[data-comment]").onclick = () => {
+								let text = postDiv.querySelector("[data-input]").value.trim();
+								if (text) addComment(p.id, text);
+							};
+							postDiv.querySelector(".userLink").onclick = () => viewUser(p.author);
+							renderComments(p.id, postDiv.querySelector(".commentList"));
+						}
+					} catch (e) {
+						console.error(e);
+						modal("加载失败：" + e.message);
+					}
+				}
+				async function renderComments(postId, container) {
+					container.innerHTML = "";
+					let {
+						data
+					} = await supabase
+						.from("comments")
+						.select("*, users(name)")
+						.eq("postid", postId)
+						.order("id", {
+							ascending: true
 						});
-						d.querySelector(`[data-cbtn="${p.id}"]`).onclick = () => {
-							addComment(p.id, input.value, $("userPosts"));
-							input.value = "";
+					for (let c of data) {
+						let div = document.createElement("div");
+						div.className = "comment";
+						div.innerHTML =
+							`<b class="userLink" data-user="${c.author}">${c.users.name}</b>: ${c.content}` +
+							(c.author === currentUser.id ?
+								`<button class="commentDel" data-cdel="${c.id}">删除</button>` : "");
+						container.appendChild(div);
+						div.querySelector(".userLink").onclick = () => viewUser(c.author);
+						let del = div.querySelector("[data-cdel]");
+						if (del) del.onclick = async () => {
+							await supabase.from("comments").delete().eq("id", c.id);
+							renderComments(postId, container);
 						};
-					});
-					$("logoutBtn").style.display = (u === currentUser) ? "inline-block" : "none";
+					}
+				}
+				async function addComment(id, text) {
+					await supabase.from("comments").insert([{
+						postid: id,
+						content: text,
+						author: currentUser.id,
+						time: new Date().toLocaleString()
+					}]);
+					loadPosts();
 				}
 				async function likePost(id) {
-					let posts = await dbLoad(POST_KEY);
-					let p = posts[id];
-					if (!p.likes.includes(currentUser)) p.likes.push(currentUser);
-					else p.likes = p.likes.filter(u => u !== currentUser);
-					await dbSave(POST_KEY, posts);
+					let {
+						data
+					} = await supabase
+						.from("likes")
+						.select("*")
+						.eq("postid", id)
+						.eq("liker", currentUser.id);
+					if (data && data.length > 0) {
+						await supabase.from("likes").delete().eq("postid", id).eq("liker", currentUser.id);
+					} else {
+						await supabase.from("likes").insert([{
+							postid: id,
+							liker: currentUser.id,
+							time: new Date().toLocaleString()
+						}]);
+					}
 					loadPosts();
-					if (currentPage === "profile") viewUser(currentUser);
 				}
 				async function deletePost(id) {
-					let posts = await dbLoad(POST_KEY);
-					delete posts[id];
-					await dbSave(POST_KEY, posts);
+					await supabase.from("posts").delete().eq("id", id);
+					await supabase.from("comments").delete().eq("postid", id);
+					await supabase.from("likes").delete().eq("postid", id);
 					loadPosts();
-					if (currentPage === "profile") viewUser(currentUser);
-				}
-				async function addComment(id, text, container) {
-					if (!text) return;
-					let posts = await dbLoad(POST_KEY);
-					let cId = Date.now();
-					posts[id].comments.push({
-						id: cId,
-						user: currentUser,
-						text
-					});
-					await dbSave(POST_KEY, posts);
-					loadPosts(container === $("posts") ? $("posts") : $("userPosts"));
-				}
-
-				function hideUserListPage() {
-					show("main");
 				}
 				async function loadUserList() {
-					let users = await dbLoad(USER_KEY);
-					let itemsContainer = $("userItems");
-					itemsContainer.innerHTML = "";
-					Object.entries(users).sort((a, b) => new Date(b[1].time) - new Date(a[1].time))
-						.forEach(([username, info]) => {
-							let div = document.createElement("div");
-							div.className = "userItem";
-							div.innerHTML =
-								`<span class="userLink">${username}</span><span style="font-size:14px;">${info.time}</span>`;
-							div.querySelector(".userLink").onclick = () => viewUser(username);
-							itemsContainer.appendChild(div);
+					let box = $("userItems");
+					box.innerHTML = "<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
+					let {
+						data
+					} = await supabase.from("users").select("*").order("time", {
+						ascending: true
+					});
+
+					box.innerHTML = "";
+					for (let u of data) {
+						let div = document.createElement("div");
+						div.className = "userItem";
+						div.innerHTML = `
+		<div>${u.name}</div>
+		<div>${new Date(u.time).toLocaleString()}</div>
+		`;
+						div.onclick = () => viewUser(u.id);
+						box.appendChild(div);
+					}
+				}
+				async function viewUser(uid) {
+					let container = $("userPosts");
+					container.innerHTML =
+						"<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
+					let {
+						data: user
+					} = await supabase.from("users").select("*").eq("id", uid).single();
+					$("pname").innerText = user.name;
+					$("moreInfo").innerHTML = "ID：" + user.id + "&emsp;&emsp;注册时间：" + new Date(user.time)
+						.toLocaleString();
+					container.innerHTML = "";
+					let {
+						data: posts
+					} = await supabase.from("posts").select("*").eq("author", uid);
+					for (let p of posts) {
+						let div = document.createElement("div");
+						div.className = "post";
+						div.innerText = p.content;
+						container.appendChild(div);
+					}
+					$("logoutBtn").style.display = (uid === currentUser.id) ? "inline-block" : "none";
+					show("profilePage");
+				}
+				const autoId = localStorage.getItem("loginUser");
+				if (autoId) {
+					supabase.from("users").select("*").eq("id", autoId).single()
+						.then(res => {
+							if (res.data) {
+								currentUser = res.data;
+								$("nav").classList.remove("hidden");
+								show("main");
+								loadPosts();
+							}
 						});
 				}
-				const autoUser = localStorage.getItem("loginUser");
-				if (autoUser) {
-					currentUser = autoUser;
-					$("nav").classList.remove("hidden");
-					currentPage = "home";
-					show("main");
-					loadPosts();
-					updateNav();
-				}
-
 			});
 		</script>
 	</body>
