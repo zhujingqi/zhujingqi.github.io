@@ -3,11 +3,10 @@
 ### Discussion Part
 [Click to go!](https://github.com/zhujingqi/zhujingqi.github.io/discussions)
 
-Or, you can go to [Here](https://zhujingqi.com/forum.html) on my website.
+Or, you can go to [Jacky Forum](https://zhujingqi.com/forum/index.html).
 ### About
 
-[This is my personal website, let's go!](https://zhujingqi.com)
-
-My personal website is about my articles, my personality, games, tools, etc.
-
-### It's a good website!
+It's my personal website.
+[See more](https://zhujingqi.com)
+### It's a good website
+Let's explore!
