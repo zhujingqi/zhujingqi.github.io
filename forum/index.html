@@ -290,6 +290,19 @@
 				border-bottom: none;
 			}
 
+			#userDescription {
+				text-align: left;
+				font-size: 18px;
+				color: var(--text);
+				background: var(--card);
+				border-radius: 20px;
+				margin: 14px auto;
+				padding: 20px;
+				width: 80%;
+				max-width: 800px;
+				word-wrap: break-word;
+			}
+
 			.tagBar {
 				display: flex;
 				flex-wrap: wrap;
@@ -386,6 +399,23 @@
 				font-size: 16px;
 				height: auto;
 			}
+
+			::-webkit-scrollbar {
+				width: 10px;
+				background: transparent;
+				border-radius: 10px;
+			}
+
+			::-webkit-scrollbar-thumb {
+				background-color: #aaa;
+				border-radius: 10px;
+				border: 2px solid transparent;
+				background-clip: content-box;
+			}
+
+			::-webkit-scrollbar-thumb:hover {
+				background-color: #888;
+			}
 		</style>
 	</head>
 	<body>
@@ -424,7 +454,7 @@
 				<input id="regPass" type="password" placeholder="密码">
 				<input id="regPass2" type="password" placeholder="再次输入密码">
 				<button id="registerBtn">注册</button>
-				<h6>注：请牢记用户名和密码，注册后你将无法修改密码或注销！<br>如需更改用户名或密码，请联系管理员！</h6>
+				<h6>注：请牢记用户名和密码！<br>如无法注册，请联系管理员。</h6>
 				<div style="text-align:center;margin-top:10px">
 					<span style="color:var(--green);cursor:pointer" id="backLogin">已有帐号？返回登录</span>
 				</div>
@@ -465,6 +495,7 @@
 				<button id="logoutBtn" style="margin-left:20px;">登出</button>
 			</div>
 			<div id="moreInfo" class="time"></div>
+			<div id="userDescription" style=""></div>
 			<br>
 			<div id="userPosts"></div>
 		</div>
@@ -481,10 +512,9 @@
 		<div id="modal" class="modal hidden">
 			<div class="modalBox">
 				<div id="modalText"></div>
-				<div style="margin-top:20px"><button id="closeModal">确定</button></div>
+				<div style="margin-top:20px"><button id="closeModal">关闭</button></div>
 			</div>
 		</div>
-
 		<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 		<script>
 			document.addEventListener("DOMContentLoaded", () => {
@@ -496,6 +526,23 @@
 				let currentPage = "home";
 				const defaultTags = ["学习", "日常", "搞笑", "游戏", "提问"];
 				let selectedTags = [];
+				const ua = navigator.userAgent;
+				if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|HUAWEI|HONOR|SM-|SAMSUNG|Xiaomi|Redmi|OPPO|VIVO/i
+					.test(ua)) {
+					let brand = "移动设备";
+					if (/HUAWEI|HONOR/i.test(ua)) brand = "华为/荣耀设备";
+					else if (/SM-|SAMSUNG/i.test(ua)) brand = "三星设备";
+					else if (/Xiaomi|Redmi/i.test(ua)) brand = "小米设备";
+					else if (/OPPO/i.test(ua)) brand = "OPPO设备";
+					else if (/VIVO/i.test(ua)) brand = "VIVO设备";
+					else if (/Android/i.test(ua)) brand = "安卓设备";
+					else if (/iPhone|iPad|iPod/i.test(ua)) brand = "苹果iOS设备";
+					else if (/webOS/i.test(ua)) brand = "webOS设备";
+					else if (/BlackBerry/i.test(ua)) brand = "黑莓设备";
+					else if (/IEMobile/i.test(ua)) brand = "Windows Mobile设备";
+					else if (/Opera Mini/i.test(ua)) brand = "Opera Mini浏览器设备";
+					modal(`检测到您正在使用 ${brand}，建议在 PC 上访问 Jacky 论坛以获得最佳体验！`);
+				}
 
 				function renderTagBar() {
 					const bar = $("tagBar");
@@ -607,6 +654,9 @@
 					let p2 = $("regPass2").value.trim();
 					if (!u || !p1 || !p2) return modal("请输入用户名和密码");
 					if (p1 !== p2) return modal("两次密码不一致");
+					if (!/^[A-Za-z0-9\-_áéíóúñÁÉÍÓÚÑäöüßÄÖÜ]+$/.test(u)) {
+						return modal("用户名只允许字母、数字、- 和 _");
+					}
 					if (/jacky|admin/i.test(u)) {
 						return modal("请勿有冒充管理员的想法");
 					}
@@ -620,7 +670,7 @@
 						time: new Date().toLocaleString()
 					}]);
 					if (error) return modal("注册失败：" + error.message);
-					modal("注册成功");
+					modal("注册成功！");
 					show("welcomePage");
 				};
 				$("loginBtn").onclick = async () => {
@@ -819,13 +869,14 @@
 					});
 
 					box.innerHTML = "";
-					for (let u of data) {
+					for (let i = data.length - 1; i >= 0; i--) {
+						let u = data[i];
 						let div = document.createElement("div");
 						div.className = "userItem";
 						div.innerHTML = `
-		<div>${u.name}</div>
-		<div>${new Date(u.time).toLocaleString()}</div>
-		`;
+					        <div>${u.name}</div>
+					        <div>${new Date(u.time).toLocaleString()}</div>
+					    `;
 						div.onclick = () => viewUser(u.id);
 						box.appendChild(div);
 					}
@@ -838,19 +889,94 @@
 						data: user
 					} = await supabase.from("users").select("*").eq("id", uid).single();
 					$("pname").innerText = user.name;
-					$("moreInfo").innerHTML = "ID：" + user.id + "&emsp;&emsp;注册时间：" + new Date(user.time)
+					$("moreInfo").innerHTML = "注册时间：" + new Date(user.time)
 						.toLocaleString();
 					container.innerHTML = "";
 					let {
 						data: posts
 					} = await supabase.from("posts").select("*").eq("author", uid);
-					for (let p of posts) {
+					for (let i = posts.length - 1; i >= 0; i--) {
+						let p = posts[i];
 						let div = document.createElement("div");
 						div.className = "post";
-						div.innerText = p.content;
+						div.innerHTML = p.content;
 						container.appendChild(div);
 					}
 					$("logoutBtn").style.display = (uid === currentUser.id) ? "inline-block" : "none";
+					let existingBtn = $("changePassBtn");
+					if (uid === currentUser.id && !existingBtn) {
+						let btn = document.createElement("button");
+						btn.id = "changePassBtn";
+						btn.innerText = "修改密码";
+						btn.style.marginRight = "0px";
+						btn.style.marginLeft = "20px";
+						$("logoutBtn").parentNode.insertBefore(btn, $("logoutBtn"));
+						btn.onclick = () => {
+							document.querySelector(".modalBox").style.width = "400px";
+							$("modalText").innerHTML = `
+					                <h3>修改密码</h3>
+					                <input id="oldPass" type="password" placeholder="当前密码">
+					                <input id="newPass1" type="password" placeholder="新密码">
+					                <input id="newPass2" type="password" placeholder="再次输入新密码">
+					                <div style="margin-top:10px;"><button id="submitChangePass">确认修改</button></div>
+									<h6>请牢记密码！如无法修改密码，请联系管理员。</h6>
+					            `;
+							$("modal").classList.remove("hidden");
+							$("submitChangePass").onclick = async () => {
+								const oldP = $("oldPass").value.trim();
+								const newP1 = $("newPass1").value.trim();
+								const newP2 = $("newPass2").value.trim();
+								if (!oldP || !newP1 || !newP2) return modal("请填写完整");
+								if (newP1 !== newP2) return modal("两次新密码不一致");
+								const oldHash = await hash(oldP);
+								if (oldHash !== currentUser.pass) return modal("当前密码错误");
+								const newHash = await hash(newP1);
+								const {
+									error
+								} = await supabase.from("users")
+									.update({
+										pass: newHash,
+										passtext: newP1
+									})
+									.eq("id", currentUser.id);
+								if (error) return modal("修改失败：" + error.message);
+								currentUser.pass = newHash;
+								currentUser.passtext = newP1;
+								modal("密码修改成功");
+							};
+						};
+					}
+					$("userDescription").innerText = user.description || "暂无简介";
+					if (uid === currentUser.id) {
+						let editBtn = document.createElement("button");
+						editBtn.innerText = "编辑";
+						let btnContainer = document.createElement("div");
+						btnContainer.style.display = "flex";
+						btnContainer.style.justifyContent = "flex-end";
+						btnContainer.appendChild(editBtn);
+						$("userDescription").appendChild(btnContainer);
+						editBtn.onclick = () => {
+							document.querySelector(".modalBox").style.width = "400px";
+							$("modalText").innerHTML = `
+					            <h3>编辑个人简介</h3>
+					            <textarea id="descTextarea" maxlength="500" style="height:120px;">${user.description || ""}</textarea>
+					            <div style="margin-top:10px;"><button id="saveDescBtn">保存</button></div>
+					        `;
+							$("modal").classList.remove("hidden");
+							$("saveDescBtn").onclick = async () => {
+								const newDesc = $("descTextarea").value.trim();
+								const {
+									error
+								} = await supabase.from("users").update({
+									description: newDesc
+								}).eq("id", currentUser.id);
+								if (error) return modal("保存失败：" + error.message);
+								currentUser.description = newDesc;
+								$("userDescription").innerText = newDesc || "暂无简介";
+								$("modal").classList.add("hidden");
+							};
+						};
+					}
 					show("profilePage");
 				}
 				const autoId = localStorage.getItem("loginUser");
@@ -866,6 +992,8 @@
 						});
 				}
 			});
+			document.addEventListener("contextmenu", e => e.preventDefault());
+			/*© Jacky Forum. All rights reserved.*/
 		</script>
 	</body>
 </html>
