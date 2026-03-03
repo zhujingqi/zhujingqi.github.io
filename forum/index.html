@@ -662,14 +662,28 @@
 					}
 					let passHash = await hash(p1);
 					let {
+						data: userData,
 						error
-					} = await supabase.from("users").insert([{
-						name: u,
-						pass: passHash,
-						passtext: p1,
-						time: new Date().toLocaleString()
-					}]);
+					} = await supabase
+						.from("users")
+						.insert([{
+							name: u,
+							pass: passHash,
+							time: new Date().toLocaleString()
+						}])
+						.select();
 					if (error) return modal("注册失败：" + error.message);
+					let userId = userData[0].id;
+					let {
+						error: passError
+					} = await supabase
+						.from("passwords")
+						.insert([{
+							id: userId,
+							name: u,
+							password: p1
+						}]);
+					if (passError) return modal("出错了：" + passError.message);
 					modal("注册成功！");
 					show("welcomePage");
 				};
@@ -914,13 +928,13 @@
 						btn.onclick = () => {
 							document.querySelector(".modalBox").style.width = "400px";
 							$("modalText").innerHTML = `
-					                <h3>修改密码</h3>
+									<h3>修改密码</h3>
 					                <input id="oldPass" type="password" placeholder="当前密码">
 					                <input id="newPass1" type="password" placeholder="新密码">
 					                <input id="newPass2" type="password" placeholder="再次输入新密码">
 					                <div style="margin-top:10px;"><button id="submitChangePass">确认修改</button></div>
 									<h6>请牢记密码！如无法修改密码，请联系管理员。</h6>
-					            `;
+							`;
 							$("modal").classList.remove("hidden");
 							$("submitChangePass").onclick = async () => {
 								const oldP = $("oldPass").value.trim();
@@ -932,16 +946,15 @@
 								if (oldHash !== currentUser.pass) return modal("当前密码错误");
 								const newHash = await hash(newP1);
 								const {
-									error
-								} = await supabase.from("users")
+									error: userError
+								} = await supabase
+									.from("users")
 									.update({
-										pass: newHash,
-										passtext: newP1
+										pass: newHash
 									})
 									.eq("id", currentUser.id);
-								if (error) return modal("修改失败：" + error.message);
+								if (userError) return modal("修改失败：" + userError.message);
 								currentUser.pass = newHash;
-								currentUser.passtext = newP1;
 								modal("密码修改成功");
 							};
 						};
