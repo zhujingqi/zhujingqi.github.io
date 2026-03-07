@@ -1128,24 +1128,25 @@
 					}
 				}
 				async function loadUserList() {
-					let box = $("userItems");
-					box.innerHTML = "<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
-					let {
-						data
-					} = await supabase.from("users").select("*").order("coins", {
-						ascending: false
-					});
-					box.innerHTML = "";
-					for (let i = data.length - 1; i >= 0; i--) {
-						let u = data[i];
-						let div = document.createElement("div");
-						div.className = "userItem";
-						div.innerHTML =
-							`<div style="flex:1">${u.name} <span class="userLevel">${getUserLevel(u.coins)}</span></div>` +
-							`<div style="width:150px;text-align:right;">${u.coins || 0}</div>`;
-						div.onclick = () => viewUser(u.id);
-						box.appendChild(div);
-					}
+				    let box = $("userItems");
+				    box.innerHTML = "<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
+				    let { data } = await supabase.from("users").select("*");
+				    data.sort((a, b) => {
+				        let coinsA = a.coins || 0;
+				        let coinsB = b.coins || 0;
+				        if (coinsB !== coinsA) return coinsB - coinsA;
+				        return a.name.localeCompare(b.name);
+				    });
+				    box.innerHTML = "";
+				    for (let u of data) {
+				        let div = document.createElement("div");
+				        div.className = "userItem";
+				        div.innerHTML =
+				            `<div style="flex:1">${u.name} <span class="userLevel">${getUserLevel(u.coins || 0)}</span></div>` +
+				            `<div style="width:150px;text-align:right;">${u.coins || 0}</div>`;
+				        div.onclick = () => viewUser(u.id);
+				        box.appendChild(div);
+				    }
 				}
 				async function viewUser(uid) {
 					let container = $("userPosts");
