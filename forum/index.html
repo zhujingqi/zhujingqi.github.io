@@ -416,6 +416,138 @@
 			::-webkit-scrollbar-thumb:hover {
 				background-color: #888;
 			}
+
+			#backBtn {
+				position: absolute;
+				left: 20px;
+				top: 20px;
+				background: var(--card);
+				color: var(--text);
+				border: none;
+				padding: 10px 20px;
+				border-radius: 20px;
+				cursor: pointer;
+				transition: 0.2s;
+			}
+
+			#backBtn:hover {
+				background: var(--green);
+				color: #fff;
+			}
+
+			#newUsers {
+				position: absolute;
+				right: 2%;
+				top: 20%;
+				width: 10%;
+				background: var(--card);
+				padding: 20px;
+				border-radius: 20px;
+				margin: 0 auto 20px auto;
+				box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+			}
+
+			.newUserItem {
+				display: flex;
+				justify-content: space-between;
+				padding: 8px 0;
+				border-bottom: 1px solid #ccc;
+				cursor: pointer;
+			}
+
+			.newUserItem:last-child {
+				border-bottom: none;
+			}
+
+			.newUserItem:hover {
+				color: var(--green);
+			}
+
+			#notice {
+				position: absolute;
+				left: 2%;
+				top: 20%;
+				width: 10%;
+				background: var(--card);
+				padding: 20px;
+				border-radius: 20px;
+				box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+			}
+
+			@media (max-width: 900px) {
+
+				#notice,
+				#newUsers,
+				#fortuneBox {
+					display: none;
+				}
+			}
+
+			.helpBtn {
+				width: 20px;
+				height: 20px;
+				border-radius: 50%;
+				border: none;
+				font-size: 14px;
+				cursor: pointer;
+			}
+
+			.helpBtn:hover {
+				background: #f0f0f0;
+			}
+
+			#coinMsg {
+				position: fixed;
+				top: 20px;
+				left: 50%;
+				transform: translateX(-50%);
+				background: #0a0;
+				color: #fff;
+				padding: 10px 20px;
+				border-radius: 20px;
+				font-weight: bold;
+				opacity: 0;
+				pointer-events: none;
+				transition: opacity 0.5s;
+				z-index: 9999;
+			}
+
+			.userLevel {
+				font-size: 14px;
+				color: #888;
+				margin-left: 4px;
+			}
+
+			body.dark .userLevel {
+				color: #aaa;
+			}
+
+			#fortuneBox {
+				text-align: center;
+				position: absolute;
+				right: 2%;
+				bottom: 40px;
+				width: 10%;
+				background: var(--card);
+				padding: 20px;
+				border-radius: 20px;
+				margin: 0 auto 20px auto;
+				box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+			}
+
+			#fortuneBtn {
+				font-size: 14px;
+			}
+
+			#fortuneLevel {
+				font-size: 25px;
+				font-weight: bold;
+			}
+
+			.fortuneList {
+				margin: 6px 0;
+				font-size: 15px;
+			}
 		</style>
 	</head>
 	<body>
@@ -440,7 +572,7 @@
 				</div>
 				<span style="text-align:center; color:#aaa; font-size: 12px;">
 					<br>
-					初次加载可能较慢，请耐心等待 :)
+					首次加载可能较慢，请耐心等待 :)
 					<br>
 					<a href="#">Jacky 论坛</a> ·
 					<a href="https://zhujingqi.com">Zhujingqi</a>
@@ -456,7 +588,10 @@
 				<input id="regPass" type="password" placeholder="密码">
 				<input id="regPass2" type="password" placeholder="再次输入密码">
 				<button id="registerBtn">注册</button>
-				<h6>注：请牢记用户名和密码！<br>如无法注册，请联系管理员。</h6>
+				<h6 style="text-align:center;">
+					注册即代表您同意 <a id="termsBtn" style="cursor:pointer;">用户协议</a><br>
+					请牢记用户名和密码。如无法注册，请联系管理员。
+				</h6>
 				<div style="text-align:center;margin-top:10px">
 					<span style="color:var(--green);cursor:pointer" id="backLogin">已有帐号？返回登录</span>
 				</div>
@@ -467,6 +602,40 @@
 				<img src="forum.png" style="width: 100px; height: 100px;" />
 				Jacky 论坛
 			</div>
+			<div id="notice">
+				<h3>公告</h3>
+				<div class="noticeItem">🎉欢迎来到 <b>Jacky 论坛</b> :)</div>
+				<br>
+				<div class="noticeItem">
+					近期更新：<br>
+					· 今日运势<br>
+					· 金币系统<br>
+					· 公告栏<br>
+					· 新用户列表<br>
+					<br>
+				</div>
+				<div class="noticeItem" style="font-size: 14px;">
+					分享 Jacky 论坛，让好友加入！<br>
+					<a onclick="navigator.clipboard.writeText(location.href).then(()=>this.innerText='已复制')"
+						style="cursor:pointer;">
+						点击复制链接
+					</a>
+				</div>
+			</div>
+			<div id="fortuneBox">
+				今日运势
+				<button id="fortuneBtn">获取运势</button>
+				<div id="fortuneResult" style="display:none;">
+					<div id="fortuneLevel"></div>
+					<div class="fortuneList">
+						<b>宜：</b><span id="fortuneGood"></span>
+					</div>
+					<div class="fortuneList">
+						<b>忌：</b><span id="fortuneBad"></span>
+					</div>
+				</div>
+			</div>
+			<div id="newUsers"></div>
 			<div id="posts"></div>
 		</div>
 		<div id="editorPage" class="hidden center">
@@ -483,15 +652,16 @@
 		</div>
 		<div id="userListPage" class="hidden" style="display:flex;flex-direction:column;height:100vh;">
 			<div style="padding:20px;flex:1;overflow-y:auto;">
-				<h2 style="color:var(--green);">用户列表</h2>
+				<h2 style="color:var(--green);">排行榜</h2>
 				<div style="display:flex;font-weight:bold;padding:8px 0;border-bottom:1px solid #ccc;width:500px;">
 					<div style="flex:1;">用户名</div>
-					<div style="width:150px;text-align:right;">注册时间</div>
+					<div style="width:150px;text-align:right;">金币数</div>
 				</div>
 				<div id="userItems"></div>
 			</div>
 		</div>
 		<div id="profilePage" class="hidden" style="display:flex;flex-direction:column;height:100vh;">
+			<div id="backBtn">←</div>
 			<div class="postHeader" style="justify-content:flex-start;align-items:center;">
 				<h2 id="pname"></h2>
 				<button id="logoutBtn" style="margin-left:20px;">登出</button>
@@ -516,6 +686,9 @@
 				<div id="modalText"></div>
 				<div style="margin-top:20px"><button id="closeModal">关闭</button></div>
 			</div>
+		</div>
+		<div id="coinMsg">
+
 		</div>
 		<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 		<script>
@@ -585,6 +758,7 @@
 				$("homeBtn").onclick = () => {
 					show("main");
 					loadPosts();
+					loadNewUsers();
 					setActive("homeBtn");
 				};
 				$("editorBtn").onclick = () => {
@@ -603,6 +777,12 @@
 				};
 				$("moreBtn").onclick = e => {
 					$("moreMenu").classList.toggle("hidden");
+				};
+				$("backBtn").onclick = () => {
+					show("main");
+					loadPosts();
+					loadNewUsers();
+					setActive("homeBtn");
 				};
 				$("goRegister").onclick = () => show("registerPage");
 				$("backLogin").onclick = () => show("welcomePage");
@@ -635,6 +815,22 @@
 <a href="https://zhujingqi.com/money.html">点击此处赞助 Jacky</a>
 					`);
 				};
+				$("termsBtn").onclick = () => {
+					document.querySelector(".modalBox").style.width = "800px";
+					modal(`
+<h3>Jacky 论坛 用户协议</h3>
+<p>注册或使用 Jacky 论坛，即表示您同意以下条款：</p>
+<ul>
+	<li>禁止发布违法内容。</li>
+    <li>所有内容和设计归 Jacky 论坛 所有。</li>
+    <li>请妥善保管账号和密码，因账号泄露造成的损失由用户自行承担。</li>
+    <li>本论坛对内容及服务拥有最终解释权，并可随时修改协议或规则。</li>
+    <li>本论坛不保证内容绝对正确或服务持续可用。</li>
+    <li>使用本论坛即表示您接受本协议及其未来更新。</li>
+</ul>
+<p>如有疑问，请联系 <a href="mailto:jacky@zhujingqi.com">jacky@zhujingqi.com</a></p>
+					`);
+				}
 				$("lightTheme").onclick = () => {
 					document.body.classList.remove("dark");
 				};
@@ -671,7 +867,8 @@
 						.insert([{
 							name: u,
 							pass: passHash,
-							time: new Date().toLocaleString()
+							time: new Date().toLocaleString(),
+							coins: 0
 						}])
 						.select();
 					if (error) return modal("注册失败：" + error.message);
@@ -709,6 +906,7 @@
 					$("nav").classList.remove("hidden");
 					show("main");
 					loadPosts();
+					loadNewUsers();
 					modal("欢迎 <b>" + data.name + "</b> 来到 <b>Jacky</b> 论坛！");
 				};
 				$("sendBtn").onclick = async () => {
@@ -739,6 +937,7 @@
 					show("main");
 					loadPosts();
 					setActive("homeBtn");
+					await changeCoins(currentUser.id, 5);
 				};
 				async function loadPosts(container = $("posts")) {
 					container.innerHTML =
@@ -755,7 +954,7 @@
 								time,
 								author,
 								tag,
-								users:author(name)
+								users:author(name, coins)
 							`)
 							.order("id", {
 								ascending: false
@@ -785,6 +984,7 @@
 							postDiv.innerHTML =
 								'<div class="postHeaderTop"><div class="userInfo">' +
 								'<span class="userLink" data-user="' + p.author + '">' + (p.users?.name || "未知") +
+								'<span class="userLevel">' + getUserLevel(p.users?.coins || 0) + '</span>' +
 								'</span>' +
 								'<span class="time">' + new Date(p.time).toLocaleString() + '</span>' +
 								'</div></div>' +
@@ -820,7 +1020,7 @@
 						data
 					} = await supabase
 						.from("comments")
-						.select("*, users(name)")
+						.select("*, users(name, coins)")
 						.eq("postid", postId)
 						.order("id", {
 							ascending: true
@@ -829,7 +1029,9 @@
 						let div = document.createElement("div");
 						div.className = "comment";
 						div.innerHTML =
-							`<b class="userLink" data-user="${c.author}">${c.users.name}</b>: ${c.content}` +
+							`<b class="userLink" data-user="${c.author}">${c.users.name}` +
+							`<span class="userLevel">` + getUserLevel(c.users?.coins || 0) + `</span>` + `</b>` +
+							`: ${c.content}` +
 							(c.author === currentUser.id ?
 								`<button class="commentDel" data-cdel="${c.id}">删除</button>` : "");
 						container.appendChild(div);
@@ -838,6 +1040,7 @@
 						if (del) del.onclick = async () => {
 							await supabase.from("comments").delete().eq("id", c.id);
 							renderComments(postId, container);
+							await changeCoins(currentUser.id, -3);
 						};
 					}
 				}
@@ -849,6 +1052,7 @@
 						time: new Date().toLocaleString()
 					}]);
 					loadPosts();
+					await changeCoins(currentUser.id, 3);
 				}
 				async function likePost(id) {
 					let {
@@ -860,39 +1064,84 @@
 						.eq("liker", currentUser.id);
 					if (data && data.length > 0) {
 						await supabase.from("likes").delete().eq("postid", id).eq("liker", currentUser.id);
+						await changeCoins(currentUser.id, -1);
 					} else {
 						await supabase.from("likes").insert([{
 							postid: id,
 							liker: currentUser.id,
 							time: new Date().toLocaleString()
 						}]);
+						await changeCoins(currentUser.id, 1);
 					}
 					loadPosts();
 				}
 				async function deletePost(id) {
+					let {
+						data: myComments
+					} = await supabase
+						.from("comments")
+						.select("*")
+						.eq("postid", id)
+						.eq("author", currentUser.id);
+					let {
+						data: myLikes
+					} = await supabase
+						.from("likes")
+						.select("*")
+						.eq("postid", id)
+						.eq("liker", currentUser.id);
+					let penalty = -5;
+					if (myComments) penalty -= myComments.length * 3;
+					if (myLikes) penalty -= myLikes.length * 1;
+					await changeCoins(currentUser.id, penalty);
 					await supabase.from("posts").delete().eq("id", id);
 					await supabase.from("comments").delete().eq("postid", id);
 					await supabase.from("likes").delete().eq("postid", id);
 					loadPosts();
+				}
+				async function loadNewUsers(limit = 5) {
+					const container = $("newUsers");
+					container.innerHTML = "<p style='color:var(--sub);text-align:center;'>Loading...</p>";
+					let {
+						data,
+						error
+					} = await supabase
+						.from("users")
+						.select("*")
+						.order("time", {
+							ascending: false
+						})
+						.limit(limit);
+					if (error) {
+						container.innerHTML = "<p style='color:red;text-align:center;'>ERROR</p>";
+						return;
+					}
+					container.innerHTML = "<h3>欢迎新用户</h3>";
+					for (let u of data) {
+						let div = document.createElement("div");
+						div.className = "newUserItem";
+						div.innerHTML =
+							`<span>${u.name}</span>`;
+						div.onclick = () => viewUser(u.id);
+						container.appendChild(div);
+					}
 				}
 				async function loadUserList() {
 					let box = $("userItems");
 					box.innerHTML = "<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
 					let {
 						data
-					} = await supabase.from("users").select("*").order("time", {
-						ascending: true
+					} = await supabase.from("users").select("*").order("coins", {
+						ascending: false
 					});
-
 					box.innerHTML = "";
 					for (let i = data.length - 1; i >= 0; i--) {
 						let u = data[i];
 						let div = document.createElement("div");
 						div.className = "userItem";
-						div.innerHTML = `
-					        <div>${u.name}</div>
-					        <div>${new Date(u.time).toLocaleString()}</div>
-					    `;
+						div.innerHTML =
+							`<div style="flex:1">${u.name} <span class="userLevel">${getUserLevel(u.coins)}</span></div>` +
+							`<div style="width:150px;text-align:right;">${u.coins || 0}</div>`;
 						div.onclick = () => viewUser(u.id);
 						box.appendChild(div);
 					}
@@ -904,9 +1153,33 @@
 					let {
 						data: user
 					} = await supabase.from("users").select("*").eq("id", uid).single();
-					$("pname").innerText = user.name;
-					$("moreInfo").innerHTML = "注册时间：" + new Date(user.time)
-						.toLocaleString();
+					$("pname").innerHTML = user.name + " " +
+						`<span class="userLevel">${getUserLevel(user.coins)}</span>` +
+						"&ensp;<button class='helpBtn' id='levelBtn'>?</button>";
+					$("moreInfo").innerHTML =
+						"金币：" + (user.coins || 0) +
+						"&ensp;<button class='helpBtn' id='coinBtn'>?</button>" +
+						"&emsp;&emsp;注册时间：" + new Date(user.time).toLocaleString();
+					$("levelBtn").onclick = () => {
+						document.querySelector(".modalBox").style.width = "600px";
+						modal(`
+					<h3>等级规则</h3>
+					<p>1. 等级分为 LV0-LV5 共 6 个等级</p>
+					<p>2. 不同等级会有不同颜色区分</p>
+					<p>3. 金币到达某数量后，自动升级</p>
+					<p>4. 获取金币并提升等级吧！</p>
+						`);
+					}
+					$("coinBtn").onclick = () => {
+						document.querySelector(".modalBox").style.width = "600px";
+						modal(`
+					<h3>金币规则</h3>
+					<p>1. 发布 +5 金币</p>
+					<p>2. 评论 +3 金币</p>
+					<p>3. 点赞 +1 金币</p>
+					<p>4. 删除帖子、内容或取消点赞，减少对应数量金币</p>
+						`);
+					}
 					container.innerHTML = "";
 					let {
 						data: posts
@@ -994,7 +1267,142 @@
 					}
 					show("profilePage");
 				}
+				async function changeCoins(uid, amount) {
+					let {
+						data
+					} = await supabase
+						.from("users")
+						.select("coins")
+						.eq("id", uid)
+						.single();
+					let newCoins = (data.coins || 0) + amount;
+					if (newCoins < 0) newCoins = 0;
+					await supabase
+						.from("users")
+						.update({
+							coins: newCoins
+						})
+						.eq("id", uid);
+					if (currentUser && currentUser.id === uid) {
+						currentUser.coins = newCoins;
+						showCoinMsg(amount > 0 ? `金币 +${amount}！` : `金币 -${Math.abs(amount)}！`);
+					}
+				}
+
+				function showCoinMsg(text) {
+					const msg = document.getElementById("coinMsg");
+					msg.textContent = text;
+					msg.style.opacity = 1;
+					clearTimeout(msg.hideTimeout);
+					msg.hideTimeout = setTimeout(() => {
+						msg.style.opacity = 0;
+					}, 3000);
+				}
 				const autoId = localStorage.getItem("loginUser");
+
+				function getUserLevel(coins) {
+					let level = "LV0",
+						color = "#888";
+					if (coins > 200) {
+						level = "LV5";
+						color = "#ff5500";
+					} else if (coins > 100) {
+						level = "LV4";
+						color = "#ff9900";
+					} else if (coins > 50) {
+						level = "LV3";
+						color = "#ffcc00";
+					} else if (coins > 30) {
+						level = "LV2";
+						color = "#00aaff";
+					} else if (coins > 0) {
+						level = "LV1";
+						color = "#77bb00";
+					}
+					return `<span class="userLevel" style="color:${color}">${level}</span>`;
+				}
+				const levels = ["大吉", "吉", "中平", "凶", "大凶"];
+				const things = [
+					"发帖",
+					"评论",
+					"点赞",
+					"写代码",
+					"刷题",
+					"学习",
+					"找 BUG",
+					"早睡",
+					"熬夜",
+					"打游戏",
+					"看手机",
+					"上学",
+					"写作业",
+					"重启电脑",
+					"清理桌面",
+					"探索网站",
+					"赞助杰基",
+					"看排行榜",
+					"装呆",
+					"装酷",
+					"发呆",
+					"思考人生",
+					"怀疑人生",
+					"数键盘上的按键（有几个呢？）",
+					"等待管理员上线",
+					"万事皆宜",
+					"万事不宜"
+				];
+
+				function stringToSeed(str) {
+					let hash = 0;
+					for (let i = 0; i < str.length; i++) {
+						hash = str.charCodeAt(i) + ((hash << 5) - hash);
+					}
+					return Math.abs(hash);
+				}
+
+				function seededRandom(seed) {
+					seed = (seed * 9301 + 49297) % 233280;
+					return seed / 233280;
+				}
+
+				function getDailyFortune(username) {
+					const d = new Date();
+					const dateStr = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
+					const seed = stringToSeed(username + dateStr);
+					const r1 = seededRandom(seed);
+					const level = levels[Math.floor(r1 * levels.length)];
+					const r2 = seededRandom(seed + 1);
+					let goodIndex = Math.floor(r2 * things.length);
+					const r3 = seededRandom(seed + 2);
+					let badIndex = Math.floor(r3 * things.length);
+					if (goodIndex === badIndex) {
+						badIndex = (badIndex + 1) % things.length;
+					}
+					return {
+						level: level,
+						good: things[goodIndex],
+						bad: things[badIndex]
+					};
+				}
+				document.getElementById("fortuneBtn").onclick = function() {
+					const username = currentUser.name;
+					const f = getDailyFortune(username);
+					document.getElementById("fortuneLevel").innerText = f.level;
+					document.getElementById("fortuneGood").innerText = f.good;
+					document.getElementById("fortuneBad").innerText = f.bad;
+					document.getElementById("fortuneResult").style.display = "block";
+					const colors = {
+						"大吉": "gold",
+						"吉": "green",
+						"中平": "gray",
+						"凶": "red",
+						"大凶": "darkred"
+					};
+					const levelEl = document.getElementById("fortuneLevel");
+					levelEl.innerText = f.level;
+					levelEl.style.color = colors[f.level];
+					this.style.display = "none";
+				};
 				if (autoId) {
 					supabase.from("users").select("*").eq("id", autoId).single()
 						.then(res => {
@@ -1003,6 +1411,7 @@
 								$("nav").classList.remove("hidden");
 								show("main");
 								loadPosts();
+								loadNewUsers();
 							}
 						});
 				}
