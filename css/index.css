@@ -377,6 +377,13 @@
 	transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
+.switchlang {
+	position: fixed;
+	top: 20px;
+	right: 60px;
+	font-size: 15px;
+	opacity: 0.7;
+}
 /*
 NAME DEFINITION:
 .hero hero
@@ -402,4 +409,5 @@ NAME DEFINITION:
 .pupil
 .mouth
 .face
+.switchlang
 */
