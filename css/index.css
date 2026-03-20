@@ -377,7 +377,7 @@
 	transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
-.switchlang {
+#switchlang {
 	position: fixed;
 	top: 20px;
 	right: 60px;
@@ -409,5 +409,5 @@ NAME DEFINITION:
 .pupil
 .mouth
 .face
-.switchlang
+#switchlang
 */
