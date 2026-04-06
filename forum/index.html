@@ -542,6 +542,57 @@
 				font-size: 15px;
 			}
 
+			.pager {
+				width: 100%;
+				max-width: 800px;
+				margin: 10px auto 20px auto;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				gap: 6px;
+				flex-wrap: wrap;
+				padding-bottom: 25px;
+			}
+
+			.pager .pageBtn,
+			.pager .navBtn {
+				min-width: 40px;
+				height: 40px;
+				padding: 0 12px;
+				border-radius: 12px;
+				border: 1px solid transparent;
+				background: var(--card);
+				color: var(--text);
+				font-size: 16px;
+				cursor: pointer;
+				transition: .2s;
+			}
+
+			.pager .pageBtn:hover,
+			.pager .navBtn:hover {
+				border-color: var(--green);
+				color: var(--green);
+			}
+
+			.pager .pageBtn.active {
+				background: var(--green);
+				color: #fff;
+				border-color: var(--green);
+				font-weight: bold;
+			}
+
+			.pager .pageBtn:disabled,
+			.pager .navBtn:disabled {
+				opacity: .4;
+				cursor: not-allowed;
+			}
+
+			.pager .ellipsis {
+				padding: 0 4px;
+				color: var(--sub);
+				user-select: none;
+			}
+
 			@media (max-width: 800px) {
 
 				#logo,
@@ -612,6 +663,26 @@
 
 				#moreMenu div {
 					padding: 6px;
+				}
+
+				.pager {
+					gap: 4px;
+					padding-bottom: 30px;
+					margin: 8px auto 14px auto;
+				}
+
+				.pager .pageBtn,
+				.pager .navBtn {
+					min-width: 30px;
+					height: 30px;
+					padding: 0 8px;
+					border-radius: 10px;
+					font-size: 12px;
+				}
+
+				.pager .ellipsis {
+					font-size: 12px;
+					padding: 0 2px;
 				}
 			}
 		</style>
@@ -700,6 +771,7 @@
 			</div>
 			<div id="newUsers"></div>
 			<div id="posts"></div>
+			<div id="postPager" class="pager"></div>
 		</div>
 		<div id="editorPage" class="hidden center">
 			<div class="card" style="width:95%;max-width:600px;">
@@ -765,6 +837,10 @@
 				let currentPage = "home";
 				const defaultTags = ["学习", "日常", "搞笑", "游戏", "提问"];
 				let selectedTags = [];
+				const POSTS_PER_PAGE = 5;
+				let postPage = 1;
+				let postTotalPages = 1;
+				let postPages = [];
 				const ua = navigator.userAgent;
 				if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|HUAWEI|HONOR|SM-|SAMSUNG|Xiaomi|Redmi|OPPO|VIVO/i
 					.test(ua)) {
@@ -821,7 +897,7 @@
 				}
 				$("homeBtn").onclick = () => {
 					show("main");
-					loadPosts();
+					loadPosts(1);
 					loadNewUsers();
 					setActive("homeBtn");
 				};
@@ -844,7 +920,7 @@
 				};
 				$("backBtn").onclick = () => {
 					show("main");
-					loadPosts();
+					loadPosts(postPage);
 					loadNewUsers();
 					setActive("homeBtn");
 				};
@@ -969,7 +1045,7 @@
 					localStorage.setItem("loginUser", data.id);
 					$("nav").classList.remove("hidden");
 					show("main");
-					loadPosts();
+					loadPosts(1);
 					loadNewUsers();
 					modal("欢迎 <b>" + data.name + "</b> 来到 <b>Jacky</b> 论坛！");
 				};
@@ -999,32 +1075,143 @@
 					if (error) return modal("发帖失败：" + error.message);
 					$("text").value = "";
 					show("main");
-					loadPosts();
+					loadPosts(1);
 					setActive("homeBtn");
 					await changeCoins(currentUser.id, 5);
 				};
-				async function loadPosts(container = $("posts")) {
+
+				function renderPager() {
+					const pager = $("postPager");
+					pager.innerHTML = "";
+					const maxPage = postPages.length + (postPages[postPages.length - 1]?.hasMore ? 1 : 0);
+					if (maxPage <= 1) {
+						const btn = document.createElement("button");
+						btn.className = "pageBtn active";
+						btn.textContent = "1";
+						btn.disabled = true;
+						pager.appendChild(btn);
+						return;
+					}
+					const makeBtn = (text, page, cls = "pageBtn", disabled = false, active = false) => {
+						const b = document.createElement("button");
+						b.className = cls + (active ? " active" : "");
+						b.textContent = text;
+						b.disabled = disabled;
+						if (!disabled && page != null) {
+							b.onclick = () => loadPosts(page);
+						}
+						return b;
+					};
+					const addEllipsis = () => {
+						const s = document.createElement("span");
+						s.className = "ellipsis";
+						s.textContent = "...";
+						pager.appendChild(s);
+					};
+					pager.appendChild(makeBtn("‹", postPage - 1, "navBtn", postPage <= 1));
+					const pages = [];
+					if (maxPage <= 7) {
+						for (let i = 1; i <= maxPage; i++) pages.push(i);
+					} else {
+						pages.push(1);
+						let start = Math.max(2, postPage - 2);
+						let end = Math.min(maxPage - 1, postPage + 2);
+						if (start > 2) pages.push("...");
+						for (let i = start; i <= end; i++) pages.push(i);
+						if (end < maxPage - 1) pages.push("...");
+						pages.push(maxPage);
+					}
+					for (let item of pages) {
+						if (item === "...") addEllipsis();
+						else pager.appendChild(makeBtn(String(item), item, "pageBtn", false, item === postPage));
+					}
+					pager.appendChild(makeBtn("›", postPage + 1, "navBtn", !postPages[postPage - 1]?.hasMore));
+				}
+				async function fetchPostPage(cursor = null) {
+					let query = supabase
+						.from("posts")
+						.select(`
+							id,
+							content,
+							time,
+							author,
+							tag,
+							users:author(name, coins)
+						`)
+						.order("id", {
+							ascending: false
+						})
+						.limit(POSTS_PER_PAGE);
+					if (cursor !== null) {
+						query = query.lt("id", cursor);
+					}
+					let {
+						data,
+						error
+					} = await query;
+					if (error) throw error;
+					const posts = data || [];
+					return {
+						posts,
+						nextCursor: posts.length ? posts[posts.length - 1].id : null,
+						hasMore: posts.length === POSTS_PER_PAGE
+					};
+				}
+				async function fetchPostPage(cursor = null) {
+					let query = supabase
+						.from("posts")
+						.select(`
+							id,
+							content,
+							time,
+							author,
+							tag,
+							users:author(name, coins)
+						`)
+						.order("id", {
+							ascending: false
+						})
+						.limit(POSTS_PER_PAGE);
+					if (cursor !== null) {
+						query = query.lt("id", cursor);
+					}
+					let {
+						data,
+						error
+					} = await query;
+					if (error) throw error;
+					const posts = data || [];
+					return {
+						posts,
+						nextCursor: posts.length ? posts[posts.length - 1].id : null,
+						hasMore: posts.length === POSTS_PER_PAGE
+					};
+				}
+				async function loadPosts(page = 1, container = $("posts")) {
 					container.innerHTML =
 						"<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
 					try {
-						let {
-							data: posts,
-							error
-						} = await supabase
-							.from("posts")
-							.select(`
-								id,
-								content,
-								time,
-								author,
-								tag,
-								users:author(name, coins)
-							`)
-							.order("id", {
-								ascending: false
-							});
-						if (error) throw error;
+						if (page === 1) {
+							postPages = [];
+						}
+						while (postPages.length < page) {
+							const cursor = postPages.length ? postPages[postPages.length - 1].nextCursor : null;
+							const pageData = await fetchPostPage(cursor);
+							postPages.push(pageData);
+							if (!pageData.hasMore) break;
+						}
+						if (!postPages[page - 1]) {
+							page = postPages.length || 1;
+						}
+						postPage = page;
+						renderPager();
+						const posts = postPages[page - 1]?.posts || [];
 						container.innerHTML = "";
+						if (!posts.length) {
+							container.innerHTML =
+								"<p style='text-align:center;color:var(--sub);margin-top:20px;'>暂无帖子</p>";
+							return;
+						}
 						for (let p of posts) {
 							let postDiv = document.createElement("div");
 							postDiv.className = "post";
@@ -1115,7 +1302,7 @@
 						author: currentUser.id,
 						time: new Date().toLocaleString()
 					}]);
-					loadPosts();
+					loadPosts(postPage);
 					await changeCoins(currentUser.id, 3);
 				}
 				async function likePost(id) {
@@ -1137,7 +1324,7 @@
 						}]);
 						await changeCoins(currentUser.id, 1);
 					}
-					loadPosts();
+					loadPosts(postPage);
 				}
 				async function deletePost(id) {
 					let {
@@ -1161,7 +1348,7 @@
 					await supabase.from("posts").delete().eq("id", id);
 					await supabase.from("comments").delete().eq("postid", id);
 					await supabase.from("likes").delete().eq("postid", id);
-					loadPosts();
+					loadPosts(1);
 				}
 				async function loadNewUsers(limit = 5) {
 					const container = $("newUsers");
@@ -1477,7 +1664,7 @@
 								currentUser = res.data;
 								$("nav").classList.remove("hidden");
 								show("main");
-								loadPosts();
+								loadPosts(1);
 								loadNewUsers();
 							}
 						});
