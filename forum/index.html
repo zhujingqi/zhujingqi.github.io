@@ -1446,6 +1446,7 @@
 						container.appendChild(div);
 					}
 					$("logoutBtn").style.display = (uid === currentUser.id) ? "inline-block" : "none";
+					/*There are errors
 					let existingBtn = $("changePassBtn");
 					if (uid === currentUser.id && !existingBtn) {
 						let btn = document.createElement("button");
@@ -1453,7 +1454,6 @@
 						btn.innerText = "修改密码";
 						btn.style.marginRight = "0px";
 						btn.style.marginLeft = "20px";
-						if (existingBtn) existingBtn.remove();/*Add this because...*/
 						$("logoutBtn").parentNode.insertBefore(btn, $("logoutBtn"));
 						btn.onclick = () => {
 							document.querySelector(".modalBox").style.width = "400px";
@@ -1489,6 +1489,7 @@
 							};
 						};
 					}
+					*/
 					$("userDescription").innerText = user.description || "暂无简介";
 					if (uid === currentUser.id) {
 						let editBtn = document.createElement("button");
