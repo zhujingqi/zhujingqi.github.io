@@ -775,7 +775,7 @@
 		</div>
 		<div id="editorPage" class="hidden center">
 			<div class="card" style="width:95%;max-width:600px;">
-				<textarea id="text" placeholder="发布新鲜事（最多5000字符）" style="width:100%;" maxlength="5000"></textarea>
+				<textarea id="text" placeholder="发布新鲜事（最多2000字符）" style="width:100%;" maxlength="2000"></textarea>
 				<div class="tagBarContainer"
 					style="display:flex;align-items:center;gap:6px;flex-wrap:nowrap;margin-top:8px;">
 					<div class="tagBar" id="tagBar" style="display:flex;gap:6px;flex-shrink:1;overflow-x:auto;"></div>
@@ -1453,6 +1453,7 @@
 						btn.innerText = "修改密码";
 						btn.style.marginRight = "0px";
 						btn.style.marginLeft = "20px";
+						if (existingBtn) existingBtn.remove();/*Add this because...*/
 						$("logoutBtn").parentNode.insertBefore(btn, $("logoutBtn"));
 						btn.onclick = () => {
 							document.querySelector(".modalBox").style.width = "400px";
