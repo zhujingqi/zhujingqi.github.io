@@ -692,6 +692,7 @@
 			<button id="homeBtn">首页</button>
 			<button id="editorBtn">发布</button>
 			<button id="showUsersBtn">用户</button>
+			<button id="chatBtn">聊天</button>
 			<button id="profileBtn">我的</button>
 			<button id="moreBtn">更多</button>
 		</div>
@@ -910,6 +911,9 @@
 					show("userListPage");
 					loadUserList();
 					setActive("showUsersBtn");
+				};
+				$("chatBtn").onclick = () => {
+					window.location.href = "https://zhujingqi.com/chat/";
 				};
 				$("profileBtn").onclick = () => {
 					if (currentUser) viewUser(currentUser.id);
