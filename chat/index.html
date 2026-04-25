@@ -965,6 +965,24 @@
 				font-size: 13px;
 			}
 
+			.verifiedBadge {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				width: 16px;
+				height: 16px;
+				margin-left: 6px;
+				border-radius: 50%;
+				background: #00aaff;
+				color: #fff;
+				font-size: 11px;
+				font-weight: 700;
+				line-height: 1;
+				vertical-align: middle;
+				cursor: default;
+				user-select: none;
+			}
+
 			@media (max-width: 860px) {
 
 				:root {
@@ -1323,6 +1341,7 @@
 				let unreadCache = {};
 				let unreadLoaded = false;
 				let contextUserId = null;
+				const VERIFIED_USERS = [1, 10, 30, 74];
 				const EMOJIS = {
 					smile: "smile.svg",
 					cry: "cry.svg",
@@ -1346,7 +1365,7 @@
 					{
 						name: "Jacky Chat",
 						icon: "icon.svg",
-						url: "https://zhujingqi.com"
+						url: "https://zhujingqi.com/chat/"
 					},
 					{
 						name: "ROOMS",
@@ -1370,6 +1389,15 @@
 					},
 
 				];
+
+				function isVerified(id) {
+					return VERIFIED_USERS.includes(Number(id));
+				}
+
+				function getVerifiedBadgeHTML(id) {
+					if (!isVerified(id)) return "";
+					return `<span class="verifiedBadge" title="官方账号">V</span>`;
+				}
 
 				function isMobile() {
 					return window.innerWidth <= 860;
@@ -1759,7 +1787,7 @@
 						div.innerHTML = `
 							<div style="min-width:0;">
 								<div class="itemTitle">
-									${escapeHtml(u.name)} ${getUserLevelHTML(u.coins || 0)}
+									${escapeHtml(u.name)} ${getUserLevelHTML(u.coins || 0)} ${getVerifiedBadgeHTML(u.id)}
 									${unread > 0 ? `<span class="unreadDot" id="unread-${u.id}">${unread > 99 ? "99+" : unread}</span>` : ""}
 								</div>
 								<div class="itemSub">
@@ -1990,7 +2018,8 @@
 					$("msgInput").disabled = false;
 					$("sendMsgBtn").disabled = false;
 					const other = getUserById(currentChatUserId);
-					$("chatTitle").textContent = other?.name || "未知用户";
+					$("chatTitle").innerHTML =
+						`${escapeHtml(other?.name || "未知用户")} ${getVerifiedBadgeHTML(other.id)}`;
 					const msgs = await loadMessages(currentChatUserId);
 					body.innerHTML = "";
 					if (!msgs.length) {
@@ -2099,7 +2128,7 @@
 						div.className = "item";
 						div.innerHTML = `
 							<div>
-								<div class="itemTitle">${escapeHtml(u.name)} ${getUserLevelHTML(u.coins || 0)}</div>
+								<div class="itemTitle">${escapeHtml(u.name)} ${getUserLevelHTML(u.coins || 0)} ${getVerifiedBadgeHTML(u.id)}</div>
 								<div class="itemSub">金币：${u.coins || 0} · ${escapeHtml(u.time || "")}</div>
 							</div>
 							<div style="font-size:12px; opacity:.8;">详情</div>
@@ -2157,8 +2186,8 @@
 					} = await supabase.from("contact").insert([{
 						id1,
 						id2,
-						created_at: new Date().toLocaleString(),
-						last_msg: new Date().toLocaleString(),
+						created_at: new Date().toISOString(),
+						last_msg: new Date().toISOString(),
 						pin: []
 					}]);
 					if (error) return openModal("添加失败", error.message);
@@ -2250,7 +2279,7 @@
 					if (!currentChatUserId) return;
 					const txt = $("msgInput").value.trim();
 					if (!txt) return;
-					const now = new Date().toLocaleString();
+					const now = new Date().toISOString();
 					const [id1, id2] = sortPair(currentUser.id, currentChatUserId);
 					const {
 						error
@@ -2279,9 +2308,11 @@
 
 				function renderProfilePage() {
 					$("profileName").innerHTML =
-						`${escapeHtml(currentUser.name)} ${getUserLevelHTML(currentUser.coins || 0)}`;
+						`${escapeHtml(currentUser.name)} ${getUserLevelHTML(currentUser.coins || 0)} ${getVerifiedBadgeHTML(currentUser.id)}`;
 					$("profileCoins").textContent = currentUser.coins || 0;
-					$("profileTime").textContent = currentUser.time ? new Date(currentUser.time).toLocaleString() : "";
+					$("profileTime").textContent = currentUser.time ?
+						new Date(currentUser.time).toLocaleString("zh-CN") :
+						"";
 					$("descView").textContent = currentUser.description || "暂无简介";
 					$("descInput").value = currentUser.description || "";
 				}
@@ -2430,7 +2461,7 @@
 						.insert([{
 							name: u,
 							pass: passHash,
-							time: new Date().toLocaleString(),
+							time: new Date().toISOString(),
 							coins: 0
 						}])
 						.select();
@@ -2456,7 +2487,8 @@
 					const u = getUserById(userId);
 					if (!u) return;
 					drawerUserId = Number(userId);
-					$("drawerName").innerHTML = `${escapeHtml(u.name)} ${getUserLevelHTML(u.coins || 0)}`;
+					$("drawerName").innerHTML =
+						`${escapeHtml(u.name)} ${getUserLevelHTML(u.coins || 0)} ${getVerifiedBadgeHTML(u.id)}`;
 					$("drawerInfo").innerHTML = `
 <b>名字：</b>${escapeHtml(u.name)}
 <b>等级：</b>${getUserLevelHTML(u.coins || 0)}
