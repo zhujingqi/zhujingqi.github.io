@@ -37,6 +37,15 @@
 				--shadow: 0 8px 20px rgba(0, 0, 0, .35);
 			}
 
+			button,
+			.btn,
+			.item,
+			.appItem,
+			nav {
+				user-select: none;
+				-webkit-user-select: none;
+			}
+
 			.loadingText {
 				display: flex;
 				align-items: center;
@@ -984,6 +993,9 @@
 			}
 
 			@media (max-width: 860px) {
+				* {
+					-webkit-tap-highlight-color: transparent;
+				}
 
 				:root {
 					font-size: 16px;
@@ -1726,23 +1738,40 @@
 					}
 				}
 
+				function parseDbTime(t) {
+					if (!t) return null;
+					if (t instanceof Date) return isNaN(t.getTime()) ? null : t;
+					const s = String(t).trim();
+					if (!s) return null;
+					let d = new Date(s);
+					if (!isNaN(d.getTime())) return d;
+					const fixed = s.replace(" ", "T");
+					d = new Date(fixed);
+					if (!isNaN(d.getTime())) return d;
+					if (!/[zZ]|[+-]\d{2}:?\d{2}$/.test(fixed)) {
+						d = new Date(fixed + "Z");
+						if (!isNaN(d.getTime())) return d;
+					}
+					return null;
+				}
+
 				function formatChatTime(t) {
-					const d = new Date(t);
+					const d = parseDbTime(t);
+					if (!d) return "";
 					const now = new Date();
 					const isSameDay =
 						d.getFullYear() === now.getFullYear() &&
 						d.getMonth() === now.getMonth() &&
 						d.getDate() === now.getDate();
-					const isYesterday =
-						new Date(now - 86400000).toDateString() === d.toDateString();
-					const time = d.toLocaleTimeString([], {
+					const isYesterday = new Date(now - 86400000).toDateString() === d.toDateString();
+					const time = d.toLocaleTimeString("zh-CN", {
 						hour: "2-digit",
 						minute: "2-digit",
 						hour12: false
 					});
 					if (isSameDay) return time;
 					if (isYesterday) return "昨天 " + time;
-					return d.toLocaleDateString() + " " + time;
+					return d.toLocaleDateString("zh-CN") + " " + time;
 				}
 				async function renderChatContactList() {
 					const box = $("chatContactList");
@@ -1754,8 +1783,8 @@
 						const pa = isContactPinnedByMe(ca) ? 1 : 0;
 						const pb = isContactPinnedByMe(cb) ? 1 : 0;
 						if (pa !== pb) return pb - pa;
-						const ta = ca?.last_msg ? new Date(ca.last_msg).getTime() : 0;
-						const tb = cb?.last_msg ? new Date(cb.last_msg).getTime() : 0;
+						const ta = ca?.last_msg ? (parseDbTime(ca.last_msg)?.getTime() || 0) : 0;
+						const tb = cb?.last_msg ? (parseDbTime(cb.last_msg)?.getTime() || 0) : 0;
 						if (ta !== tb) return tb - ta;
 						return a.name.localeCompare(b.name, "zh-CN");
 					});
@@ -2311,7 +2340,7 @@
 						`${escapeHtml(currentUser.name)} ${getUserLevelHTML(currentUser.coins || 0)} ${getVerifiedBadgeHTML(currentUser.id)}`;
 					$("profileCoins").textContent = currentUser.coins || 0;
 					$("profileTime").textContent = currentUser.time ?
-						new Date(currentUser.time).toLocaleString("zh-CN") :
+						(parseDbTime(currentUser.time)?.toLocaleString("zh-CN") || "") :
 						"";
 					$("descView").textContent = currentUser.description || "暂无简介";
 					$("descInput").value = currentUser.description || "";
