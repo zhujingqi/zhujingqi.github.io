@@ -522,6 +522,29 @@
 				color: #aaa;
 			}
 
+			.verifiedBadge {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				height: 18px;
+				padding: 0 6px;
+				margin-left: 6px;
+				border-radius: 999px;
+				font-size: 12px;
+				font-weight: 700;
+				background-color: #00aaff;
+				color: #fff;
+				border: none;
+				vertical-align: middle;
+				user-select: none;
+				title: "官方用户";
+			}
+
+			.verifiedBadge::before {
+				content: "V";
+				line-height: 1;
+			}
+
 			#fortuneBox {
 				text-align: center;
 				position: absolute;
@@ -623,6 +646,81 @@
 			#viewer img {
 				max-width: 90%;
 				max-height: 90%;
+			}
+
+			.loadingMask {
+				position: fixed;
+				inset: 0;
+				background: var(--bg);
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				z-index: 99999;
+				transition: opacity .35s ease;
+			}
+
+			.loadingMask.fadeOut {
+				opacity: 0;
+				pointer-events: none;
+			}
+
+			.loadingBox {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 14px;
+			}
+
+			.loadingLogo {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+				font-size: 28px;
+				font-weight: bold;
+				color: var(--green);
+			}
+
+			.loadingLogo img {
+				width: 56px;
+				height: 56px;
+			}
+
+			.loadingText {
+				font-size: 16px;
+				color: var(--sub);
+				letter-spacing: 1px;
+			}
+
+			.dot {
+				display: inline-block;
+				animation: loadingDot 1.2s infinite;
+			}
+
+			.dot1 {
+				animation-delay: 0s;
+			}
+
+			.dot2 {
+				animation-delay: .2s;
+			}
+
+			.dot3 {
+				animation-delay: .4s;
+			}
+
+			@keyframes loadingDot {
+
+				0%,
+				80%,
+				100% {
+					opacity: .2;
+					transform: translateY(0);
+				}
+
+				40% {
+					opacity: 1;
+					transform: translateY(-2px);
+				}
 			}
 
 			@media (max-width: 800px) {
@@ -758,7 +856,7 @@
 					<br>
 					账号体系已与 <b><a href="https://zhujingqi.com/chat/">Jacky Chat</a></b> 互通
 					<br>
-					<a href="#">Jacky 论坛</a> · <a href="#">Jacky Chat</a> · 
+					<a href="#">Jacky 论坛</a> · <a href="#">Jacky Chat</a> ·
 					<a href="https://zhujingqi.com">Zhujingqi</a>
 					<br>
 					© Jacky Forum. All rights reserved.
@@ -892,6 +990,7 @@
 				let postPage = 1;
 				let postTotalPages = 1;
 				let postPages = [];
+				const VERIFIED_USERS = [1, 10, 30, 74];
 
 				function renderTagBar() {
 					const bar = $("tagBar");
@@ -928,6 +1027,16 @@
 				async function hash(text) {
 					const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
 					return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+				}
+
+				function isVerified(user) {
+					if (!user) return false;
+					return VERIFIED_USERS.includes(user.id);
+				}
+
+				function getVerifiedBadge(user) {
+					if (!isVerified(user)) return "";
+					return '<span class="verifiedBadge"></span>';
 				}
 				$("homeBtn").onclick = () => {
 					show("main");
@@ -1202,7 +1311,7 @@
 							time,
 							author,
 							tag,
-							users:author(name, coins)
+							users:author(id, name, coins)
 						`)
 						.order("id", {
 							ascending: false
@@ -1232,7 +1341,7 @@
 							time,
 							author,
 							tag,
-							users:author(name, coins)
+							users:author(id, name, coins)
 						`)
 						.order("id", {
 							ascending: false
@@ -1300,7 +1409,8 @@
 							let liked = userLike && userLike.length > 0;
 							postDiv.innerHTML =
 								'<div class="postHeaderTop"><div class="userInfo">' +
-								'<span class="userLink" data-user="' + p.author + '">' + (p.users?.name || "未知") +
+								'<span class="userLink" data-user="' + p.author + '">' +
+								(p.users?.name || "未知") + getVerifiedBadge(p.users) +
 								'<span class="userLevel">' + getUserLevel(p.users?.coins || 0) + '</span>' +
 								'</span>' +
 								'<span class="time">' + new Date(p.time).toLocaleString() + '</span>' +
@@ -1337,7 +1447,7 @@
 						data
 					} = await supabase
 						.from("comments")
-						.select("*, users(name, coins)")
+						.select("*, users(id, name, coins)")
 						.eq("postid", postId)
 						.order("id", {
 							ascending: true
@@ -1347,9 +1457,9 @@
 						div.className = "comment";
 						div.innerHTML =
 							`<b class="userLink" data-user="${c.author}">${c.users.name}` +
-							`<span class="userLevel">` + getUserLevel(c.users?.coins || 0) + `</span>` + `</b>` +
-							`: ${c.content}` +
-							(c.author === currentUser.id ?
+							getVerifiedBadge(c.users) +
+							`<span class="userLevel">` + getUserLevel(c.users?.coins || 0) +
+							`</span>` + `</b>` + `: ${c.content}` + (c.author === currentUser.id ?
 								`<button class="commentDel" data-cdel="${c.id}">删除</button>` : "");
 						container.appendChild(div);
 						div.querySelector(".userLink").onclick = () => viewUser(c.author);
@@ -1438,7 +1548,7 @@
 						let div = document.createElement("div");
 						div.className = "newUserItem";
 						div.innerHTML =
-							`<span>${u.name}</span>`;
+							`<span>${u.name}${getVerifiedBadge(u)}</span>`;
 						div.onclick = () => viewUser(u.id);
 						container.appendChild(div);
 					}
@@ -1473,7 +1583,8 @@
 					let {
 						data: user
 					} = await supabase.from("users").select("*").eq("id", uid).single();
-					$("pname").innerHTML = user.name + " " +
+					$("pname").innerHTML = user.name +
+						getVerifiedBadge(user) +
 						`<span class="userLevel">${getUserLevel(user.coins)}</span>` +
 						"&ensp;<button class='helpBtn' id='levelBtn'>?</button>";
 					$("moreInfo").innerHTML =
@@ -1747,18 +1858,41 @@
 						openViewer(img.src);
 					}
 				});
-				if (autoId) {
-					supabase.from("users").select("*").eq("id", autoId).single()
-						.then(res => {
-							if (res.data) {
-								currentUser = res.data;
+				(async () => {
+					const mask = document.createElement("div");
+					mask.className = "loadingMask";
+					mask.innerHTML = `
+						<div class="loadingBox">
+							<div class="loadingLogo">
+								<img src="icon.svg" alt="">
+								<span>Jacky 论坛</span>
+							</div>
+							<div class="loadingText">Loading<span class="dot dot1">.</span><span class="dot dot2">.</span><span class="dot dot3">.</span></div>
+						</div>
+					`;
+					document.body.appendChild(mask);
+					try {
+						if (autoId) {
+							const {
+								data
+							} = await supabase.from("users").select("*").eq("id", autoId).single();
+							if (data) {
+								currentUser = data;
 								$("nav").classList.remove("hidden");
 								show("main");
 								loadPosts(1);
 								loadNewUsers();
+							} else {
+								show("welcomePage");
 							}
-						});
-				}
+						} else {
+							show("welcomePage");
+						}
+					} finally {
+						mask.classList.add("fadeOut");
+						setTimeout(() => mask.remove(), 300);
+					}
+				})();
 			});
 			document.addEventListener("contextmenu", e => e.preventDefault());
 			/*© Jacky Forum. All rights reserved.*/
