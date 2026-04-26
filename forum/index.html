@@ -340,6 +340,34 @@
 				border-color: var(--green);
 			}
 
+			.postBgRow {
+				margin-top: 10px;
+				margin-bottom: 10px;
+			}
+
+			.postBgRow button {
+				width: 100%;
+			}
+
+			.bgPickerGrid {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 8px;
+				margin-top: 12px;
+			}
+
+			.bgOption {
+				border-radius: 12px;
+				height: 50px;
+				border: 2px solid transparent;
+				cursor: pointer;
+			}
+
+			.bgOption.active {
+				border-color: var(--green);
+				transform: scale(1.05);
+			}
+
 			.postTag {
 				padding: 4px 12px;
 				border-radius: 20px;
@@ -828,6 +856,16 @@
 					font-size: 12px;
 					padding: 0 2px;
 				}
+
+				.bgPickerGrid {
+					grid-template-columns: repeat(4, 1fr);
+					gap: 6px;
+				}
+
+				.bgOption {
+					height: 40px;
+					border-radius: 10px;
+				}
 			}
 		</style>
 	</head>
@@ -927,6 +965,9 @@
 					<input id="customTag" placeholder="自定义标签（你也可以不选择任何标签）"
 						style="height:36px;font-size:14px;flex-shrink:0;width:300px;" maxlength="10">
 				</div>
+				<div class="postBgRow">
+					<button id="bgBuyBtn" type="button">背景</button>
+				</div>
 				<button id="sendBtn">发布</button>
 			</div>
 		</div>
@@ -991,6 +1032,22 @@
 				let postTotalPages = 1;
 				let postPages = [];
 				const VERIFIED_USERS = [1, 10, 30, 74];
+				const POST_BG_COST = 15;
+				const POST_BG_OPTIONS = [
+				    "#ffeaea",
+				    "#fff0ea",
+				    "#fff5ea",
+				    "#fffbea",
+				    "#f9ffe9",
+				    "#eefeea",
+				    "#eafef3",
+				    "#eafcff",
+				    "#eaf4ff",
+				    "#eef0ff",
+				    "#f3eaff",
+				    "#f9eaff"
+				];
+				let selectedPostBg = "";
 
 				function renderTagBar() {
 					const bar = $("tagBar");
@@ -1155,6 +1212,8 @@
 				$("sysTheme").onclick = () => {
 					document.body.classList.remove("dark");
 				};
+				$("bgBuyBtn").textContent = selectedPostBg ? "已使用" : "背景";
+				$("bgBuyBtn").onclick = openPostBgPicker;
 
 				function setActive(id) {
 					["homeBtn", "editorBtn", "showUsersBtn", "profileBtn", "moreBtn"]
@@ -1238,17 +1297,25 @@
 						const reClose = new RegExp(`&lt;/(${tagName})&gt;`, "gi");
 						txt = txt.replace(reOpen, "<$1$2>").replace(reClose, "</$1>");
 					}
+					let finalContent = txt;
+					if (selectedPostBg) {
+						finalContent = `[[bg:${selectedPostBg}]]` + txt;
+					}
 					let {
 						error
 					} = await supabase.from("posts").insert([{
 						id: Date.now(),
-						content: txt,
+						content: finalContent,
 						time: new Date().toLocaleString(),
 						author: currentUser.id,
 						tag: tag
 					}]);
 					if (error) return modal("发帖失败：" + error.message);
 					$("text").value = "";
+					$("customTag").value = "";
+					selectedTags = [];
+					selectedPostBg = "";
+					$("bgBuyBtn").textContent = "背景";
 					show("main");
 					loadPosts(1);
 					setActive("homeBtn");
@@ -1407,6 +1474,12 @@
 								.eq("postid", p.id)
 								.eq("liker", currentUser.id);
 							let liked = userLike && userLike.length > 0;
+							const bgInfo = getPostBgInfo(p.content);
+							const postContent = bgInfo.content;
+							postDiv.className = "post";
+							postDiv.style.background = bgInfo.bg || "var(--card)";
+							postDiv.style.backgroundSize = "cover";
+							postDiv.style.backgroundPosition = "center";
 							postDiv.innerHTML =
 								'<div class="postHeaderTop"><div class="userInfo">' +
 								'<span class="userLink" data-user="' + p.author + '">' +
@@ -1417,7 +1490,7 @@
 								'</div></div>' +
 								'<div class="postTags">' + (p.tag ? `<span class="postTag">${p.tag}</span>` : "") +
 								'</div>' +
-								'<div class="postContent">' + p.content + '</div>' +
+								'<div class="postContent">' + postContent + '</div>' +
 								'<div class="postActions"><span class="like ' + (liked ? "liked" : "") +
 								'" data-id="' + p.id + '">❤ ' + likeCount + '</span>' +
 								(p.author === currentUser.id ? '<button data-del="' + p.id + '">删除</button>' : "") +
@@ -1526,6 +1599,59 @@
 					await supabase.from("likes").delete().eq("postid", id);
 					loadPosts(1);
 				}
+
+				function getPostBgInfo(content) {
+					const text = String(content || "");
+					const match = text.match(/^\[\[bg:(.+?)\]\]/);
+					if (!match) return {
+						bg: null,
+						content: text
+					};
+					return {
+						bg: match[1],
+						content: text.slice(match[0].length)
+					};
+				}
+
+				function openPostBgPicker() {
+					if (!currentUser) return;
+					document.querySelector(".modalBox").style.width = "420px";
+					let picked = "";
+					modal(`
+						<h3>背景</h3>
+						<div style="font-size:14px;color:var(--sub);">
+							花 15 金币，给这一条帖子加个彩色背景
+						</div>
+						<div id="bgPickerGrid" class="bgPickerGrid"></div>
+						<div style="margin-top:14px;text-align:center;">
+							<button id="bgApplyBtn" disabled>确定</button>
+						</div>
+					`);
+					const grid = $("bgPickerGrid");
+					for (const color of POST_BG_OPTIONS) {
+						const item = document.createElement("div");
+						item.className = "bgOption";
+						item.style.background = color;
+						item.onclick = () => {
+							picked = color;
+							grid.querySelectorAll(".bgOption").forEach(el => el.classList.remove("active"));
+							item.classList.add("active");
+							$("bgApplyBtn").disabled = false;
+						};
+						grid.appendChild(item);
+					}
+					$("bgApplyBtn").onclick = async () => {
+						if (!picked) return;
+						if ((currentUser.coins || 0) < POST_BG_COST) {
+							return modal("金币不足");
+						}
+						await changeCoins(currentUser.id, -POST_BG_COST);
+						selectedPostBg = picked;
+						$("bgBuyBtn").textContent = "已使用";
+						$("modal").classList.add("hidden");
+						showCoinMsg("已应用背景，金币 -15");
+					};
+				}
 				async function loadNewUsers(limit = 5) {
 					const container = $("newUsers");
 					container.innerHTML = "<p style='color:var(--sub);text-align:center;'>Loading...</p>";
@@ -1618,55 +1744,15 @@
 					for (let i = posts.length - 1; i >= 0; i--) {
 						let p = posts[i];
 						let div = document.createElement("div");
+						const bgInfo = getPostBgInfo(p.content);
 						div.className = "post";
-						div.innerHTML = p.content;
+						div.style.background = bgInfo.bg || "var(--card)";
+						div.style.backgroundSize = "cover";
+						div.style.backgroundPosition = "center";
+						div.innerHTML = bgInfo.content;
 						container.appendChild(div);
 					}
 					$("logoutBtn").style.display = (uid === currentUser.id) ? "inline-block" : "none";
-					/*There are errors
-					let existingBtn = $("changePassBtn");
-					if (uid === currentUser.id && !existingBtn) {
-						let btn = document.createElement("button");
-						btn.id = "changePassBtn";
-						btn.innerText = "修改密码";
-						btn.style.marginRight = "0px";
-						btn.style.marginLeft = "20px";
-						$("logoutBtn").parentNode.insertBefore(btn, $("logoutBtn"));
-						btn.onclick = () => {
-							document.querySelector(".modalBox").style.width = "400px";
-							$("modalText").innerHTML = `
-									<h3>修改密码</h3>
-					                <input id="oldPass" type="password" placeholder="当前密码">
-					                <input id="newPass1" type="password" placeholder="新密码">
-					                <input id="newPass2" type="password" placeholder="再次输入新密码">
-					                <div style="margin-top:10px;"><button id="submitChangePass">确认修改</button></div>
-									<h6>请牢记密码！如无法修改密码，请联系管理员。</h6>
-							`;
-							$("modal").classList.remove("hidden");
-							$("submitChangePass").onclick = async () => {
-								const oldP = $("oldPass").value.trim();
-								const newP1 = $("newPass1").value.trim();
-								const newP2 = $("newPass2").value.trim();
-								if (!oldP || !newP1 || !newP2) return modal("请填写完整");
-								if (newP1 !== newP2) return modal("两次新密码不一致");
-								const oldHash = await hash(oldP);
-								if (oldHash !== currentUser.pass) return modal("当前密码错误");
-								const newHash = await hash(newP1);
-								const {
-									error: userError
-								} = await supabase
-									.from("users")
-									.update({
-										pass: newHash
-									})
-									.eq("id", currentUser.id);
-								if (userError) return modal("修改失败：" + userError.message);
-								currentUser.pass = newHash;
-								modal("密码修改成功");
-							};
-						};
-					}
-					*/
 					$("userDescription").innerText = user.description || "暂无简介";
 					if (uid === currentUser.id) {
 						let editBtn = document.createElement("button");
