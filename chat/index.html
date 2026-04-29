@@ -992,6 +992,17 @@
 				user-select: none;
 			}
 
+			#load-bar {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 0%;
+				height: 3px;
+				background: #00a88f;
+				z-index: 9999;
+				transition: width 0.08s linear;
+			}
+
 			@media (max-width: 860px) {
 				* {
 					-webkit-tap-highlight-color: transparent;
@@ -1139,6 +1150,7 @@
 		</style>
 	</head>
 	<body>
+		<div id="load-bar"></div>
 		<div id="toast" class="toast"></div>
 		<div id="welcomePage" class="center">
 			<div class="big" style="color: #000;">
@@ -1155,11 +1167,21 @@
 				<div class="muted" style="margin-top:12px;">
 					账号体系已与 <b><a href="https://zhujingqi.com/forum/">Jacky 论坛</a></b> 互通
 					<br>
-					<a href="#">Jacky Chat</a> · <a href="https://zhujingqi.com/forum/">Jacky 论坛</a> ·
+					<a href="https://zhujingqi.com/chat/">Jacky Chat</a> · <a href="https://zhujingqi.com/forum/">Jacky 论坛</a> ·
 					<a href="https://zhujingqi.com">Zhujingqi</a>
 					<br>
 					© Jacky Forum. All rights reserved.
 				</div>
+			</div>
+			<div class="muted" style="margin-top:12px;">
+				<details>
+					<summary>点击查看加载小提示</summary>
+					1. 从未出现顶部绿色加载条？哦不！<br>
+					2. 加载条过半？已完成连接数据库！<br>
+					3. 加载条消失了？全部加载已完成，欢迎使用！<br>
+					<b>Tips:</b><br>
+					初次加载可能较慢，请耐心等待。遇到按钮无法点击？还没加载完。由于设备问题或网络问题，<br>加载速度可能有所偏差。加载太慢 / 卡住了？<a onclick="location.reload()" style="cursor: pointer;">点击重新加载</a>！请将 <b>Jacky Chat</b> 添加至桌面，使用更便捷！<br>
+				</details>
 			</div>
 		</div>
 		<div id="registerPage" class="center hidden">
@@ -1408,6 +1430,34 @@
 					},
 
 				];
+				async function loadBar() {
+					const bar = document.getElementById('load-bar');
+					if (localStorage.getItem('autologin')) {
+						bar.remove();
+						return;
+					}
+					bar.style.width = '25%';
+					try {
+						const {
+							count,
+							error
+						} = await supabase
+							.from("messages")
+							.select("id", {
+								count: "exact",
+								head: true
+							})
+							.limit(1);
+						if (error) throw error;
+						bar.style.width = '75%';
+					} catch (err) {
+						bar.style.background = "#ff4444";
+						openModal("加载失败", `数据库连接失败：` + err + ` 请重新加载`);
+					}
+					bar.style.width = '100%';
+					setTimeout(() => bar.remove(), 300);
+				}
+				loadBar();
 
 				function isVerified(id) {
 					return VERIFIED_USERS.includes(Number(id));
