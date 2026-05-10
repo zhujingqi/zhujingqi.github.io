@@ -147,8 +147,8 @@
 			}
 
 			#logo img {
-				width: 100px;
-				height: 100px;
+				width: 80px;
+				height: 80px;
 			}
 
 			#pname {
@@ -222,6 +222,7 @@
 				display: flex;
 				height: 40px;
 				margin: 0;
+				z-index: 2000;
 			}
 
 			.bottom button {
@@ -284,7 +285,7 @@
 			}
 
 			.userItem {
-				width: 100%;
+				width: 90%;
 				max-width: 800px;
 				padding: 20px;
 				border-bottom: 1px solid #aaa;
@@ -347,6 +348,33 @@
 
 			.postBgRow button {
 				width: 100%;
+			}
+
+			.post.custom-bg {
+				position: relative;
+				overflow: hidden;
+				background: none !important;
+				z-index: 0;
+			}
+
+			.post.custom-bg::before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: var(--custom-bg);
+				background-size: cover;
+				background-position: center;
+				z-index: -1;
+				transition: filter 0.3s ease;
+			}
+
+			body.dark .post.custom-bg {}
+
+			body.dark .post.custom-bg::before {
+				filter: brightness(0.3) saturate(2);
 			}
 
 			.bgPickerGrid {
@@ -474,9 +502,9 @@
 
 			#newUsers {
 				position: absolute;
-				right: 2%;
-				top: 20%;
-				width: 10%;
+				right: 40px;
+				top: 40px;
+				width: 150px;
 				background: var(--card);
 				padding: 20px;
 				border-radius: 20px;
@@ -502,13 +530,20 @@
 
 			#notice {
 				position: absolute;
-				left: 2%;
+				left: 20px;
 				top: 20%;
-				width: 10%;
+				width: 150px;
 				background: var(--card);
 				padding: 20px;
 				border-radius: 20px;
 				box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+				transition: all 0.4s ease;
+				z-index: 100;
+			}
+
+			#notice.collapsed {
+				left: -150px;
+				padding: 20px 10px 20px 40px;
 			}
 
 			.helpBtn {
@@ -736,6 +771,80 @@
 				animation-delay: .4s;
 			}
 
+			.postFilterBar {
+				width: 100%;
+				max-width: 800px;
+				padding: 0 20px 10px 20px;
+				box-sizing: border-box;
+				margin: 0 auto 10px auto;
+			}
+
+			.postSearch {
+				width: 100%;
+				margin: 0 0 10px 0;
+				height: 42px;
+				border-radius: 20px;
+				border: 1px solid #ccc;
+				padding: 0 14px;
+				background: var(--card);
+				color: var(--text);
+				box-sizing: border-box;
+				transition: 0.2s;
+			}
+
+			.postTagBar {
+				display: flex;
+				flex-wrap: nowrap;
+				gap: 8px;
+				overflow-x: auto;
+				padding-bottom: 4px;
+				scrollbar-width: none;
+				-ms-overflow-style: none;
+			}
+
+			.postTagBar::-webkit-scrollbar {
+				display: none;
+			}
+
+			.postTagChip {
+				padding: 6px 14px;
+				border-radius: 999px;
+				background: var(--card);
+				border: 1px solid #ccc;
+				cursor: pointer;
+				user-select: none;
+				white-space: nowrap;
+				font-size: 14px;
+				transition: .2s;
+			}
+
+			.postTagChip:hover {
+				background: var(--green);
+				color: #fff;
+				border-color: var(--green);
+			}
+
+			.postTagChip.active {
+				background: var(--green);
+				color: #fff;
+				border-color: var(--green);
+			}
+
+			.searchRow {
+				display: flex;
+				gap: 10px;
+				margin-bottom: 10px;
+			}
+
+			.searchRow .postSearch {
+				flex: 1;
+				margin: 0;
+			}
+
+			.searchRow button {
+				flex-shrink: 0;
+			}
+
 			@keyframes loadingDot {
 
 				0%,
@@ -754,12 +863,12 @@
 			@media (max-width: 800px) {
 				.bottom {
 					bottom: 0;
-					height: 50px;
+					height: 60px;
 				}
 
 				.bottom button {
 					height: 100%;
-					padding-bottom: 20px;
+					padding-bottom: 40px;
 				}
 
 				#logo,
@@ -839,7 +948,7 @@
 
 				.pager {
 					gap: 4px;
-					padding-bottom: 40px;
+					padding-bottom: 60px;
 					margin: 8px auto 14px auto;
 				}
 
@@ -865,6 +974,30 @@
 				.bgOption {
 					height: 40px;
 					border-radius: 10px;
+				}
+
+				.searchRow {
+					gap: 6px;
+				}
+
+				.searchRow .postSearch {
+					height: 34px;
+					font-size: 14px;
+					padding: 0 10px;
+				}
+
+				.searchRow button {
+					height: 34px;
+					padding: 0 10px;
+					font-size: 12px;
+				}
+
+				.postSearch {
+					font-size: 14px;
+				}
+
+				.postTagChip {
+					font-size: 12px;
 				}
 			}
 		</style>
@@ -923,19 +1056,31 @@
 				Jacky 论坛
 			</div>
 			<div id="notice">
+				<button id="toggleNoticeBtn" class="helpBtn" style="position:absolute; right:8px; top:8px; font-size:16px; width:24px; height:24px; line-height:20px;">
+					<b><</b>
+				</button>
 				<h3>公告</h3>
 				<div class="noticeItem">🎉欢迎来到 <b>Jacky 论坛</b> :)</div>
 				<br>
 				<div class="noticeItem">
-					近期更新：<br>
-					· 彩色帖子<br>
-					· 官方蓝V<br>
-					· Jacky Chat<br>
-					· 获取应用版（点击【更多】出现）<br>
-					<br>
+					<details>
+						<summary><b>近期更新</b></summary>
+						· 可折叠的公告栏<br>
+						· 全站统计用户数与贴子数<br>
+						· 排行榜序号与新用户列表<br>
+						· 搜索与标签筛选<br>
+						· 深色模式下的彩色背景<br>
+					</details>
 				</div>
+				<br>
+				<div class="noticeItem" id="statsBox">
+					<strong>全站统计</strong><br>
+					用户数：<span id="totalUsers">加载中...</span><br>
+					帖子数：<span id="totalPosts">加载中...</span>
+				</div>
+				<br>
 				<div class="noticeItem" style="font-size: 14px;">
-					分享 Jacky 论坛，让好友加入！<br>
+					分享 Jacky 论坛，<br>让好友加入！<br>
 					<a onclick="navigator.clipboard.writeText(location.href).then(()=>this.innerText='已复制')"
 						style="cursor:pointer;">
 						点击复制链接
@@ -955,7 +1100,13 @@
 					</div>
 				</div>
 			</div>
-			<div id="newUsers"></div>
+			<div id="postFilterBar" class="postFilterBar">
+				<div class="searchRow">
+					<input id="postSearch" class="postSearch" placeholder="搜索帖子内容或标签...">
+					<button id="searchBtn">搜索</button>
+				</div>
+				<div id="postTagBar" class="postTagBar"></div>
+			</div>
 			<div id="posts"></div>
 			<div id="postPager" class="pager"></div>
 		</div>
@@ -966,7 +1117,7 @@
 					style="display:flex;align-items:center;gap:6px;flex-wrap:nowrap;margin-top:8px;">
 					<div class="tagBar" id="tagBar" style="display:flex;gap:6px;flex-shrink:1;overflow-x:auto;"></div>
 					<input id="customTag" placeholder="自定义标签（你也可以不选择任何标签）"
-						style="height:36px;font-size:14px;flex-shrink:0;width:300px;" maxlength="10">
+						style="height:36px;font-size:14px;flex-shrink:0;width:360px;" maxlength="10">
 				</div>
 				<div class="postBgRow">
 					<button id="bgBuyBtn" type="button">背景</button>
@@ -984,6 +1135,7 @@
 				</div>
 				<div id="userItems"></div>
 			</div>
+			<div id="newUsers"></div>
 		</div>
 		<div id="profilePage" class="hidden" style="display:flex;flex-direction:column;height:100vh;">
 			<div id="backBtn">←</div>
@@ -1028,7 +1180,7 @@
 				const $ = id => document.getElementById(id);
 				let currentUser = null;
 				let currentPage = "home";
-				const defaultTags = ["学习", "日常", "搞笑", "游戏", "提问"];
+				const defaultTags = ["学习", "日常", "搞笑", "提问"];
 				let selectedTags = [];
 				const POSTS_PER_PAGE = 5;
 				let postPage = 1;
@@ -1037,20 +1189,29 @@
 				const VERIFIED_USERS = [1, 10, 30, 74];
 				const POST_BG_COST = 15;
 				const POST_BG_OPTIONS = [
-				    "#ffeaea",
-				    "#fff0ea",
-				    "#fff5ea",
-				    "#fffbea",
-				    "#f9ffe9",
-				    "#eefeea",
-				    "#eafef3",
-				    "#eafcff",
-				    "#eaf4ff",
-				    "#eef0ff",
-				    "#f3eaff",
-				    "#f9eaff"
+					"#ffeaea",
+					"#fff0ea",
+					"#fff5ea",
+					"#fffbea",
+					"#f9ffe9",
+					"#eefeea",
+					"#eafef3",
+					"#eafcff",
+					"#eaf4ff",
+					"#eef0ff",
+					"#f3eaff",
+					"#f9eaff"
 				];
 				let selectedPostBg = "";
+				let postSearch = "";
+				let activePostTag = "全部";
+				const filterTags = [
+					"全部",
+					"公告",
+					...defaultTags,
+					"其它"
+				];
+				let searchTimer = null;
 
 				function renderTagBar() {
 					const bar = $("tagBar");
@@ -1067,6 +1228,34 @@
 							});
 						};
 						bar.appendChild(span);
+					}
+				}
+				async function loadStats() {
+					try {
+						const {
+							count: userCount,
+							error: userErr
+						} = await supabase
+							.from("users")
+							.select("id", {
+								count: "exact",
+								head: true
+							});
+						const {
+							count: postCount,
+							error: postErr
+						} = await supabase
+							.from("posts")
+							.select("id", {
+								count: "exact",
+								head: true
+							});
+						if (!userErr) $("totalUsers").textContent = userCount || 0;
+						if (!postErr) $("totalPosts").textContent = postCount || 0;
+					} catch (e) {
+						console.error("Stats Error", e);
+						$("totalUsers").textContent = "—";
+						$("totalPosts").textContent = "—";
 					}
 				}
 
@@ -1101,8 +1290,9 @@
 				$("homeBtn").onclick = () => {
 					show("main");
 					$("moreMenu").classList.add("hidden");
+					renderPostFilters();
 					loadPosts(1);
-					loadNewUsers();
+					loadStats();
 					setActive("homeBtn");
 				};
 				$("editorBtn").onclick = () => {
@@ -1113,6 +1303,7 @@
 				};
 				$("showUsersBtn").onclick = () => {
 					show("userListPage");
+					loadNewUsers();
 					$("moreMenu").classList.add("hidden");
 					loadUserList();
 					setActive("showUsersBtn");
@@ -1131,8 +1322,8 @@
 				$("backBtn").onclick = () => {
 					show("main");
 					$("moreMenu").classList.add("hidden");
+					renderPostFilters();
 					loadPosts(postPage);
-					loadNewUsers();
 					setActive("homeBtn");
 				};
 				$("goRegister").onclick = () => show("registerPage");
@@ -1282,8 +1473,8 @@
 					localStorage.setItem("loginUser", data.id);
 					$("nav").classList.remove("hidden");
 					show("main");
+					renderPostFilters();
 					loadPosts(1);
-					loadNewUsers();
 					modal("欢迎 <b>" + data.name + "</b> 来到 <b>Jacky</b> 论坛！");
 				};
 				$("sendBtn").onclick = async () => {
@@ -1321,9 +1512,37 @@
 					$("bgBuyBtn").textContent = "背景";
 					show("main");
 					loadPosts(1);
+					loadStats();
 					setActive("homeBtn");
 					await changeCoins(currentUser.id, 5);
 				};
+				async function loadNewUsers(limit = 10) {
+					const container = $("newUsers");
+					container.innerHTML = "<p style='color:var(--sub);text-align:center;'>Loading...</p>";
+					let {
+						data,
+						error
+					} = await supabase
+						.from("users")
+						.select("*")
+						.order("time", {
+							ascending: false
+						})
+						.limit(limit);
+					if (error) {
+						container.innerHTML = "<p style='color:red;text-align:center;'>ERROR</p>";
+						return;
+					}
+					container.innerHTML = "<h3>欢迎新用户</h3>";
+					for (let u of data) {
+						let div = document.createElement("div");
+						div.className = "newUserItem";
+						div.innerHTML =
+							`<span>${u.name}${getVerifiedBadge(u)}</span>`;
+						div.onclick = () => viewUser(u.id);
+						container.appendChild(div);
+					}
+				}
 
 				function renderPager() {
 					const pager = $("postPager");
@@ -1372,34 +1591,38 @@
 					}
 					pager.appendChild(makeBtn("›", postPage + 1, "navBtn", !postPages[postPage - 1]?.hasMore));
 				}
-				async function fetchPostPage(cursor = null) {
-					let query = supabase
-						.from("posts")
-						.select(`
-							id,
-							content,
-							time,
-							author,
-							tag,
-							users:author(id, name, coins)
-						`)
-						.order("id", {
-							ascending: false
-						})
-						.limit(POSTS_PER_PAGE);
-					if (cursor !== null) {
-						query = query.lt("id", cursor);
+
+				function renderPostFilters() {
+					const search = $("postSearch");
+					const tagBar = $("postTagBar");
+					if (!search || !tagBar) return;
+					search.value = postSearch;
+					tagBar.innerHTML = "";
+					for (const tag of filterTags) {
+						const chip = document.createElement("span");
+						chip.className = "postTagChip" + (tag === activePostTag ? " active" : "");
+						chip.textContent = tag;
+						chip.onclick = () => {
+							activePostTag = tag;
+							postSearch = "";
+							$("postSearch").value = "";
+							renderPostFilters();
+							loadPosts(1);
+							loadStats();
+						};
+						tagBar.appendChild(chip);
 					}
-					let {
-						data,
-						error
-					} = await query;
-					if (error) throw error;
-					const posts = data || [];
-					return {
-						posts,
-						nextCursor: posts.length ? posts[posts.length - 1].id : null,
-						hasMore: posts.length === POSTS_PER_PAGE
+					$("searchBtn").onclick = () => {
+						postSearch = search.value.trim();
+						loadPosts(1);
+						loadStats();
+					};
+					search.onkeydown = e => {
+						if (e.key === "Enter") {
+							postSearch = search.value.trim();
+							loadPosts(1);
+							loadStats();
+						}
 					};
 				}
 				async function fetchPostPage(cursor = null) {
@@ -1417,6 +1640,20 @@
 							ascending: false
 						})
 						.limit(POSTS_PER_PAGE);
+					if (activePostTag === "其它") {
+						query = query.not(
+							"tag",
+							"in",
+							`(${defaultTags.map(t => `"${t}"`).join(",")})`
+						);
+					} else if (activePostTag !== "全部") {
+						query = query.eq("tag", activePostTag);
+					}
+					const q = postSearch.trim();
+					if (q) {
+						const safeQ = q.replace(/[%_,]/g, "");
+						query = query.or(`content.ilike.%${safeQ}%,tag.ilike.%${safeQ}%`);
+					}
 					if (cursor !== null) {
 						query = query.lt("id", cursor);
 					}
@@ -1430,6 +1667,20 @@
 						posts,
 						nextCursor: posts.length ? posts[posts.length - 1].id : null,
 						hasMore: posts.length === POSTS_PER_PAGE
+					};
+				}
+				const notice = $("notice");
+				const toggleBtn = $("toggleNoticeBtn");
+				if (toggleBtn) {
+					toggleBtn.onclick = () => {
+						notice.classList.toggle("collapsed");
+						if (notice.classList.contains("collapsed")) {
+							toggleBtn.innerHTML = "<b>></b>";
+							toggleBtn.style.right = "8px";
+						} else {
+							toggleBtn.innerHTML = "<b><</b>";
+							toggleBtn.style.right = "8px";
+						}
 					};
 				}
 				async function loadPosts(page = 1, container = $("posts")) {
@@ -1480,20 +1731,21 @@
 							const bgInfo = getPostBgInfo(p.content);
 							const postContent = bgInfo.content;
 							postDiv.className = "post";
-							postDiv.style.background = bgInfo.bg || "var(--card)";
-							postDiv.style.backgroundSize = "cover";
-							postDiv.style.backgroundPosition = "center";
+							if (bgInfo.bg) {
+								postDiv.style.setProperty('--custom-bg', bgInfo.bg);
+								postDiv.classList.add('custom-bg');
+							}
 							postDiv.innerHTML =
 								'<div class="postHeaderTop"><div class="userInfo">' +
 								'<span class="userLink" data-user="' + p.author + '">' +
-								(p.users?.name || "未知") + getVerifiedBadge(p.users) +
+								(p.users?.name || "未知") +
 								'<span class="userLevel">' + getUserLevel(p.users?.coins || 0) + '</span>' +
-								'</span>' +
+								'<span>' + getVerifiedBadge(p.users) + '</span>' + '</span>' +
 								'<span class="time">' + new Date(p.time).toLocaleString() + '</span>' +
 								'</div></div>' +
-								'<div class="postTags">' + (p.tag ? `<span class="postTag">${p.tag}</span>` : "") +
-								'</div>' +
-								'<div class="postContent">' + postContent + '</div>' +
+								'<div class="postTags">' +
+								(p.tag ? `<span class="postTag" data-tag="${p.tag}">${p.tag}</span>` : "") +
+								'</div>' + '<div class="postContent">' + postContent + '</div>' +
 								'<div class="postActions"><span class="like ' + (liked ? "liked" : "") +
 								'" data-id="' + p.id + '">❤ ' + likeCount + '</span>' +
 								(p.author === currentUser.id ? '<button data-del="' + p.id + '">删除</button>' : "") +
@@ -1509,6 +1761,17 @@
 								let text = postDiv.querySelector("[data-input]").value.trim();
 								if (text) addComment(p.id, text);
 							};
+							const tagEl = postDiv.querySelector("[data-tag]");
+							if (tagEl) {
+								tagEl.onclick = () => {
+									activePostTag = p.tag;
+									postSearch = "";
+									$("postSearch").value = "";
+									renderPostFilters();
+									loadPosts(1);
+									loadStats();
+								};
+							}
 							postDiv.querySelector(".userLink").onclick = () => viewUser(p.author);
 							renderComments(p.id, postDiv.querySelector(".commentList"));
 						}
@@ -1533,9 +1796,9 @@
 						div.className = "comment";
 						div.innerHTML =
 							`<b class="userLink" data-user="${c.author}">${c.users.name}` +
-							getVerifiedBadge(c.users) +
 							`<span class="userLevel">` + getUserLevel(c.users?.coins || 0) +
-							`</span>` + `</b>` + `: ${c.content}` + (c.author === currentUser.id ?
+							`</span>` + getVerifiedBadge(c.users) + `</b>` + `: ${c.content}` +
+							(c.author === currentUser.id ?
 								`<button class="commentDel" data-cdel="${c.id}">删除</button>` : "");
 						container.appendChild(div);
 						div.querySelector(".userLink").onclick = () => viewUser(c.author);
@@ -1601,6 +1864,7 @@
 					await supabase.from("comments").delete().eq("postid", id);
 					await supabase.from("likes").delete().eq("postid", id);
 					loadPosts(1);
+					loadStats();
 				}
 
 				function getPostBgInfo(content) {
@@ -1655,33 +1919,6 @@
 						showCoinMsg("已应用背景，金币 -15");
 					};
 				}
-				async function loadNewUsers(limit = 5) {
-					const container = $("newUsers");
-					container.innerHTML = "<p style='color:var(--sub);text-align:center;'>Loading...</p>";
-					let {
-						data,
-						error
-					} = await supabase
-						.from("users")
-						.select("*")
-						.order("time", {
-							ascending: false
-						})
-						.limit(limit);
-					if (error) {
-						container.innerHTML = "<p style='color:red;text-align:center;'>ERROR</p>";
-						return;
-					}
-					container.innerHTML = "<h3>欢迎新用户</h3>";
-					for (let u of data) {
-						let div = document.createElement("div");
-						div.className = "newUserItem";
-						div.innerHTML =
-							`<span>${u.name}${getVerifiedBadge(u)}</span>`;
-						div.onclick = () => viewUser(u.id);
-						container.appendChild(div);
-					}
-				}
 				async function loadUserList() {
 					let box = $("userItems");
 					box.innerHTML = "<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
@@ -1695,15 +1932,25 @@
 						return a.name.localeCompare(b.name);
 					});
 					box.innerHTML = "";
-					for (let u of data) {
+					data.forEach((u, i) => {
+						let rank = i + 1;
 						let div = document.createElement("div");
 						div.className = "userItem";
-						div.innerHTML =
-							`<div style="flex:1">${u.name} <span class="userLevel">${getUserLevel(u.coins || 0)}</span></div>` +
-							`<div style="width:150px;text-align:right;">${u.coins || 0}</div>`;
+						let rankDisplay;
+						if (rank === 1) rankDisplay = `<span style="color: #ffaa00;">1</span>`;
+						else if (rank === 2) rankDisplay = `<span style="color: #a3a3a3">2</span>`;
+						else if (rank === 3) rankDisplay = `<span style="color: #c68326">3</span>`;
+						else rankDisplay = `<span class="rank-num">${rank}</span>`;
+						div.innerHTML = `
+				            <div style="width: 40px; font-weight: bold; text-align: center;">${rankDisplay}</div>
+				            <div style="flex:1">
+				                ${u.name} <span class="userLevel">${getUserLevel(u.coins || 0)}</span>
+				            </div>
+				            <div style="width:100px; text-align:right;">${u.coins || 0}</div>
+				        `;
 						div.onclick = () => viewUser(u.id);
 						box.appendChild(div);
-					}
+					});
 				}
 				async function viewUser(uid) {
 					let container = $("userPosts");
@@ -1713,8 +1960,7 @@
 						data: user
 					} = await supabase.from("users").select("*").eq("id", uid).single();
 					$("pname").innerHTML = user.name +
-						getVerifiedBadge(user) +
-						`<span class="userLevel">${getUserLevel(user.coins)}</span>` +
+						`<span class="userLevel">${getUserLevel(user.coins)}</span>` + getVerifiedBadge(user) +
 						"&ensp;<button class='helpBtn' id='levelBtn'>?</button>";
 					$("moreInfo").innerHTML =
 						"金币：" + (user.coins || 0) +
@@ -1744,16 +1990,30 @@
 					let {
 						data: posts
 					} = await supabase.from("posts").select("*").eq("author", uid);
+					const isSelf = currentUser && uid === currentUser.id;
 					for (let i = posts.length - 1; i >= 0; i--) {
 						let p = posts[i];
 						let div = document.createElement("div");
 						const bgInfo = getPostBgInfo(p.content);
 						div.className = "post";
-						div.style.background = bgInfo.bg || "var(--card)";
-						div.style.backgroundSize = "cover";
-						div.style.backgroundPosition = "center";
-						div.innerHTML = bgInfo.content;
+						if (bgInfo.bg) {
+							div.style.setProperty('--custom-bg', bgInfo.bg);
+							div.classList.add('custom-bg');
+						}
+						div.innerHTML =
+							'<span class="time">' + new Date(p.time).toLocaleString() + '</span>' +
+							'<div class="postContent">' + bgInfo.content + '</div>' +
+							'<div class="postActions">' +
+							(isSelf ? '<button class="deleteBtn" data-del="' + p.id + '">删除</button>' : '') +
+							'</div>';
 						container.appendChild(div);
+						const delBtn = div.querySelector("[data-del]");
+						if (delBtn) {
+							delBtn.onclick = async () => {
+								await deletePost(p.id);
+								await viewUser(uid);
+							};
+						}
 					}
 					$("logoutBtn").style.display = (uid === currentUser.id) ? "inline-block" : "none";
 					$("userDescription").innerText = user.description || "暂无简介";
@@ -1969,8 +2229,9 @@
 								currentUser = data;
 								$("nav").classList.remove("hidden");
 								show("main");
+								renderPostFilters();
 								loadPosts(1);
-								loadNewUsers();
+								loadStats();
 							} else {
 								show("welcomePage");
 							}
