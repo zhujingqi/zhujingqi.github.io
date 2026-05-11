@@ -247,6 +247,7 @@
 				display: flex;
 				justify-content: center;
 				align-items: center;
+				z-index: 99999;
 			}
 
 			.modalBox {
@@ -1970,7 +1971,7 @@
 						document.querySelector(".modalBox").style.width = "600px";
 						modal(`
 					<h3>等级规则</h3>
-					<p>1. 等级分为 LV0 - LV7 共 8 个等级</p>
+					<p>1. 等级分为 LV0 - LV9 共 10 个等级</p>
 					<p>2. 不同等级会有不同颜色区分</p>
 					<p>3. 金币到达某数量后，自动升级</p>
 					<p>4. 获取金币并提升等级吧！</p>
@@ -2085,12 +2086,18 @@
 				function getUserLevel(coins) {
 					let level = "LV0",
 						color = "#888";
-					if (coins > 640) {
+					if (coins > 2560) {
+						level = "LV9";
+						color = "#FFD700; background: black; padding: 2px; border-radius: 5px;";
+					} else if (coins > 1280) {
+						level = "LV8";
+						color = "#9900ff";
+					} else if (coins > 640) {
 						level = "LV7";
-						color = "#9900FF";
+						color = "#ff55ff";
 					} else if (coins > 320) {
 						level = "LV6";
-						color = "#BA0000";
+						color = "#d93131";
 					} else if (coins > 160) {
 						level = "LV5";
 						color = "#ff5500";
