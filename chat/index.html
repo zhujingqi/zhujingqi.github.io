@@ -1488,15 +1488,20 @@
 				}
 
 				function getLevelInfo(coins) {
-					let level = "LV0";
-					let color = "#888";
-
-					if (coins > 640) {
+					let level = "LV0",
+						color = "#888";
+					if (coins > 2560) {
+						level = "LV9";
+						color = "#FFD700; background: black; padding: 2px; border-radius: 5px;";
+					} else if (coins > 1280) {
+						level = "LV8";
+						color = "#9900ff";
+					} else if (coins > 640) {
 						level = "LV7";
-						color = "#9900FF";
+						color = "#ff55ff";
 					} else if (coins > 320) {
 						level = "LV6";
-						color = "#BA0000";
+						color = "#d93131";
 					} else if (coins > 160) {
 						level = "LV5";
 						color = "#ff5500";
@@ -1513,7 +1518,6 @@
 						level = "LV1";
 						color = "#77bb00";
 					}
-
 					return {
 						level,
 						color
