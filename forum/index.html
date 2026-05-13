@@ -1057,8 +1057,10 @@
 				Jacky 论坛
 			</div>
 			<div id="notice">
-				<button id="toggleNoticeBtn" class="helpBtn" style="position:absolute; right:8px; top:8px; font-size:16px; width:24px; height:24px; line-height:20px;">
-					<b><</b>
+				<button id="toggleNoticeBtn" class="helpBtn"
+					style="position:absolute; right:8px; top:8px; font-size:16px; width:24px; height:24px; line-height:20px;">
+					<b>
+						<< /b>
 				</button>
 				<h3>公告</h3>
 				<div class="noticeItem">🎉欢迎来到 <b>Jacky 论坛</b> :)</div>
@@ -1642,10 +1644,9 @@
 						})
 						.limit(POSTS_PER_PAGE);
 					if (activePostTag === "其它") {
-						query = query.not(
-							"tag",
-							"in",
-							`(${defaultTags.map(t => `"${t}"`).join(",")})`
+						const excludedTags = ["公告", ...defaultTags];
+						query = query.or(
+							`tag.is.null,tag.not.in.(${excludedTags.map(t => `"${t}"`).join(",")})`
 						);
 					} else if (activePostTag !== "全部") {
 						query = query.eq("tag", activePostTag);
