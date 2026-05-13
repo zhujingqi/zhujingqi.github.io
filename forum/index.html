@@ -1437,7 +1437,7 @@
 						.insert([{
 							name: u,
 							pass: passHash,
-							time: new Date().toLocaleString(),
+							time: new Date().toISOString(),
 							coins: 0
 						}])
 						.select();
@@ -1502,7 +1502,7 @@
 					} = await supabase.from("posts").insert([{
 						id: Date.now(),
 						content: finalContent,
-						time: new Date().toLocaleString(),
+						time: new Date().toISOString(),
 						author: currentUser.id,
 						tag: tag
 					}]);
@@ -1816,7 +1816,7 @@
 						postid: id,
 						content: text,
 						author: currentUser.id,
-						time: new Date().toLocaleString()
+						time: new Date().toISOString()
 					}]);
 					loadPosts(postPage);
 					await changeCoins(currentUser.id, 3);
@@ -1836,7 +1836,7 @@
 						await supabase.from("likes").insert([{
 							postid: id,
 							liker: currentUser.id,
-							time: new Date().toLocaleString()
+							time: new Date().toISOString()
 						}]);
 						await changeCoins(currentUser.id, 1);
 					}
@@ -1966,7 +1966,7 @@
 					$("moreInfo").innerHTML =
 						"金币：" + (user.coins || 0) +
 						"&ensp;<button class='helpBtn' id='coinBtn'>?</button>" +
-						"&emsp;&emsp;注册时间：" + new Date(user.time).toLocaleString();
+						"&emsp;&emsp;注册时间：" + new Date(user.time).toISOString();
 					$("levelBtn").onclick = () => {
 						document.querySelector(".modalBox").style.width = "600px";
 						modal(`
