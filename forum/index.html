@@ -1549,7 +1549,8 @@
 				function renderPager() {
 					const pager = $("postPager");
 					pager.innerHTML = "";
-					const maxPage = postPages.length + (postPages[postPages.length - 1]?.hasMore ? 1 : 0);
+					const hasMore = postPages[postPage - 1]?.hasMore;
+					const maxPage = hasMore ? postPages.length + 1 : postPages.length;
 					if (maxPage <= 1) {
 						const btn = document.createElement("button");
 						btn.className = "pageBtn active";
@@ -1574,26 +1575,73 @@
 						s.textContent = "...";
 						pager.appendChild(s);
 					};
-					pager.appendChild(makeBtn("‹", postPage - 1, "navBtn", postPage <= 1));
+					pager.appendChild(
+						makeBtn("‹", postPage - 1, "navBtn", postPage <= 1)
+					);
 					const pages = [];
 					if (maxPage <= 7) {
-						for (let i = 1; i <= maxPage; i++) pages.push(i);
+						for (let i = 1; i <= maxPage; i++) {
+							pages.push(i);
+						}
 					} else {
 						pages.push(1);
 						let start = Math.max(2, postPage - 2);
 						let end = Math.min(maxPage - 1, postPage + 2);
 						if (start > 2) pages.push("...");
-						for (let i = start; i <= end; i++) pages.push(i);
+						for (let i = start; i <= end; i++) {
+							pages.push(i);
+						}
 						if (end < maxPage - 1) pages.push("...");
 						pages.push(maxPage);
 					}
 					for (let item of pages) {
-						if (item === "...") addEllipsis();
-						else pager.appendChild(makeBtn(String(item), item, "pageBtn", false, item === postPage));
+						if (item === "...") {
+							addEllipsis();
+						} else {
+							pager.appendChild(
+								makeBtn(
+									String(item),
+									item,
+									"pageBtn",
+									false,
+									item === postPage
+								)
+							);
+						}
 					}
-					pager.appendChild(makeBtn("›", postPage + 1, "navBtn", !postPages[postPage - 1]?.hasMore));
-				}
+					pager.appendChild(
+						makeBtn(
+							"›",
+							postPage + 1,
+							"navBtn",
+							!hasMore
+						)
+					);
+					const lastBtn = document.createElement("button");
+					lastBtn.className = "navBtn";
+					lastBtn.textContent = "»";
+					lastBtn.onclick = async () => {
+						lastBtn.disabled = true;
+						lastBtn.textContent = "...";
+						try {
+							while (postPages[postPages.length - 1]?.hasMore) {
+								const cursor = postPages[postPages.length - 1].nextCursor;
 
+								const pageData = await fetchPostPage(cursor);
+
+								postPages.push(pageData);
+
+								if (!pageData.hasMore) break;
+							}
+							postPage = postPages.length;
+							await loadPosts(postPage);
+						} finally {
+							lastBtn.disabled = false;
+							lastBtn.textContent = "»";
+						}
+					};
+					pager.appendChild(lastBtn);
+				}
 				function renderPostFilters() {
 					const search = $("postSearch");
 					const tagBar = $("postTagBar");
