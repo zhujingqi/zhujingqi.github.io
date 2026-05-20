@@ -1188,6 +1188,7 @@
 				let postPage = 1;
 				let postTotalPages = 1;
 				let postPages = [];
+				let totalPostCount = 0;
 				const VERIFIED_USERS = [1, 10, 30, 74];
 				const POST_BG_COST = 15;
 				const POST_BG_OPTIONS = [
@@ -1254,6 +1255,7 @@
 							});
 						if (!userErr) $("totalUsers").textContent = userCount || 0;
 						if (!postErr) $("totalPosts").textContent = postCount || 0;
+						if (!postErr) totalPostCount = postCount || 0;
 					} catch (e) {
 						console.error("Stats Error", e);
 						$("totalUsers").textContent = "—";
@@ -1548,9 +1550,11 @@
 
 				function renderPager() {
 					const pager = $("postPager");
+					if (!pager) return;
 					pager.innerHTML = "";
-					const hasMore = postPages[postPage - 1]?.hasMore;
-					const maxPage = hasMore ? postPages.length + 1 : postPages.length;
+					const fallbackMaxPage = postPages.length + (postPages[postPages.length - 1]?.hasMore ? 1 : 0);
+					const countedMaxPage = totalPostCount > 0 ? Math.ceil(totalPostCount / POSTS_PER_PAGE) : 0;
+					const maxPage = Math.max(1, countedMaxPage, fallbackMaxPage);
 					if (maxPage <= 1) {
 						const btn = document.createElement("button");
 						btn.className = "pageBtn active";
@@ -1575,22 +1579,16 @@
 						s.textContent = "...";
 						pager.appendChild(s);
 					};
-					pager.appendChild(
-						makeBtn("‹", postPage - 1, "navBtn", postPage <= 1)
-					);
+					pager.appendChild(makeBtn("‹", postPage - 1, "navBtn", postPage <= 1));
 					const pages = [];
 					if (maxPage <= 7) {
-						for (let i = 1; i <= maxPage; i++) {
-							pages.push(i);
-						}
+						for (let i = 1; i <= maxPage; i++) pages.push(i);
 					} else {
 						pages.push(1);
 						let start = Math.max(2, postPage - 2);
 						let end = Math.min(maxPage - 1, postPage + 2);
 						if (start > 2) pages.push("...");
-						for (let i = start; i <= end; i++) {
-							pages.push(i);
-						}
+						for (let i = start; i <= end; i++) pages.push(i);
 						if (end < maxPage - 1) pages.push("...");
 						pages.push(maxPage);
 					}
@@ -1599,42 +1597,30 @@
 							addEllipsis();
 						} else {
 							pager.appendChild(
-								makeBtn(
-									String(item),
-									item,
-									"pageBtn",
-									false,
-									item === postPage
-								)
+								makeBtn(String(item), item, "pageBtn", false, item === postPage)
 							);
 						}
 					}
-					pager.appendChild(
-						makeBtn(
-							"›",
-							postPage + 1,
-							"navBtn",
-							!hasMore
-						)
-					);
+					pager.appendChild(makeBtn("›", postPage + 1, "navBtn", postPage >= maxPage));
 					const lastBtn = document.createElement("button");
 					lastBtn.className = "navBtn";
 					lastBtn.textContent = "»";
+					lastBtn.disabled = postPage >= maxPage;
 					lastBtn.onclick = async () => {
+						if (totalPostCount > 0) {
+							await loadPosts(maxPage);
+							return;
+						}
 						lastBtn.disabled = true;
 						lastBtn.textContent = "...";
 						try {
 							while (postPages[postPages.length - 1]?.hasMore) {
 								const cursor = postPages[postPages.length - 1].nextCursor;
-
 								const pageData = await fetchPostPage(cursor);
-
 								postPages.push(pageData);
-
 								if (!pageData.hasMore) break;
 							}
-							postPage = postPages.length;
-							await loadPosts(postPage);
+							await loadPosts(postPages.length);
 						} finally {
 							lastBtn.disabled = false;
 							lastBtn.textContent = "»";
@@ -1642,6 +1628,7 @@
 					};
 					pager.appendChild(lastBtn);
 				}
+
 				function renderPostFilters() {
 					const search = $("postSearch");
 					const tagBar = $("postTagBar");
