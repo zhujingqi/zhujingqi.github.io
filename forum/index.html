@@ -164,7 +164,7 @@
 				width: 80%;
 				max-width: 800px;
 				word-wrap: break-word;
-				font-size: 20px;
+				font-size: 18px;
 				white-space: pre-wrap;
 				display: flex;
 				flex-direction: column;
@@ -846,6 +846,26 @@
 				flex-shrink: 0;
 			}
 
+			.toggleLongPost.inline {
+				margin-left: 8px;
+				padding: 2px 8px;
+				font-size: 14px;
+				height: 24px;
+				line-height: 20px;
+				border-radius: 999px;
+				vertical-align: middle;
+				float: right;
+			}
+
+			.postContent {
+				line-height: 1.7;
+				word-break: break-word;
+			}
+
+			.longPostText {
+				display: inline;
+			}
+
 			@keyframes loadingDot {
 
 				0%,
@@ -888,7 +908,7 @@
 
 				.post,
 				.userItem {
-					font-size: 16px;
+					font-size: 14px;
 				}
 
 				button,
@@ -1114,12 +1134,17 @@
 		</div>
 		<div id="editorPage" class="hidden center">
 			<div class="card" style="width:95%;max-width:600px;">
-				<textarea id="text" placeholder="发布新鲜事（最多2000字符）" style="width:100%;" maxlength="2000"></textarea>
+				<textarea id="text" placeholder="发布新鲜事（最多5000字符）" style="width:100%;" maxlength="5000"></textarea>
+				<div style="display:flex;gap:6px;margin-top:8px;">
+					<input id="imgUrlInput" placeholder="图片链接（例如 https://xxx.com/xxx.jpg）"
+						style="flex:1;height:36px;font-size:14px;">
+					<button id="insertImgBtn" type="button">插图</button>
+				</div>
 				<div class="tagBarContainer"
 					style="display:flex;align-items:center;gap:6px;flex-wrap:nowrap;margin-top:8px;">
 					<div class="tagBar" id="tagBar" style="display:flex;gap:6px;flex-shrink:1;overflow-x:auto;"></div>
 					<input id="customTag" placeholder="自定义标签（你也可以不选择任何标签）"
-						style="height:36px;font-size:14px;flex-shrink:0;width:360px;" maxlength="10">
+						style="height:36px;font-size:14px;flex-shrink:0;width:300px;" maxlength="10">
 				</div>
 				<div class="postBgRow">
 					<button id="bgBuyBtn" type="button">背景</button>
@@ -1412,6 +1437,15 @@
 				};
 				$("bgBuyBtn").textContent = selectedPostBg ? "已使用" : "背景";
 				$("bgBuyBtn").onclick = openPostBgPicker;
+				$("insertImgBtn").onclick = () => {
+					const url = $("imgUrlInput").value.trim();
+					if (!url) return modal("请输入图片链接");
+					if (!/^https?:\/\//i.test(url)) return modal("图片链接必须以 http:// 或 https:// 开头");
+					const textArea = $("text");
+					const insert = `<img src="${url}" class="zoomable" style="max-width:60%;border-radius:12px;">`;
+					textArea.value += (textArea.value ? "\n" : "") + insert + "\n";
+					$("imgUrlInput").value = "";
+				};
 
 				function setActive(id) {
 					["homeBtn", "editorBtn", "showUsersBtn", "profileBtn", "moreBtn"]
@@ -1486,15 +1520,7 @@
 					if (!txt) return;
 					let custom = $("customTag").value.trim();
 					let tag = custom || selectedTags[0] || null;
-					txt = txt.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-					const allow = ["b", "i", "u", "br", "a", "h1", "h2", "h3", "h4", "h5", "h6", "hr", "marquee",
-						"center", "img"
-					];
-					for (let tagName of allow) {
-						const reOpen = new RegExp(`&lt;(${tagName})(\\s[^&gt;]*)?&gt;`, "gi");
-						const reClose = new RegExp(`&lt;/(${tagName})&gt;`, "gi");
-						txt = txt.replace(reOpen, "<$1$2>").replace(reClose, "</$1>");
-					}
+					txt = sanitizePostHtml(txt);
 					let finalContent = txt;
 					if (selectedPostBg) {
 						finalContent = `[[bg:${selectedPostBg}]]` + txt;
@@ -1520,6 +1546,109 @@
 					setActive("homeBtn");
 					await changeCoins(currentUser.id, 5);
 				};
+
+				function sanitizePostHtml(txt) {
+					const safeTags = {
+						b: [],
+						i: [],
+						u: [],
+						br: [],
+						hr: [],
+						center: [],
+						marquee: [],
+						h1: ["style"],
+						h2: ["style"],
+						h3: ["style"],
+						h4: ["style"],
+						h5: ["style"],
+						h6: ["style"],
+						div: ["style"],
+						span: ["style"],
+						a: ["href", "style"],
+						img: ["src", "style", "class"]
+					};
+					const safeStyles = [
+						"color",
+						"background",
+						"background-color",
+						"font-size",
+						"text-align",
+						"border-radius",
+						"margin",
+						"margin-top",
+						"margin-bottom",
+						"padding",
+						"width",
+						"height",
+						"max-width",
+						"display"
+					];
+					txt = String(txt || "");
+					txt = txt
+						.replace(/</g, "&lt;")
+						.replace(/>/g, "&gt;");
+					txt = txt.replace(
+						/&lt;(\/?)([a-z0-9]+)(.*?)&gt;/gi,
+						(match, closing, tagName, attrs) => {
+							tagName = tagName.toLowerCase();
+							if (!safeTags[tagName]) {
+								return match;
+							}
+							if (closing) {
+								return `</${tagName}>`;
+							}
+							let allowedAttrs = "";
+							for (const attr of safeTags[tagName]) {
+								const reg = new RegExp(
+									attr + `="([^"]*)"`,
+									"i"
+								);
+								const found = attrs.match(reg);
+								if (!found) continue;
+								let value = found[1].trim();
+								if (/^javascript:/i.test(value)) {
+									continue;
+								}
+								if (attr === "href") {
+									if (!/^https?:\/\//i.test(value)) {
+										continue;
+									}
+								}
+								if (attr === "src") {
+
+									if (!/^https?:\/\//i.test(value)) {
+										continue;
+									}
+								}
+								if (attr === "style") {
+									if (
+										/expression|url\s*\(|javascript:|position\s*:\s*fixed/i.test(value)
+									) {
+										continue;
+									}
+									let finalStyle = "";
+									value.split(";").forEach(rule => {
+										let [key, val] = rule.split(":");
+										if (!key || !val) return;
+										key = key.trim().toLowerCase();
+										val = val.trim();
+										if (!safeStyles.includes(key)) {
+											return;
+										}
+										finalStyle += `${key}:${val};`;
+									});
+									value = finalStyle;
+									if (!value.trim()) {
+										continue;
+									}
+								}
+								allowedAttrs += ` ${attr}="${value}"`;
+							}
+							return `<${tagName}${allowedAttrs}>`;
+						}
+					);
+					return txt;
+				}
 				async function loadNewUsers(limit = 10) {
 					const container = $("newUsers");
 					container.innerHTML = "<p style='color:var(--sub);text-align:center;'>Loading...</p>";
@@ -1766,11 +1895,13 @@
 							let liked = userLike && userLike.length > 0;
 							const bgInfo = getPostBgInfo(p.content);
 							const postContent = bgInfo.content;
-							postDiv.className = "post";
-							if (bgInfo.bg) {
-								postDiv.style.setProperty('--custom-bg', bgInfo.bg);
-								postDiv.classList.add('custom-bg');
-							}
+							const hasHtml = /<[^>]+>/.test(postContent);
+							const plainText = postContent.replace(/<[^>]*>/g, "");
+							const needFold = !hasHtml && plainText.length > 300;
+							const foldedText = needFold ? plainText.slice(0, 300) + "..." : plainText;
+							const contentHTML = needFold ?
+								`<span class="longPostText">${foldedText}</span><button class="toggleLongPost inline">展开</button>` :
+								postContent;
 							postDiv.innerHTML =
 								'<div class="postHeaderTop"><div class="userInfo">' +
 								'<span class="userLink" data-user="' + p.author + '">' +
@@ -1781,7 +1912,8 @@
 								'</div></div>' +
 								'<div class="postTags">' +
 								(p.tag ? `<span class="postTag" data-tag="${p.tag}">${p.tag}</span>` : "") +
-								'</div>' + '<div class="postContent">' + postContent + '</div>' +
+								'</div>' +
+								'<div class="postContent">' + contentHTML + '</div>' +
 								'<div class="postActions"><span class="like ' + (liked ? "liked" : "") +
 								'" data-id="' + p.id + '">❤ ' + likeCount + '</span>' +
 								(p.author === currentUser.id ? '<button data-del="' + p.id + '">删除</button>' : "") +
@@ -1806,6 +1938,16 @@
 									renderPostFilters();
 									loadPosts(1);
 									loadStats();
+								};
+							}
+							const toggleBtn = postDiv.querySelector(".toggleLongPost");
+							if (toggleBtn) {
+								let expanded = false;
+								toggleBtn.onclick = () => {
+									expanded = !expanded;
+									postDiv.querySelector(".longPostText").innerHTML =
+										expanded ? postContent : foldedText;
+									toggleBtn.textContent = expanded ? "收起" : "展开";
 								};
 							}
 							postDiv.querySelector(".userLink").onclick = () => viewUser(p.author);
