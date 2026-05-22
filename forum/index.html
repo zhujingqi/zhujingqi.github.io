@@ -183,14 +183,50 @@
 				margin-left: 6px;
 			}
 
-			.like {
+			.postActions {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 10px;
+			}
+
+			.voteGroup {
+				display: flex;
+				align-items: center;
+				gap: 12px;
+			}
+
+			.like,
+			.dislike {
+				display: inline-flex;
+				align-items: center;
+				gap: 4px;
 				cursor: pointer;
-				color: var(--sub);
+				user-select: none;
+				color: #888;
+				transition: .2s;
+			}
+
+			.voteIcon {
+				width: 18px;
+				height: 18px;
+				fill: currentColor;
+				flex: 0 0 auto;
 			}
 
 			.like.liked {
 				color: #f66;
-				margin-left: 6px;
+				font-weight: 700;
+			}
+
+			.dislike.disliked {
+				color: #0055ff;
+				font-weight: 700;
+			}
+
+			.like:hover,
+			.dislike:hover {
+				transform: translateY(-1px);
 			}
 
 			.commentRow {
@@ -435,13 +471,6 @@
 
 			.postContent {
 				margin: 4px 0 8px 0;
-			}
-
-			.postActions {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				margin-top: 4px;
 			}
 
 			.comment {
@@ -1087,11 +1116,11 @@
 				<div class="noticeItem">
 					<details>
 						<summary><b>近期更新</b></summary>
+						· 踩帖子功能<br>
+						· 发帖插入图片<br>
+						· 折叠帖子<br>
 						· 可折叠的公告栏<br>
 						· 全站统计用户数与贴子数<br>
-						· 排行榜序号与新用户列表<br>
-						· 搜索与标签筛选<br>
-						· 深色模式下的彩色背景<br>
 					</details>
 				</div>
 				<br>
@@ -1884,15 +1913,27 @@
 									count: "exact",
 									head: true
 								})
-								.eq("postid", p.id);
+								.eq("postid", p.id)
+								.eq("type", 1);
 							let {
-								data: userLike
+								count: dislikeCount
+							} = await supabase
+								.from("likes")
+								.select("*", {
+									count: "exact",
+									head: true
+								})
+								.eq("postid", p.id)
+								.eq("type", -1);
+							let {
+								data: userVotes
 							} = await supabase
 								.from("likes")
 								.select("*")
 								.eq("postid", p.id)
 								.eq("liker", currentUser.id);
-							let liked = userLike && userLike.length > 0;
+							let liked = userVotes?.some(x => x.type == 1);
+							let disliked = userVotes?.some(x => x.type == -1);
 							const bgInfo = getPostBgInfo(p.content);
 							const postContent = bgInfo.content;
 							const hasHtml = /<[^>]+>/.test(postContent);
@@ -1914,8 +1955,18 @@
 								(p.tag ? `<span class="postTag" data-tag="${p.tag}">${p.tag}</span>` : "") +
 								'</div>' +
 								'<div class="postContent">' + contentHTML + '</div>' +
-								'<div class="postActions"><span class="like ' + (liked ? "liked" : "") +
-								'" data-id="' + p.id + '">❤ ' + likeCount + '</span>' +
+								'<div class="postActions">' +
+								'<div class="voteGroup">' +
+								'<span class="like ' + (liked ? "liked" : "") + '" data-id="' + p.id + '">' +
+								'<svg viewBox="0 0 24 24" class="voteIcon"><path d="M12 21s-6.7-4.35-9.33-8A5.4 5.4 0 0 1 12 4.2A5.4 5.4 0 0 1 21.33 13C18.7 16.65 12 21 12 21z"/></svg> ' +
+								likeCount +
+								'</span>' +
+								'<span class="dislike ' + (disliked ? "disliked" : "") + '" data-dislike="' + p.id +
+								'">' +
+								'<svg viewBox="0 0 24 24" class="voteIcon"><path d="M12 21l-8-8h5V3h6v10h5l-8 8z"/></svg> ' +
+								dislikeCount +
+								'</span>' +
+								'</div>' +
 								(p.author === currentUser.id ? '<button data-del="' + p.id + '">删除</button>' : "") +
 								'</div>' +
 								'<div class="commentRow"><input data-input="' + p.id + '" placeholder="评论...">' +
@@ -1923,6 +1974,7 @@
 								'<div class="commentList"></div>';
 							container.appendChild(postDiv);
 							postDiv.querySelector(".like").onclick = () => likePost(p.id);
+							postDiv.querySelector(".dislike").onclick = () => dislikePost(p.id);
 							let delBtn = postDiv.querySelector("[data-del]");
 							if (delBtn) delBtn.onclick = () => deletePost(p.id);
 							postDiv.querySelector("[data-comment]").onclick = () => {
@@ -2006,16 +2058,66 @@
 						.select("*")
 						.eq("postid", id)
 						.eq("liker", currentUser.id);
-					if (data && data.length > 0) {
-						await supabase.from("likes").delete().eq("postid", id).eq("liker", currentUser.id);
+					if (data.some(x => x.type === 1)) {
+						await supabase
+							.from("likes")
+							.delete()
+							.eq("postid", id)
+							.eq("liker", currentUser.id)
+							.eq("type", 1);
 						await changeCoins(currentUser.id, -1);
 					} else {
-						await supabase.from("likes").insert([{
-							postid: id,
-							liker: currentUser.id,
-							time: new Date().toISOString()
-						}]);
+						await supabase
+							.from("likes")
+							.delete()
+							.eq("postid", id)
+							.eq("liker", currentUser.id)
+							.eq("type", -1);
+						await supabase
+							.from("likes")
+							.insert([{
+								postid: id,
+								liker: currentUser.id,
+								type: 1,
+								time: new Date().toISOString()
+							}]);
 						await changeCoins(currentUser.id, 1);
+					}
+					loadPosts(postPage);
+				}
+				async function dislikePost(id) {
+					let {
+						data
+					} = await supabase
+						.from("likes")
+						.select("*")
+						.eq("postid", id)
+						.eq("liker", currentUser.id);
+					if (data.some(x => x.type === -1)) {
+						await supabase
+							.from("likes")
+							.delete()
+							.eq("postid", id)
+							.eq("liker", currentUser.id)
+							.eq("type", -1);
+						await changeCoins(currentUser.id, 1);
+					} else {
+						await supabase
+							.from("likes")
+							.delete()
+							.eq("postid", id)
+							.eq("liker", currentUser.id)
+							.eq("type", 1);
+						await supabase
+							.from("likes")
+							.insert([{
+								postid: id,
+								liker: currentUser.id,
+								type: -1,
+								time: new Date().toISOString()
+							}]);
+						await changeCoins(currentUser.id, -1);
+
 					}
 					loadPosts(postPage);
 				}
@@ -2161,7 +2263,8 @@
 					<p>1. 发布 +5 金币</p>
 					<p>2. 评论 +3 金币</p>
 					<p>3. 点赞 +1 金币</p>
-					<p>4. 删除帖子、内容或取消点赞，减少对应数量金币</p>
+					<p>4. 踩 + (-1) 金币</p>
+					<p>5. 删除帖子、内容或取消点赞，减少对应数量金币</p>
 						`);
 					}
 					container.innerHTML = "";
