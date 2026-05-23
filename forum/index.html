@@ -1116,6 +1116,8 @@
 				<div class="noticeItem">
 					<details>
 						<summary><b>近期更新</b></summary>
+						· 彻底解决帖子重复加载特性<br>
+						· 快速跳转最后一页<br>
 						· 踩帖子功能<br>
 						· 发帖插入图片<br>
 						· 折叠帖子<br>
@@ -1243,6 +1245,7 @@
 				let postTotalPages = 1;
 				let postPages = [];
 				let totalPostCount = 0;
+				let currentLoadToken = 0;
 				const VERIFIED_USERS = [1, 10, 30, 74];
 				const POST_BG_COST = 15;
 				const POST_BG_OPTIONS = [
@@ -1309,7 +1312,10 @@
 							});
 						if (!userErr) $("totalUsers").textContent = userCount || 0;
 						if (!postErr) $("totalPosts").textContent = postCount || 0;
-						if (!postErr) totalPostCount = postCount || 0;
+						if (!postErr) {
+							totalPostCount = postCount || 0;
+							renderPager();
+						}
 					} catch (e) {
 						console.error("Stats Error", e);
 						$("totalUsers").textContent = "—";
@@ -1349,8 +1355,8 @@
 					show("main");
 					$("moreMenu").classList.add("hidden");
 					renderPostFilters();
-					loadPosts(1);
 					loadStats();
+					loadPosts(1);
 					setActive("homeBtn");
 				};
 				$("editorBtn").onclick = () => {
@@ -1570,8 +1576,8 @@
 					selectedPostBg = "";
 					$("bgBuyBtn").textContent = "背景";
 					show("main");
-					loadPosts(1);
 					loadStats();
+					loadPosts(1);
 					setActive("homeBtn");
 					await changeCoins(currentUser.id, 5);
 				};
@@ -1710,23 +1716,13 @@
 					const pager = $("postPager");
 					if (!pager) return;
 					pager.innerHTML = "";
-					const fallbackMaxPage = postPages.length + (postPages[postPages.length - 1]?.hasMore ? 1 : 0);
-					const countedMaxPage = totalPostCount > 0 ? Math.ceil(totalPostCount / POSTS_PER_PAGE) : 0;
-					const maxPage = Math.max(1, countedMaxPage, fallbackMaxPage);
-					if (maxPage <= 1) {
-						const btn = document.createElement("button");
-						btn.className = "pageBtn active";
-						btn.textContent = "1";
-						btn.disabled = true;
-						pager.appendChild(btn);
-						return;
-					}
+					const maxPage = Math.max(1, Math.ceil(totalPostCount / POSTS_PER_PAGE));
 					const makeBtn = (text, page, cls = "pageBtn", disabled = false, active = false) => {
 						const b = document.createElement("button");
 						b.className = cls + (active ? " active" : "");
 						b.textContent = text;
 						b.disabled = disabled;
-						if (!disabled && page != null) {
+						if (!disabled && page) {
 							b.onclick = () => loadPosts(page);
 						}
 						return b;
@@ -1760,31 +1756,7 @@
 						}
 					}
 					pager.appendChild(makeBtn("›", postPage + 1, "navBtn", postPage >= maxPage));
-					const lastBtn = document.createElement("button");
-					lastBtn.className = "navBtn";
-					lastBtn.textContent = "»";
-					lastBtn.disabled = postPage >= maxPage;
-					lastBtn.onclick = async () => {
-						if (totalPostCount > 0) {
-							await loadPosts(maxPage);
-							return;
-						}
-						lastBtn.disabled = true;
-						lastBtn.textContent = "...";
-						try {
-							while (postPages[postPages.length - 1]?.hasMore) {
-								const cursor = postPages[postPages.length - 1].nextCursor;
-								const pageData = await fetchPostPage(cursor);
-								postPages.push(pageData);
-								if (!pageData.hasMore) break;
-							}
-							await loadPosts(postPages.length);
-						} finally {
-							lastBtn.disabled = false;
-							lastBtn.textContent = "»";
-						}
-					};
-					pager.appendChild(lastBtn);
+					pager.appendChild(makeBtn("»", maxPage, "navBtn", postPage >= maxPage));
 				}
 
 				function renderPostFilters() {
@@ -1802,25 +1774,27 @@
 							postSearch = "";
 							$("postSearch").value = "";
 							renderPostFilters();
-							loadPosts(1);
 							loadStats();
+							loadPosts(1);
 						};
 						tagBar.appendChild(chip);
 					}
 					$("searchBtn").onclick = () => {
 						postSearch = search.value.trim();
-						loadPosts(1);
 						loadStats();
+						loadPosts(1);
 					};
 					search.onkeydown = e => {
 						if (e.key === "Enter") {
 							postSearch = search.value.trim();
-							loadPosts(1);
 							loadStats();
+							loadPosts(1);
 						}
 					};
 				}
-				async function fetchPostPage(cursor = null) {
+				async function fetchPostPage(page = 1) {
+					let from = (page - 1) * POSTS_PER_PAGE;
+					let to = from + POSTS_PER_PAGE - 1;
 					let query = supabase
 						.from("posts")
 						.select(`
@@ -1834,7 +1808,7 @@
 						.order("id", {
 							ascending: false
 						})
-						.limit(POSTS_PER_PAGE);
+						.range(from, to);
 					if (activePostTag === "其它") {
 						const excludedTags = ["公告", ...defaultTags];
 						query = query.or(
@@ -1848,19 +1822,13 @@
 						const safeQ = q.replace(/[%_,]/g, "");
 						query = query.or(`content.ilike.%${safeQ}%,tag.ilike.%${safeQ}%`);
 					}
-					if (cursor !== null) {
-						query = query.lt("id", cursor);
-					}
 					let {
 						data,
 						error
 					} = await query;
 					if (error) throw error;
-					const posts = data || [];
 					return {
-						posts,
-						nextCursor: posts.length ? posts[posts.length - 1].id : null,
-						hasMore: posts.length === POSTS_PER_PAGE
+						posts: data || []
 					};
 				}
 				const notice = $("notice");
@@ -1878,24 +1846,15 @@
 					};
 				}
 				async function loadPosts(page = 1, container = $("posts")) {
+					const token = ++currentLoadToken;
 					container.innerHTML =
 						"<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
 					try {
-						if (page === 1) {
-							postPages = [];
-						}
-						while (postPages.length < page) {
-							const cursor = postPages.length ? postPages[postPages.length - 1].nextCursor : null;
-							const pageData = await fetchPostPage(cursor);
-							postPages.push(pageData);
-							if (!pageData.hasMore) break;
-						}
-						if (!postPages[page - 1]) {
-							page = postPages.length || 1;
-						}
 						postPage = page;
 						renderPager();
-						const posts = postPages[page - 1]?.posts || [];
+						const pageData = await fetchPostPage(page);
+						if (token !== currentLoadToken) return;
+						const posts = pageData.posts || [];
 						container.innerHTML = "";
 						if (!posts.length) {
 							container.innerHTML =
@@ -1903,6 +1862,7 @@
 							return;
 						}
 						for (let p of posts) {
+							if (token !== currentLoadToken) return;
 							let postDiv = document.createElement("div");
 							postDiv.className = "post";
 							let {
@@ -1915,6 +1875,7 @@
 								})
 								.eq("postid", p.id)
 								.eq("type", 1);
+							if (token !== currentLoadToken) return;
 							let {
 								count: dislikeCount
 							} = await supabase
@@ -1925,6 +1886,7 @@
 								})
 								.eq("postid", p.id)
 								.eq("type", -1);
+							if (token !== currentLoadToken) return;
 							let {
 								data: userVotes
 							} = await supabase
@@ -1932,6 +1894,7 @@
 								.select("*")
 								.eq("postid", p.id)
 								.eq("liker", currentUser.id);
+							if (token !== currentLoadToken) return;
 							let liked = userVotes?.some(x => x.type == 1);
 							let disliked = userVotes?.some(x => x.type == -1);
 							const bgInfo = getPostBgInfo(p.content);
@@ -1988,8 +1951,8 @@
 									postSearch = "";
 									$("postSearch").value = "";
 									renderPostFilters();
-									loadPosts(1);
 									loadStats();
+									loadPosts(1);
 								};
 							}
 							const toggleBtn = postDiv.querySelector(".toggleLongPost");
@@ -2143,8 +2106,8 @@
 					await supabase.from("posts").delete().eq("id", id);
 					await supabase.from("comments").delete().eq("postid", id);
 					await supabase.from("likes").delete().eq("postid", id);
-					loadPosts(1);
 					loadStats();
+					loadPosts(1);
 				}
 
 				function getPostBgInfo(content) {
@@ -2517,8 +2480,8 @@
 								$("nav").classList.remove("hidden");
 								show("main");
 								renderPostFilters();
-								loadPosts(1);
 								loadStats();
+								loadPosts(1);
 							} else {
 								show("welcomePage");
 							}
