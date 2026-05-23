@@ -2030,6 +2030,7 @@
 							.eq("type", 1);
 						await changeCoins(currentUser.id, -1);
 					} else {
+						const hadDislike = data.some(x => x.type === -1);
 						await supabase
 							.from("likes")
 							.delete()
@@ -2044,7 +2045,10 @@
 								type: 1,
 								time: new Date().toISOString()
 							}]);
-						await changeCoins(currentUser.id, 1);
+						await changeCoins(
+							currentUser.id,
+							hadDislike ? 2 : 1
+						);
 					}
 					loadPosts(postPage);
 				}
@@ -2065,6 +2069,7 @@
 							.eq("type", -1);
 						await changeCoins(currentUser.id, 1);
 					} else {
+						const hadLike = data.some(x => x.type === 1);
 						await supabase
 							.from("likes")
 							.delete()
@@ -2079,8 +2084,10 @@
 								type: -1,
 								time: new Date().toISOString()
 							}]);
-						await changeCoins(currentUser.id, -1);
-
+						await changeCoins(
+							currentUser.id,
+							hadLike ? -2 : -1
+						);
 					}
 					loadPosts(postPage);
 				}
