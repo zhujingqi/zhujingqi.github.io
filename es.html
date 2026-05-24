@@ -1,39 +1,34 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 	<head>
 		<title>Inicio - Zhujingqi</title>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<meta name="description" content="Jacky's Website">
+		<meta name="description" content="El sitio web de Jacky">
 		<meta name="author" content="Jacky Zhu">
 		<link id="maincss" rel="stylesheet" href="/css/main.css">
 		<link id="barcss" rel="stylesheet" href="/css/bar.css">
 		<link id="indexcss" rel="stylesheet" href="/css/index.css">
-		<link id="darkcss" rel="stylesheet" href="/css/dark.css" disabled>
-		<link rel="icon" type="image/x-icon" href="/img/zjq.png">
+		<link id="mobilecss" rel="stylesheet" href="/css/mobile.css">
+		<link rel="icon" type="image/x-icon" href="/img/zjq.svg">
 	</head>
 	<body>
 		<div class="bar">
 			<a href="/index.html" class="zjq"><b>Zhujingqi</b></a>
-			<a href="/me/">Mí</a>
+			<a href="/hub/"
+				style="background:linear-gradient(135deg,#ffb36b 0%,#ff935c 22%,#ff7a59 42%,#ff5f6d 65%,#ff7e8a 82%,#ffb38a 100%);color:#fff;">Hub</a>
+			<a href="/me/">Sobre mí</a>
 			<a href="/game/">Juegos</a>
 			<a href="/tool/">Herramientas</a>
-			<a id="switch-style" style="position: absolute; right: 0px; padding: 5px;"><img
-					src="/img/switch-style.png" height="40px" width="auto" /></a>
 		</div>
 		<div id="switchlang">
 			<a href="/index.html">中文</a> |
 			<a href="/en.html">EN</a> |
 			<a href="/es.html">ES</a>
 		</div>
-		<div class="msg" id="msg">
-			 Esta es la versión en español de la página principal de Zhujingqi!<br>
-			Puede que vaya por detrás de la <a href="/index.html">versión china.</a>
-			<span class="msgclosebtn" onclick="document.getElementById('msg').style.display='none';">&times;</span>
-		</div>
 		<div class="text">
-			¡Hola, soy Jacky! Me gusta estudiar y viajar. También soy un chico optimista y creativo.
-			( Ver más en <a href="/me/">presentación personal</a> y <a href="/about.html">Acerca de mí</a> )<br>
+			¡Hola! Soy Jacky. Me encanta estudiar y viajar, y soy una persona optimista y extrovertida llena de ideas locas.
+			(Ver más en <a href="/me/">Sobre mí</a>, <a href="/about.html">Acerca de</a>)<br>
 		</div>
 		<div class="hero text">
 			<div class="bgt" id="bgt">
@@ -45,7 +40,7 @@
 				<span class="m">SISTEMAS</span>
 				<span class="m">FUTURO</span>
 				<span class="s">VISIONARIO</span>
-				<span class="s">CONSTRUCTOR</span>
+				<span class="s">CREADOR</span>
 				<span class="s">EXPLORAR</span>
 				<span class="s">RACIONAL</span>
 				<span class="s">AMBICIOSO</span>
@@ -58,7 +53,7 @@
 				<span class="m">SISTEMAS</span>
 				<span class="m">FUTURO</span>
 				<span class="s">VISIONARIO</span>
-				<span class="s">CONSTRUCTOR</span>
+				<span class="s">CREADOR</span>
 				<span class="s">EXPLORAR</span>
 				<span class="s">RACIONAL</span>
 				<span class="s">AMBICIOSO</span>
@@ -70,55 +65,67 @@
 			<div class="hero-r">
 				<a href="/me/index.html">
 					<div class="c">
-						<h3 class="arrow">Presentación Personal</h3>
+						<img src="/img/zjq.svg" style="margin-right: 10px; height: 30px;" />
+						<h3 class="arrow">Sobre mí</h3>
 					</div>
 				</a>
 				<a href="/game/index.html">
 					<div class="c">
+						<img src="/img/zjq.svg" style="margin-right: 10px; height: 30px;" />
 						<h3 class="arrow">Centro de Juegos</h3>
 					</div>
 				</a>
 				<a href="/tool/index.html">
 					<div class="c">
+						<img src="/img/zjq.svg" style="margin-right: 10px; height: 30px;" />
 						<h3 class="arrow">Colección de Herramientas</h3>
+					</div>
+				</a>
+				<a href="/forum/">
+					<div class="c">
+						<img src="/forum/icon.svg" style="margin-right: 10px; height: 30px;" />
+						<h3 class="arrow">Foro de Jacky</h3>
 					</div>
 				</a>
 			</div>
 		</div>
 		<div class="cr">
 			<div class="cc">
-				<a href="/forum/index.html" class="c fixh">
-					<h3 class="arrow">Foro de Jacky</h3>
-				</a>
 				<a href="https://jacky.run.place" class="c fixh">
 					<h3 class="arrow">JackyOS</h3>
 				</a>
 				<div class="ct fixh">
-					<b>Tráfico del Sitio Web</b>
+					<b>Visitantes totales: </b>
 					<img src="https://w.saobby.com/w/70mn2t40">
-					( Desde 2025.3.14 )<br><br>
+					(Desde el 14/3/2025)<br><br>
 					<b>Una frase sabia: </b>
-					En ocasiones, pulsar ciertas combinaciones de teclas puede dar lugar a resultados sorprendentes.
+					Si presionas una serie específica de teclas en el teclado, sucederán cosas buenas.
 				</div>
 			</div>
 			<div class="rc">
-				<a href="/lang/" class="r c fixh">
-					<h3 class="arrow">Lingüística</h3>
-				</a>
-				<div class="r fixh">
-					Proyectos destacados: 
-					<a href="/forum/">Foro de Jacky</a>&emsp;
-					<a href="https://jacky.run.place">JackyOS</a>&emsp;
-					<a href="/game/3drunner.html">Corredor 3D</a>
-					<br><br>
-					Otras proyectos: <a href="/jackianity/index.html">Jackianidad</a>
+				<div class="r c fixh">
+					<a href="/forum/" style="margin-right: 40px;">
+						<h3 class="arrow">Foro de Jacky</h3>
+					</a>
+					<a href="/chat/" style="margin-right: 40px;">
+						<h3 class="arrow">Jacky Chat</h3>
+					</a>
+					<a href="/pedia/" style="margin-right: 40px;">
+						<h3 class="arrow">Jackypedia</h3>
+					</a>
 				</div>
 				<div class="r fixh">
-					<a href="https://github.com/zhujingqi"> GitHub</a>&emsp;
-					<a href="https://github.com/zhujingqi/zhujingqi.github.io"> Código fuente del sitio web</a>&emsp;
-					<a href="https://github.com/zhujingqi/JackyOS"> Código fuente de JackyOS</a>&emsp;
-					<a href="/jackianity"> Jackianidad</a>&emsp;
-					<a href="https://jacky.run.place/"> JackyOS</a>
+					Proyectos destacados:
+					<a href="/forum/">Foro de Jacky</a>&emsp;
+					<a href="/chat/">Jacky Chat</a>&emsp;
+					<a href="/pedia/">Jackypedia</a>&emsp;
+					<a href="/tool/jackybrowser/">Jacky Browser</a>&emsp;
+					<a href="/game/rooms/">ROOMS</a>&emsp;
+					<a href="https://jacky.run.place">JackyOS</a>&emsp;
+					<br><br>
+					Otros proyectos:
+					<a href="/jackianity/index.html">Jackianidad</a>&emsp;
+					<a href="/lang/">Lingüística</a>
 				</div>
 			</div>
 		</div>
@@ -139,20 +146,21 @@
 					<div class="leaf left"></div>
 					<div class="leaf right"></div>
 				</div>
-				<div id="watered-count">Total de riegos: 0</div>
+				<div id="watered-count">Veces regadas: 0</div>
 			</div>
 		</div>
 		<div class="text">
-			Mi correo electrónico: <a href="mailto:jacky@zhujingqi.com">jacky@zhujingqi.com</a>
-			( Ver más en <a href="/me/contact.html">Contactarme</a> )
+			Mi correo electrónico:
+			<a href="mailto:jacky@zhujingqi.com">jacky@zhujingqi.com</a>
+			(Ver más en <a href="/me/contact.html">Contacto</a>)
 		</div>
 		<div class="bottom">
 			<a href="/index.html"><b>Zhujingqi</b></a>
-			<a href="/about.html">Acerca de mí</a>
-			<a href="/money.html">Patrocinar</a>
-			<a><b>Enlaces amigos</b></a>
-			<a href="https://lqh2011.com">Sitio Web de LQH-2011</a>
-			<a href="https://pyy.run.place">Sitio Web de PYY</a>
+			<a href="/about.html">Acerca de</a>
+			<a href="/money.html">Donar</a>
+			<a><b>Sitios amigos</b></a>
+			<a href="https://lqh2011.com">Sitio web de LQH-2011</a>
+			<a href="https://pyy.run.place">Sitio web de PYY</a>
 			<div class="s-ico">
 				<a href="https://github.com/zhujingqi" target="_blank">
 					<img src="https://cdn.jsdelivr.net/npm/simple-icons@9.14.0/icons/github.svg" alt="GitHub">
@@ -168,7 +176,7 @@
 					display: none;
 				}
 			</style>
-			Sin JavaScript!
+			noscript
 		</noscript>
 		<script src="/js/index.js"></script>
 		<script src="/js/egg.js"></script>
