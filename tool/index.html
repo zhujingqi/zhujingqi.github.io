@@ -5,6 +5,7 @@
 		<meta charset="UTF-8">
 		<link id="maincss" rel="stylesheet" href="/css/main.css">
 		<link id="barcss" rel="stylesheet" href="/css/bar.css">
+		<link id="mobilecss" rel="stylesheet" href="/css/mobile.css">
 		<style>
 			.card {
 				box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.3);
@@ -30,17 +31,12 @@
 				color: #555;
 			}
 		</style>
-		<script>
-			document.addEventListener("DOMContentLoaded", function() {
-				document.querySelectorAll("a").forEach(link => {
-					link.setAttribute("target", "_blank");
-				});
-			});
-		</script>
 	</head>
 	<body>
 		<div class="bar">
 			<a href="/index.html" class="zjq"><b>Zhujingqi</b></a>
+			<a href="/hub/"
+				style="background:linear-gradient(135deg,#ffb36b 0%,#ff935c 22%,#ff7a59 42%,#ff5f6d 65%,#ff7e8a 82%,#ffb38a 100%);color:#fff;">社区</a>
 			<a href="/me/">介绍</a>
 			<a href="/game/">游戏</a>
 			<a href="/tool/">工具</a>
@@ -49,13 +45,15 @@
 			<h2>工具大全</h2>
 			<a href="/tool/jackybrowser/">
 				<div class="card" style="background-color: rgba(170, 255, 255, 0.3);">
-					<h2 style="color:#000; !important"><img src="/tool/jackybrowser/icon.svg" style="height: 20px; width: auto;" /> Jacky Browser</h2>
+					<h2 style="color:#000; !important"><img src="/tool/jackybrowser/icon.svg"
+							style="height: 20px; width: auto;" /> Jacky Browser</h2>
 					<p style="color:#000; !important">重新组织你的网页世界</p>
 				</div>
 			</a>
 			<a href="/chat/">
 				<div class="card" style="background-color: rgba(0, 170, 0, 0.3);">
-					<h2 style="color:#000; !important"><img src="/chat/icon.svg" style="height: 20px; width: auto;" /> Jacky Chat</h2>
+					<h2 style="color:#000; !important"><img src="/chat/icon.svg" style="height: 20px; width: auto;" />
+						Jacky Chat</h2>
 					<p style="color:#000; !important">简洁好用的在线聊天社区</p>
 				</div>
 			</a>
