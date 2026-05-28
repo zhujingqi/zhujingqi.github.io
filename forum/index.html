@@ -2415,20 +2415,40 @@
 				}
 
 				function getDailyFortune(username) {
-					const d = new Date();
-					const dateStr = d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate();
-					const seed = stringToSeed(username + dateStr);
-					const r1 = seededRandom(seed);
-					const level = levels[Math.floor(r1 * levels.length)];
-					const r2 = seededRandom(seed + 1);
-					let goodIndex = Math.floor(r2 * things.length);
-					const r3 = seededRandom(seed + 2);
-					let badIndex = Math.floor(r3 * things.length);
+					const now = new Date();
+					const dayIndex = Math.floor(
+						now.getTime() / 86400000
+					);
+					const baseSeed =
+						stringToSeed(username) ^
+						(dayIndex * 1145141);
+					const r1 = seededRandom(baseSeed);
+					let levelIndex =
+						Math.floor(r1 * levels.length);
+					const yesterdaySeed =
+						stringToSeed(username) ^
+						((dayIndex - 1) * 1145141);
+					const yesterdayRandom =
+						seededRandom(yesterdaySeed);
+					const yesterdayIndex =
+						Math.floor(yesterdayRandom * levels.length);
+					if (levelIndex === yesterdayIndex) {
+						levelIndex =
+							(levelIndex + 1) % levels.length;
+					}
+					const level = levels[levelIndex];
+					const r2 = seededRandom(baseSeed + 1);
+					let goodIndex =
+						Math.floor(r2 * things.length);
+					const r3 = seededRandom(baseSeed + 2);
+					let badIndex =
+						Math.floor(r3 * things.length);
 					if (goodIndex === badIndex) {
-						badIndex = (badIndex + 1) % things.length;
+						badIndex =
+							(badIndex + 1) % things.length;
 					}
 					return {
-						level: level,
+						level,
 						good: things[goodIndex],
 						bad: things[badIndex]
 					};
