@@ -2419,9 +2419,7 @@
 					const dayIndex = Math.floor(
 						now.getTime() / 86400000
 					);
-					const baseSeed =
-						stringToSeed(username) ^
-						(dayIndex * 1145141);
+					const baseSeed = (stringToSeed(username) + dayIndex * 9973) % 2147483647;
 					const r1 = seededRandom(baseSeed);
 					let levelIndex =
 						Math.floor(r1 * levels.length);
@@ -2436,7 +2434,7 @@
 						levelIndex =
 							(levelIndex + 1) % levels.length;
 					}
-					const level = levels[levelIndex];
+					const level = levels[levelIndex] || "中平";
 					const r2 = seededRandom(baseSeed + 1);
 					let goodIndex =
 						Math.floor(r2 * things.length);
