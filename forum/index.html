@@ -1898,6 +1898,10 @@
 							let liked = userVotes?.some(x => x.type == 1);
 							let disliked = userVotes?.some(x => x.type == -1);
 							const bgInfo = getPostBgInfo(p.content);
+							if (bgInfo.bg) {
+								postDiv.style.setProperty('--custom-bg', bgInfo.bg);
+								postDiv.classList.add('custom-bg');
+							}
 							const postContent = bgInfo.content;
 							const hasHtml = /<[^>]+>/.test(postContent);
 							const plainText = postContent.replace(/<[^>]*>/g, "");
@@ -2240,7 +2244,9 @@
 					container.innerHTML = "";
 					let {
 						data: posts
-					} = await supabase.from("posts").select("*").eq("author", uid);
+					} = await supabase.from("posts").select("*").eq("author", uid).order("time", {
+						ascending: true
+					});
 					const isSelf = currentUser && uid === currentUser.id;
 					for (let i = posts.length - 1; i >= 0; i--) {
 						let p = posts[i];
