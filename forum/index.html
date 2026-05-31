@@ -1865,10 +1865,6 @@
 							if (token !== currentLoadToken) return;
 							let postDiv = document.createElement("div");
 							postDiv.className = "post";
-							if (bgInfo.bg) {
-    							postDiv.style.setProperty('--custom-bg', bgInfo.bg);
-    							postDiv.classList.add('custom-bg');
-							}
 							let {
 								count: likeCount
 							} = await supabase
