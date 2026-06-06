@@ -895,6 +895,19 @@
 				display: inline;
 			}
 
+			.postWarnGate {
+				padding: 10px 12px;
+				border-radius: 12px;
+				background: rgba(255, 85, 0, 0.1);
+				border: 1px solid var(--bg);
+				line-height: 1.3;
+			}
+
+			.postWarnGate button {
+				width: 100%;
+				margin-top: 10px;
+			}
+
 			@keyframes loadingDot {
 
 				0%,
@@ -1167,8 +1180,7 @@
 			<div class="card" style="width:95%;max-width:600px;">
 				<textarea id="text" placeholder="发布新鲜事（最多5000字符）" style="width:100%;" maxlength="5000"></textarea>
 				<div style="display:flex;gap:6px;margin-top:8px;">
-					<input id="imgUrlInput" placeholder="图片链接（例如 https://xxx.com/xxx.jpg）"
-						style="flex:1;height:36px;font-size:14px;">
+					<input id="imgUrlInput" placeholder="图片链接" style="flex:1;height:36px;font-size:14px;">
 					<button id="insertImgBtn" type="button">插图</button>
 				</div>
 				<div class="tagBarContainer"
@@ -1176,6 +1188,12 @@
 					<div class="tagBar" id="tagBar" style="display:flex;gap:6px;flex-shrink:1;overflow-x:auto;"></div>
 					<input id="customTag" placeholder="自定义标签（你也可以不选择任何标签）"
 						style="height:36px;font-size:14px;flex-shrink:0;width:300px;" maxlength="10">
+				</div>
+				<div style="margin-top:8px;display:flex;align-items:center;gap:8px;">
+					<input type="checkbox" id="isSensitive" style="width:18px;height:18px;margin:0;">
+					<label for="isSensitive" style="cursor:pointer;font-size:14px;color:var(--sub);">
+						此帖子可能包含不适宜的内容
+					</label>
 				</div>
 				<div class="postBgRow">
 					<button id="bgBuyBtn" type="button">背景</button>
@@ -1547,6 +1565,7 @@
 					$("nav").classList.remove("hidden");
 					show("main");
 					renderPostFilters();
+					loadStats();
 					loadPosts(1);
 					modal("欢迎 <b>" + data.name + "</b> 来到 <b>Jacky</b> 论坛！");
 				};
@@ -1557,8 +1576,11 @@
 					let tag = custom || selectedTags[0] || null;
 					txt = sanitizePostHtml(txt);
 					let finalContent = txt;
+					if ($("isSensitive").checked) {
+						finalContent = `[[warn]]` + finalContent;
+					}
 					if (selectedPostBg) {
-						finalContent = `[[bg:${selectedPostBg}]]` + txt;
+						finalContent = `[[bg:${selectedPostBg}]]` + finalContent;
 					}
 					let {
 						error
@@ -1575,6 +1597,7 @@
 					selectedTags = [];
 					selectedPostBg = "";
 					$("bgBuyBtn").textContent = "背景";
+					$("isSensitive").checked = false;
 					show("main");
 					loadStats();
 					loadPosts(1);
@@ -1759,6 +1782,25 @@
 					pager.appendChild(makeBtn("»", maxPage, "navBtn", postPage >= maxPage));
 				}
 
+				function renderPostBody(box, content) {
+					const hasHtml = /<[^>]+>/.test(content);
+					const plainText = content.replace(/<[^>]*>/g, "");
+					const needFold = !hasHtml && plainText.length > 300;
+					const foldedText = needFold ? plainText.slice(0, 300) + "..." : plainText;
+					box.innerHTML = needFold ?
+						`<span class="longPostText">${foldedText}</span><button class="toggleLongPost inline">展开</button>` :
+						content;
+					const toggleBtn = box.querySelector(".toggleLongPost");
+					if (toggleBtn) {
+						let expanded = false;
+						toggleBtn.onclick = () => {
+							expanded = !expanded;
+							box.querySelector(".longPostText").innerHTML = expanded ? content : foldedText;
+							toggleBtn.textContent = expanded ? "收起" : "展开";
+						};
+					}
+				}
+
 				function renderPostFilters() {
 					const search = $("postSearch");
 					const tagBar = $("postTagBar");
@@ -1897,41 +1939,34 @@
 							if (token !== currentLoadToken) return;
 							let liked = userVotes?.some(x => x.type == 1);
 							let disliked = userVotes?.some(x => x.type == -1);
-							const bgInfo = getPostBgInfo(p.content);
-							if (bgInfo.bg) {
-								postDiv.style.setProperty('--custom-bg', bgInfo.bg);
-								postDiv.classList.add('custom-bg');
+							const meta = getPostMeta(p.content);
+							if (meta.bg) {
+								postDiv.style.setProperty("--custom-bg", meta.bg);
+								postDiv.classList.add("custom-bg");
 							}
-							const postContent = bgInfo.content;
-							const hasHtml = /<[^>]+>/.test(postContent);
-							const plainText = postContent.replace(/<[^>]*>/g, "");
-							const needFold = !hasHtml && plainText.length > 300;
-							const foldedText = needFold ? plainText.slice(0, 300) + "..." : plainText;
-							const contentHTML = needFold ?
-								`<span class="longPostText">${foldedText}</span><button class="toggleLongPost inline">展开</button>` :
-								postContent;
 							postDiv.innerHTML =
 								'<div class="postHeaderTop"><div class="userInfo">' +
 								'<span class="userLink" data-user="' + p.author + '">' +
 								(p.users?.name || "未知") +
 								'<span class="userLevel">' + getUserLevel(p.users?.coins || 0) + '</span>' +
-								'<span>' + getVerifiedBadge(p.users) + '</span>' + '</span>' +
+								'<span>' + getVerifiedBadge(p.users) + '</span>' +
+								'</span>' +
 								'<span class="time">' + new Date(p.time).toLocaleString() + '</span>' +
 								'</div></div>' +
 								'<div class="postTags">' +
 								(p.tag ? `<span class="postTag" data-tag="${p.tag}">${p.tag}</span>` : "") +
 								'</div>' +
-								'<div class="postContent">' + contentHTML + '</div>' +
+								'<div class="postContent"></div>' +
 								'<div class="postActions">' +
 								'<div class="voteGroup">' +
 								'<span class="like ' + (liked ? "liked" : "") + '" data-id="' + p.id + '">' +
 								'<svg viewBox="0 0 24 24" class="voteIcon"><path d="M12 21s-6.7-4.35-9.33-8A5.4 5.4 0 0 1 12 4.2A5.4 5.4 0 0 1 21.33 13C18.7 16.65 12 21 12 21z"/></svg> ' +
-								likeCount +
+								'<span class="voteNum">' + likeCount + '</span>' +
 								'</span>' +
 								'<span class="dislike ' + (disliked ? "disliked" : "") + '" data-dislike="' + p.id +
 								'">' +
 								'<svg viewBox="0 0 24 24" class="voteIcon"><path d="M12 21l-8-8h5V3h6v10h5l-8 8z"/></svg> ' +
-								dislikeCount +
+								'<span class="voteNum">' + dislikeCount + '</span>' +
 								'</span>' +
 								'</div>' +
 								(p.author === currentUser.id ? '<button data-del="' + p.id + '">删除</button>' : "") +
@@ -1940,8 +1975,21 @@
 								'<button data-comment="' + p.id + '">发送</button></div>' +
 								'<div class="commentList"></div>';
 							container.appendChild(postDiv);
-							postDiv.querySelector(".like").onclick = () => likePost(p.id);
-							postDiv.querySelector(".dislike").onclick = () => dislikePost(p.id);
+							const bodyBox = postDiv.querySelector(".postContent");
+							if (meta.warn) {
+								bodyBox.innerHTML =
+									'<div class="postWarnGate">' +
+									'<div>可能包含不适宜的内容</div>' +
+									'<button type="button" class="revealWarnBtn">显示内容</button>' +
+									'</div>';
+								bodyBox.querySelector(".revealWarnBtn").onclick = () => {
+									renderPostBody(bodyBox, meta.content);
+								};
+							} else {
+								renderPostBody(bodyBox, meta.content);
+							}
+							postDiv.querySelector(".like").onclick = () => likePost(p.id, postDiv);
+							postDiv.querySelector(".dislike").onclick = () => dislikePost(p.id, postDiv);
 							let delBtn = postDiv.querySelector("[data-del]");
 							if (delBtn) delBtn.onclick = () => deletePost(p.id);
 							postDiv.querySelector("[data-comment]").onclick = () => {
@@ -1957,16 +2005,6 @@
 									renderPostFilters();
 									loadStats();
 									loadPosts(1);
-								};
-							}
-							const toggleBtn = postDiv.querySelector(".toggleLongPost");
-							if (toggleBtn) {
-								let expanded = false;
-								toggleBtn.onclick = () => {
-									expanded = !expanded;
-									postDiv.querySelector(".longPostText").innerHTML =
-										expanded ? postContent : foldedText;
-									toggleBtn.textContent = expanded ? "收起" : "展开";
 								};
 							}
 							postDiv.querySelector(".userLink").onclick = () => viewUser(p.author);
@@ -2017,7 +2055,13 @@
 					loadPosts(postPage);
 					await changeCoins(currentUser.id, 3);
 				}
-				async function likePost(id) {
+				async function likePost(id, postDiv) {
+					const likeBtn = postDiv.querySelector(".like");
+					const dislikeBtn = postDiv.querySelector(".dislike");
+					const likeNumEl = likeBtn.querySelector(".voteNum");
+					const dislikeNumEl = dislikeBtn.querySelector(".voteNum");
+					let likeCount = parseInt(likeNumEl.textContent) || 0;
+					let dislikeCount = parseInt(dislikeNumEl.textContent) || 0;
 					let {
 						data
 					} = await supabase
@@ -2025,38 +2069,69 @@
 						.select("*")
 						.eq("postid", id)
 						.eq("liker", currentUser.id);
-					if (data.some(x => x.type === 1)) {
-						await supabase
-							.from("likes")
-							.delete()
-							.eq("postid", id)
-							.eq("liker", currentUser.id)
-							.eq("type", 1);
-						await changeCoins(currentUser.id, -1);
+					const hasLike = data.some(x => x.type === 1);
+					const hasDislike = data.some(x => x.type === -1);
+					const prevLikeCount = likeCount;
+					const prevDislikeCount = dislikeCount;
+					const prevLiked = likeBtn.classList.contains("liked");
+					const prevDisliked = dislikeBtn.classList.contains("disliked");
+					if (hasLike) {
+						likeCount = Math.max(0, likeCount - 1);
+						likeBtn.classList.remove("liked");
 					} else {
-						const hadDislike = data.some(x => x.type === -1);
-						await supabase
-							.from("likes")
-							.delete()
-							.eq("postid", id)
-							.eq("liker", currentUser.id)
-							.eq("type", -1);
-						await supabase
-							.from("likes")
-							.insert([{
-								postid: id,
-								liker: currentUser.id,
-								type: 1,
-								time: new Date().toISOString()
-							}]);
-						await changeCoins(
-							currentUser.id,
-							hadDislike ? 2 : 1
-						);
+						likeCount += 1;
+						likeBtn.classList.add("liked");
+						if (hasDislike) {
+							dislikeCount = Math.max(0, dislikeCount - 1);
+							dislikeBtn.classList.remove("disliked");
+						}
 					}
-					loadPosts(postPage);
+					likeNumEl.textContent = likeCount;
+					dislikeNumEl.textContent = dislikeCount;
+					try {
+						if (hasLike) {
+							await supabase
+								.from("likes")
+								.delete()
+								.eq("postid", id)
+								.eq("liker", currentUser.id)
+								.eq("type", 1);
+							await changeCoins(currentUser.id, -1);
+						} else {
+							await supabase
+								.from("likes")
+								.delete()
+								.eq("postid", id)
+								.eq("liker", currentUser.id)
+								.eq("type", -1);
+
+							await supabase
+								.from("likes")
+								.insert([{
+									postid: id,
+									liker: currentUser.id,
+									type: 1,
+									time: new Date().toISOString()
+								}]);
+
+							await changeCoins(currentUser.id, hasDislike ? 2 : 1);
+						}
+					} catch (e) {
+						console.error(e);
+						likeNumEl.textContent = prevLikeCount;
+						dislikeNumEl.textContent = prevDislikeCount;
+						likeBtn.classList.toggle("liked", prevLiked);
+						dislikeBtn.classList.toggle("disliked", prevDisliked);
+						modal("点赞失败：" + e.message);
+					}
 				}
-				async function dislikePost(id) {
+				async function dislikePost(id, postDiv) {
+					const likeBtn = postDiv.querySelector(".like");
+					const dislikeBtn = postDiv.querySelector(".dislike");
+					const likeNumEl = likeBtn.querySelector(".voteNum");
+					const dislikeNumEl = dislikeBtn.querySelector(".voteNum");
+					let likeCount = parseInt(likeNumEl.textContent) || 0;
+					let dislikeCount = parseInt(dislikeNumEl.textContent) || 0;
 					let {
 						data
 					} = await supabase
@@ -2064,36 +2139,59 @@
 						.select("*")
 						.eq("postid", id)
 						.eq("liker", currentUser.id);
-					if (data.some(x => x.type === -1)) {
-						await supabase
-							.from("likes")
-							.delete()
-							.eq("postid", id)
-							.eq("liker", currentUser.id)
-							.eq("type", -1);
-						await changeCoins(currentUser.id, 1);
+					const hasLike = data.some(x => x.type === 1);
+					const hasDislike = data.some(x => x.type === -1);
+					const prevLikeCount = likeCount;
+					const prevDislikeCount = dislikeCount;
+					const prevLiked = likeBtn.classList.contains("liked");
+					const prevDisliked = dislikeBtn.classList.contains("disliked");
+					if (hasDislike) {
+						dislikeCount = Math.max(0, dislikeCount - 1);
+						dislikeBtn.classList.remove("disliked");
 					} else {
-						const hadLike = data.some(x => x.type === 1);
-						await supabase
-							.from("likes")
-							.delete()
-							.eq("postid", id)
-							.eq("liker", currentUser.id)
-							.eq("type", 1);
-						await supabase
-							.from("likes")
-							.insert([{
-								postid: id,
-								liker: currentUser.id,
-								type: -1,
-								time: new Date().toISOString()
-							}]);
-						await changeCoins(
-							currentUser.id,
-							hadLike ? -2 : -1
-						);
+						dislikeCount += 1;
+						dislikeBtn.classList.add("disliked");
+						if (hasLike) {
+							likeCount = Math.max(0, likeCount - 1);
+							likeBtn.classList.remove("liked");
+						}
 					}
-					loadPosts(postPage);
+					likeNumEl.textContent = likeCount;
+					dislikeNumEl.textContent = dislikeCount;
+					try {
+						if (hasDislike) {
+							await supabase
+								.from("likes")
+								.delete()
+								.eq("postid", id)
+								.eq("liker", currentUser.id)
+								.eq("type", -1);
+							await changeCoins(currentUser.id, 1);
+						} else {
+							await supabase
+								.from("likes")
+								.delete()
+								.eq("postid", id)
+								.eq("liker", currentUser.id)
+								.eq("type", 1);
+							await supabase
+								.from("likes")
+								.insert([{
+									postid: id,
+									liker: currentUser.id,
+									type: -1,
+									time: new Date().toISOString()
+								}]);
+							await changeCoins(currentUser.id, hasLike ? -2 : -1);
+						}
+					} catch (e) {
+						console.error(e);
+						likeNumEl.textContent = prevLikeCount;
+						dislikeNumEl.textContent = prevDislikeCount;
+						likeBtn.classList.toggle("liked", prevLiked);
+						dislikeBtn.classList.toggle("disliked", prevDisliked);
+						modal("踩帖失败：" + e.message);
+					}
 				}
 				async function deletePost(id) {
 					let {
@@ -2121,16 +2219,30 @@
 					loadPosts(1);
 				}
 
-				function getPostBgInfo(content) {
-					const text = String(content || "");
-					const match = text.match(/^\[\[bg:(.+?)\]\]/);
-					if (!match) return {
-						bg: null,
-						content: text
-					};
+				function getPostMeta(content) {
+					let text = String(content || "");
+					let bg = null;
+					let warn = false;
+					let changed = true;
+					while (changed) {
+						changed = false;
+						const bgMatch = text.match(/^\[\[bg:(.+?)\]\]/);
+						if (bgMatch) {
+							bg = bgMatch[1];
+							text = text.slice(bgMatch[0].length);
+							changed = true;
+							continue;
+						}
+						if (text.startsWith("[[warn]]")) {
+							warn = true;
+							text = text.slice(8);
+							changed = true;
+						}
+					}
 					return {
-						bg: match[1],
-						content: text.slice(match[0].length)
+						bg,
+						warn,
+						content: text
 					};
 				}
 
@@ -2251,18 +2363,32 @@
 					for (let i = posts.length - 1; i >= 0; i--) {
 						let p = posts[i];
 						let div = document.createElement("div");
-						const bgInfo = getPostBgInfo(p.content);
+						const meta = getPostMeta(p.content);
 						div.className = "post";
-						if (bgInfo.bg) {
-							div.style.setProperty('--custom-bg', bgInfo.bg);
-							div.classList.add('custom-bg');
+						if (meta.bg) {
+							div.style.setProperty("--custom-bg", meta.bg);
+							div.classList.add("custom-bg");
 						}
 						div.innerHTML =
 							'<span class="time">' + new Date(p.time).toLocaleString() + '</span>' +
-							'<div class="postContent">' + bgInfo.content + '</div>' +
+							'<div class="postContent"></div>' +
 							'<div class="postActions">' +
 							(isSelf ? '<button class="deleteBtn" data-del="' + p.id + '">删除</button>' : '') +
 							'</div>';
+						const bodyBox = div.querySelector(".postContent");
+						if (meta.warn) {
+							bodyBox.innerHTML = `
+								<div class="postWarnGate">
+									<div>本帖子可能包含引起不适的内容</div>
+									<button type="button" class="revealWarnBtn">显示内容</button>
+								</div>
+							`;
+							bodyBox.querySelector(".revealWarnBtn").onclick = () => {
+								renderPostBody(bodyBox, meta.content);
+							};
+						} else {
+							renderPostBody(bodyBox, meta.content);
+						}
 						container.appendChild(div);
 						const delBtn = div.querySelector("[data-del]");
 						if (delBtn) {
@@ -2307,6 +2433,17 @@
 					show("profilePage");
 				}
 				async function changeCoins(uid, amount) {
+					const {
+						data: user
+					} = await supabase
+						.from("users")
+						.select("coin_ban")
+						.eq("id", uid)
+						.single();
+					if (user?.coin_ban) {
+						showCoinMsg(`你已被禁止获得金币！`);
+						return false;
+					}
 					let {
 						data
 					} = await supabase
@@ -2530,7 +2667,6 @@
 				})();
 			});
 			document.addEventListener("contextmenu", e => e.preventDefault());
-			/*© Jacky Forum. All rights reserved.*/
 		</script>
 	</body>
 </html>
