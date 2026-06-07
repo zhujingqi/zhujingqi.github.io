@@ -482,6 +482,24 @@
 				height: auto;
 			}
 
+			.commentFoldBtn {
+				margin-top: 6px;
+				width: 100%;
+				height: 32px;
+				font-size: 14px;
+				border-radius: 20px;
+			}
+
+			.commentExtra {
+				max-height: 0;
+				overflow: hidden;
+				transition: max-height .4s ease;
+			}
+
+			.commentExtra.show {
+				max-height: 2000px;
+			}
+
 			::-webkit-scrollbar {
 				width: 10px;
 				background: transparent;
@@ -1349,6 +1367,7 @@
 					"其它"
 				];
 				let searchTimer = null;
+				const commentExpandedMap = {};
 
 				function renderTagBar() {
 					const bar = $("tagBar");
@@ -2154,7 +2173,8 @@
 				}
 				async function renderComments(postId, container) {
 					container.innerHTML = "";
-					let {
+					const expanded = !!commentExpandedMap[postId];
+					const {
 						data
 					} = await supabase
 						.from("comments")
@@ -2163,23 +2183,70 @@
 						.order("id", {
 							ascending: true
 						});
-					for (let c of data) {
+					const comments = data || [];
+					const visible = comments.slice(0, 5);
+					const extra = comments.slice(5);
+					for (let c of visible) {
 						let div = document.createElement("div");
 						div.className = "comment";
 						div.innerHTML =
 							`<b class="userLink" data-user="${c.author}">${c.users.name}` +
-							`<span class="userLevel">` + getUserLevel(c.users?.coins || 0) +
-							`</span>` + getVerifiedBadge(c.users) + `</b>` + `: ${c.content}` +
+							`<span class="userLevel">${getUserLevel(c.users?.coins || 0)}</span>` +
+							getVerifiedBadge(c.users) +
+							`</b>: ${c.content}` +
 							(c.author === currentUser.id ?
-								`<button class="commentDel" data-cdel="${c.id}">删除</button>` : "");
+								`<button class="commentDel" data-cdel="${c.id}">删除</button>` :
+								"");
 						container.appendChild(div);
 						div.querySelector(".userLink").onclick = () => viewUser(c.author);
-						let del = div.querySelector("[data-cdel]");
-						if (del) del.onclick = async () => {
-							await supabase.from("comments").delete().eq("id", c.id);
-							renderComments(postId, container);
-							await changeCoins(currentUser.id, -3);
+						const del = div.querySelector("[data-cdel]");
+						if (del) {
+							del.onclick = async () => {
+								await supabase.from("comments").delete().eq("id", c.id);
+								renderComments(postId, container);
+								await changeCoins(currentUser.id, -3);
+							};
+						}
+					}
+					if (extra.length) {
+						const extraBox = document.createElement("div");
+						extraBox.className = "commentExtra" + (expanded ? " show" : "");
+						container.appendChild(extraBox);
+						for (let c of extra) {
+							let div = document.createElement("div");
+							div.className = "comment";
+							div.innerHTML =
+								`<b class="userLink" data-user="${c.author}">${c.users.name}` +
+								`<span class="userLevel">${getUserLevel(c.users?.coins || 0)}</span>` +
+								getVerifiedBadge(c.users) +
+								`</b>: ${c.content}` +
+								(c.author === currentUser.id ?
+									`<button class="commentDel" data-cdel="${c.id}">删除</button>` :
+									"");
+							extraBox.appendChild(div);
+							div.querySelector(".userLink").onclick = () => viewUser(c.author);
+							const del = div.querySelector("[data-cdel]");
+							if (del) {
+								del.onclick = async () => {
+									await supabase.from("comments").delete().eq("id", c.id);
+									renderComments(postId, container);
+									await changeCoins(currentUser.id, -3);
+								};
+							}
+						}
+						const btn = document.createElement("button");
+						btn.className = "commentFoldBtn";
+						btn.textContent = expanded ?
+							`收起评论（共 ${comments.length} 条）` :
+							`展开评论（共 ${comments.length} 条）`;
+						btn.onclick = () => {
+							commentExpandedMap[postId] = !expanded;
+							extraBox.classList.toggle("show");
+							btn.textContent = commentExpandedMap[postId] ?
+								`收起评论（共 ${comments.length} 条）` :
+								`展开评论（共 ${comments.length} 条）`;
 						};
+						container.appendChild(btn);
 					}
 				}
 				async function addComment(id, text) {
@@ -2189,7 +2256,10 @@
 						author: currentUser.id,
 						time: new Date().toISOString()
 					}]);
-					loadPosts(postPage);
+					const postDiv = document.querySelector(`.post [data-comment="${id}"]`)?.closest(".post");
+					if (postDiv) {
+						renderComments(id, postDiv.querySelector(".commentList"));
+					}
 					await changeCoins(currentUser.id, 3);
 				}
 				async function likePost(id, postDiv) {
