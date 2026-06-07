@@ -138,19 +138,6 @@
 				padding-bottom: 20px;
 			}
 
-			#logo {
-				font-size: 40px;
-				font-weight: bold;
-				padding: 20px;
-				text-align: center;
-				color: var(--green);
-			}
-
-			#logo img {
-				width: 80px;
-				height: 80px;
-			}
-
 			#pname {
 				font-size: 40px;
 			}
@@ -908,6 +895,62 @@
 				margin-top: 10px;
 			}
 
+			#logoRow {
+				width: 100%;
+				max-width: 800px;
+				padding: 20px 20px 8px 20px;
+				box-sizing: border-box;
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				gap: 10px;
+				flex-wrap: wrap;
+			}
+
+			#logo {
+				font-size: 40px;
+				font-weight: bold;
+				color: var(--green);
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 0;
+				text-align: left;
+			}
+
+			#logo img {
+				width: 80px;
+				height: 80px;
+			}
+
+			#onlineMini {
+				height: 36px;
+				padding: 0 14px;
+				border-radius: 999px;
+				background: var(--card);
+				color: var(--text);
+				border: 1px solid #ccc;
+				font-size: 14px;
+				white-space: nowrap;
+			}
+
+			#onlineMini:hover {
+				background: var(--green);
+				color: #fff;
+			}
+
+			.onlineUser {
+				padding: 8px 10px;
+				border-radius: 10px;
+				cursor: pointer;
+				margin-bottom: 4px;
+				transition: .15s;
+			}
+
+			.onlineUser:hover {
+				background: var(--bg);
+			}
+
 			@keyframes loadingDot {
 
 				0%,
@@ -934,14 +977,8 @@
 					padding-bottom: 40px;
 				}
 
-				#logo,
 				#pname {
 					font-size: 30px;
-				}
-
-				#logo img {
-					width: 50px;
-					height: 50px;
 				}
 
 				.big {
@@ -1062,6 +1099,25 @@
 				.postTagChip {
 					font-size: 12px;
 				}
+
+				#logoRow {
+					padding: 16px 12px 6px 12px;
+				}
+
+				#logo {
+					font-size: 30px;
+				}
+
+				#logo img {
+					width: 50px;
+					height: 50px;
+				}
+
+				#onlineMini {
+					height: 32px;
+					font-size: 12px;
+					padding: 0 10px;
+				}
 			}
 		</style>
 	</head>
@@ -1114,9 +1170,19 @@
 			</div>
 		</div>
 		<div id="main" class="hidden">
-			<div id="logo">
-				<img src="icon.svg" />
-				Jacky 论坛
+			<div id="logoRow">
+				<div id="logo">
+					<img src="icon.svg" />
+					Jacky 论坛
+				</div>
+				<button id="onlineMini" type="button">在线 0</button>
+			</div>
+			<div id="postFilterBar" class="postFilterBar">
+				<div class="searchRow">
+					<input id="postSearch" class="postSearch" placeholder="搜索帖子内容或标签...">
+					<button id="searchBtn">搜索</button>
+				</div>
+				<div id="postTagBar" class="postTagBar"></div>
 			</div>
 			<div id="notice">
 				<button id="toggleNoticeBtn" class="helpBtn"
@@ -1129,13 +1195,13 @@
 				<div class="noticeItem">
 					<details>
 						<summary><b>近期更新</b></summary>
+						· 在线人数和用户<br>
+						· 点赞 / 踩 不刷新页面<br>
+						· 勾选不适宜内容<br>
 						· 彻底解决帖子重复加载特性<br>
 						· 快速跳转最后一页<br>
 						· 踩帖子功能<br>
 						· 发帖插入图片<br>
-						· 折叠帖子<br>
-						· 可折叠的公告栏<br>
-						· 全站统计用户数与帖子数<br>
 					</details>
 				</div>
 				<br>
@@ -1165,13 +1231,6 @@
 						<b>忌：</b><span id="fortuneBad"></span>
 					</div>
 				</div>
-			</div>
-			<div id="postFilterBar" class="postFilterBar">
-				<div class="searchRow">
-					<input id="postSearch" class="postSearch" placeholder="搜索帖子内容或标签...">
-					<button id="searchBtn">搜索</button>
-				</div>
-				<div id="postTagBar" class="postTagBar"></div>
 			</div>
 			<div id="posts"></div>
 			<div id="postPager" class="pager"></div>
@@ -1342,6 +1401,7 @@
 				}
 
 				function show(p) {
+					currentPage = p;
 					["welcomePage", "registerPage", "main", "editorPage", "profilePage", "userListPage"]
 					.forEach(id => $(id).classList.add("hidden"));
 					$(p).classList.remove("hidden");
@@ -1375,6 +1435,8 @@
 					renderPostFilters();
 					loadStats();
 					loadPosts(1);
+					loadOnlineUsers();
+					startPresence();
 					setActive("homeBtn");
 				};
 				$("editorBtn").onclick = () => {
@@ -1411,6 +1473,7 @@
 				$("goRegister").onclick = () => show("registerPage");
 				$("backLogin").onclick = () => show("welcomePage");
 				$("logoutBtn").onclick = () => {
+					stopPresence();
 					localStorage.removeItem("loginUser");
 					currentUser = null;
 					$("nav").classList.add("hidden");
@@ -1567,6 +1630,8 @@
 					renderPostFilters();
 					loadStats();
 					loadPosts(1);
+					loadOnlineUsers();
+					startPresence();
 					modal("欢迎 <b>" + data.name + "</b> 来到 <b>Jacky</b> 论坛！");
 				};
 				$("sendBtn").onclick = async () => {
@@ -1799,6 +1864,78 @@
 							toggleBtn.textContent = expanded ? "收起" : "展开";
 						};
 					}
+				}
+				let presenceTimer = null;
+				async function touchPresence() {
+					if (!currentUser) return;
+					await supabase.from("users").update({
+						last_seen: new Date().toISOString()
+					}).eq("id", currentUser.id);
+				}
+				let onlineUsersCache = [];
+				async function loadOnlineUsers() {
+					const mini = $("onlineMini");
+					if (!mini) return;
+					const cutoff = new Date(Date.now() - 2 * 60 * 1000).toISOString();
+					const {
+						data,
+						error
+					} = await supabase
+						.from("users")
+						.select("id, name, last_seen, coins")
+						.gte("last_seen", cutoff)
+						.order("last_seen", {
+							ascending: false
+						})
+						.limit(10);
+					if (error) return;
+					onlineUsersCache = data || [];
+					mini.textContent = `在线 ${onlineUsersCache.length}`;
+					mini.onclick = () => {
+						if (!onlineUsersCache.length) {
+							modal("当前没有在线用户");
+							return;
+						}
+						document.querySelector(".modalBox").style.width = "320px";
+						modal(`
+							<h3>当前在线 ${onlineUsersCache.length} 人</h3>
+							<div id="onlineUserList"
+								 style="text-align:left;max-height:320px;overflow:auto;padding-right:4px;">
+								${onlineUsersCache.map(u => `
+									<div class="onlineUser" data-user="${u.id}">
+										${u.name}
+										<span class="userLevel">
+											${getUserLevel(u.coins || 0)}
+										</span>
+									</div>
+								`).join("")}
+							</div>
+						`);
+						setTimeout(() => {
+							document.querySelectorAll(".onlineUser").forEach(el => {
+								el.onclick = () => {
+									$("modal").classList.add("hidden");
+									viewUser(Number(el.dataset.user));
+								};
+							});
+						}, 0);
+					};
+				}
+
+				function startPresence() {
+					stopPresence();
+					touchPresence();
+					presenceTimer = setInterval(() => {
+						if (document.visibilityState === "visible" && currentUser) {
+							touchPresence();
+							if (currentPage === "main") loadOnlineUsers();
+						}
+					}, 60 * 1000);
+				}
+
+				function stopPresence() {
+					if (presenceTimer) clearInterval(presenceTimer);
+					presenceTimer = null;
 				}
 
 				function renderPostFilters() {
@@ -2629,6 +2766,12 @@
 						openViewer(img.src);
 					}
 				});
+				document.addEventListener("visibilitychange", () => {
+					if (document.visibilityState === "visible" && currentUser) {
+						touchPresence();
+						if (currentPage === "main") loadOnlineUsers();
+					}
+				});
 				(async () => {
 					const mask = document.createElement("div");
 					mask.className = "loadingMask";
@@ -2653,6 +2796,8 @@
 								show("main");
 								renderPostFilters();
 								loadStats();
+								loadOnlineUsers();
+								startPresence();
 								loadPosts(1);
 							} else {
 								show("welcomePage");
