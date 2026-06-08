@@ -482,24 +482,6 @@
 				height: auto;
 			}
 
-			.commentFoldBtn {
-				margin-top: 6px;
-				width: 100%;
-				height: 32px;
-				font-size: 14px;
-				border-radius: 20px;
-			}
-
-			.commentExtra {
-				max-height: 0;
-				overflow: hidden;
-				transition: max-height .4s ease;
-			}
-
-			.commentExtra.show {
-				max-height: 2000px;
-			}
-
 			::-webkit-scrollbar {
 				width: 10px;
 				background: transparent;
@@ -624,11 +606,11 @@
 				display: inline-flex;
 				align-items: center;
 				justify-content: center;
-				height: 18px;
+				height: 16px;
 				padding: 0 6px;
 				margin-left: 6px;
 				border-radius: 999px;
-				font-size: 12px;
+				font-size: 10px;
 				font-weight: 700;
 				background-color: #00aaff;
 				color: #fff;
@@ -969,6 +951,50 @@
 				background: var(--bg);
 			}
 
+			.sensitiveWrap {
+				margin-top: 8px;
+				display: flex;
+				flex-direction: column;
+				gap: 8px;
+			}
+
+			.sensitiveRow {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				flex-wrap: wrap;
+			}
+
+			.warnText {
+				width: 100%;
+				height: 36px;
+				font-size: 14px;
+				margin: 0;
+				display: none;
+			}
+
+			.warnText.show {
+				display: block;
+			}
+
+			.voteWhoRow {
+				display: flex;
+				gap: 10px;
+				margin-top: 6px;
+				font-size: 12px;
+				color: var(--sub);
+				flex-wrap: wrap;
+			}
+
+			.voteWhoLink {
+				cursor: pointer;
+				user-select: none;
+			}
+
+			.voteWhoLink:hover {
+				color: var(--green);
+			}
+
 			@keyframes loadingDot {
 
 				0%,
@@ -1136,6 +1162,24 @@
 					font-size: 12px;
 					padding: 0 10px;
 				}
+
+				.warnText {
+					height: 34px;
+					font-size: 13px;
+					padding: 0 10px;
+				}
+
+				.sensitiveRow {
+					align-items: flex-start;
+				}
+
+				.sensitiveRow label {
+					font-size: 12px;
+				}
+
+				.voteWhoRow {
+					font-size: 11px;
+				}
 			}
 		</style>
 	</head>
@@ -1213,13 +1257,12 @@
 				<div class="noticeItem">
 					<details>
 						<summary><b>近期更新</b></summary>
+						· 显示点赞、踩帖的具体用户
+						· 评论不刷新
+						· 自定义不适宜遮罩内容
+						· 取消折叠评论功能
 						· 在线人数和用户<br>
 						· 点赞 / 踩 不刷新页面<br>
-						· 勾选不适宜内容<br>
-						· 彻底解决帖子重复加载特性<br>
-						· 快速跳转最后一页<br>
-						· 踩帖子功能<br>
-						· 发帖插入图片<br>
 					</details>
 				</div>
 				<br>
@@ -1266,11 +1309,14 @@
 					<input id="customTag" placeholder="自定义标签（你也可以不选择任何标签）"
 						style="height:36px;font-size:14px;flex-shrink:0;width:300px;" maxlength="10">
 				</div>
-				<div style="margin-top:8px;display:flex;align-items:center;gap:8px;">
-					<input type="checkbox" id="isSensitive" style="width:18px;height:18px;margin:0;">
-					<label for="isSensitive" style="cursor:pointer;font-size:14px;color:var(--sub);">
-						此帖子可能包含不适宜的内容
-					</label>
+				<div class="sensitiveWrap">
+					<div class="sensitiveRow">
+						<input type="checkbox" id="isSensitive" style="width:18px;height:18px;margin:0;">
+						<label for="isSensitive" style="cursor:pointer;font-size:14px;color:var(--sub);">
+							此帖子可能包含不适宜的内容
+						</label>
+					</div>
+					<input id="warnText" class="warnText" placeholder="自定义遮罩显示文字（可不填）" maxlength="40">
 				</div>
 				<div class="postBgRow">
 					<button id="bgBuyBtn" type="button">背景</button>
@@ -1367,7 +1413,6 @@
 					"其它"
 				];
 				let searchTimer = null;
-				const commentExpandedMap = {};
 
 				function renderTagBar() {
 					const bar = $("tagBar");
@@ -1572,6 +1617,17 @@
 				};
 				$("bgBuyBtn").textContent = selectedPostBg ? "已使用" : "背景";
 				$("bgBuyBtn").onclick = openPostBgPicker;
+				const warnTextInput = $("warnText");
+				$("isSensitive").onchange = () => {
+					if (!warnTextInput) return;
+					if ($("isSensitive").checked) {
+						warnTextInput.classList.add("show");
+						warnTextInput.focus();
+					} else {
+						warnTextInput.classList.remove("show");
+						warnTextInput.value = "";
+					}
+				};
 				$("insertImgBtn").onclick = () => {
 					const url = $("imgUrlInput").value.trim();
 					if (!url) return modal("请输入图片链接");
@@ -1661,7 +1717,8 @@
 					txt = sanitizePostHtml(txt);
 					let finalContent = txt;
 					if ($("isSensitive").checked) {
-						finalContent = `[[warn]]` + finalContent;
+						const warnText = $("warnText").value.trim().replace(/\s+/g, " ") || "可能包含不适宜内容";
+						finalContent = `[[warn:${warnText}]]` + finalContent;
 					}
 					if (selectedPostBg) {
 						finalContent = `[[bg:${selectedPostBg}]]` + finalContent;
@@ -1682,6 +1739,8 @@
 					selectedPostBg = "";
 					$("bgBuyBtn").textContent = "背景";
 					$("isSensitive").checked = false;
+					$("warnText").value = "";
+					$("warnText").classList.remove("show");
 					show("main");
 					loadStats();
 					loadPosts(1);
@@ -2125,6 +2184,12 @@
 								'<span class="voteNum">' + dislikeCount + '</span>' +
 								'</span>' +
 								'</div>' +
+								'<div class="voteWhoRow">' +
+								'<span class="voteWhoLink" data-vote-list="like" data-post="' + p.id +
+								'">点赞者</span>' +
+								'<span class="voteWhoLink" data-vote-list="dislike" data-post="' + p.id +
+								'">踩帖者</span>' +
+								'</div>' +
 								(p.author === currentUser.id ? '<button data-del="' + p.id + '">删除</button>' : "") +
 								'</div>' +
 								'<div class="commentRow"><input data-input="' + p.id + '" placeholder="评论...">' +
@@ -2135,15 +2200,19 @@
 							if (meta.warn) {
 								bodyBox.innerHTML =
 									'<div class="postWarnGate">' +
-									'<div>可能包含不适宜的内容</div>' +
+									'<div class="warnMsg"></div>' +
 									'<button type="button" class="revealWarnBtn">显示内容</button>' +
 									'</div>';
+								bodyBox.querySelector(".warnMsg").textContent = meta.warnText || "可能包含不适宜的内容";
 								bodyBox.querySelector(".revealWarnBtn").onclick = () => {
 									renderPostBody(bodyBox, meta.content);
 								};
 							} else {
 								renderPostBody(bodyBox, meta.content);
 							}
+							postDiv.querySelectorAll("[data-vote-list]").forEach(el => {
+								el.onclick = () => openVotePeople(p.id, el.dataset.voteList);
+							});
 							postDiv.querySelector(".like").onclick = () => likePost(p.id, postDiv);
 							postDiv.querySelector(".dislike").onclick = () => dislikePost(p.id, postDiv);
 							let delBtn = postDiv.querySelector("[data-del]");
@@ -2173,7 +2242,6 @@
 				}
 				async function renderComments(postId, container) {
 					container.innerHTML = "";
-					const expanded = !!commentExpandedMap[postId];
 					const {
 						data
 					} = await supabase
@@ -2184,21 +2252,22 @@
 							ascending: true
 						});
 					const comments = data || [];
-					const visible = comments.slice(0, 5);
-					const extra = comments.slice(5);
-					for (let c of visible) {
+					for (let c of comments) {
 						let div = document.createElement("div");
 						div.className = "comment";
 						div.innerHTML =
-							`<b class="userLink" data-user="${c.author}">${c.users.name}` +
+							`<b class="userLink" data-user="${c.author}">${c.users?.name || "未知"}` +
 							`<span class="userLevel">${getUserLevel(c.users?.coins || 0)}</span>` +
 							getVerifiedBadge(c.users) +
 							`</b>: ${c.content}` +
-							(c.author === currentUser.id ?
+							(currentUser && c.author === currentUser.id ?
 								`<button class="commentDel" data-cdel="${c.id}">删除</button>` :
 								"");
 						container.appendChild(div);
-						div.querySelector(".userLink").onclick = () => viewUser(c.author);
+						const userLink = div.querySelector(".userLink");
+						if (userLink) {
+							userLink.onclick = () => viewUser(c.author);
+						}
 						const del = div.querySelector("[data-cdel]");
 						if (del) {
 							del.onclick = async () => {
@@ -2208,46 +2277,48 @@
 							};
 						}
 					}
-					if (extra.length) {
-						const extraBox = document.createElement("div");
-						extraBox.className = "commentExtra" + (expanded ? " show" : "");
-						container.appendChild(extraBox);
-						for (let c of extra) {
-							let div = document.createElement("div");
-							div.className = "comment";
-							div.innerHTML =
-								`<b class="userLink" data-user="${c.author}">${c.users.name}` +
-								`<span class="userLevel">${getUserLevel(c.users?.coins || 0)}</span>` +
-								getVerifiedBadge(c.users) +
-								`</b>: ${c.content}` +
-								(c.author === currentUser.id ?
-									`<button class="commentDel" data-cdel="${c.id}">删除</button>` :
-									"");
-							extraBox.appendChild(div);
-							div.querySelector(".userLink").onclick = () => viewUser(c.author);
-							const del = div.querySelector("[data-cdel]");
-							if (del) {
-								del.onclick = async () => {
-									await supabase.from("comments").delete().eq("id", c.id);
-									renderComments(postId, container);
-									await changeCoins(currentUser.id, -3);
-								};
-							}
-						}
-						const btn = document.createElement("button");
-						btn.className = "commentFoldBtn";
-						btn.textContent = expanded ?
-							`收起评论（共 ${comments.length} 条）` :
-							`展开评论（共 ${comments.length} 条）`;
-						btn.onclick = () => {
-							commentExpandedMap[postId] = !expanded;
-							extraBox.classList.toggle("show");
-							btn.textContent = commentExpandedMap[postId] ?
-								`收起评论（共 ${comments.length} 条）` :
-								`展开评论（共 ${comments.length} 条）`;
-						};
-						container.appendChild(btn);
+				}
+				async function openVotePeople(postId, kind) {
+					const {
+						data,
+						error
+					} = await supabase
+						.from("likes")
+						.select("type, time, users:liker(id, name, coins)")
+						.eq("postid", postId)
+						.order("time", {
+							ascending: true
+						});
+					if (error) {
+						modal("读取失败：" + error.message);
+						return;
 					}
+					const rows = (data || []).filter(x => x.type === (kind === "like" ? 1 : -1));
+					document.querySelector(".modalBox").style.width = "360px";
+					modal(`
+						<h3>谁${kind === "like" ? "赞了" : "踩了"}</h3>
+						<div style="max-height:320px;overflow:auto;text-align:left;">
+							${
+								rows.length
+									? rows.map(x => `
+										<div class="onlineUser" data-user="${x.users?.id}">
+											${x.users?.name || "未知"}
+											<span class="userLevel">${getUserLevel(x.users?.coins || 0)}</span>
+											${getVerifiedBadge(x.users)}
+										</div>
+									`).join("")
+									: `<div style="color:var(--sub);padding:8px 0;">暂无</div>`
+							}
+						</div>
+					`);
+					setTimeout(() => {
+						document.querySelectorAll(".onlineUser").forEach(el => {
+							el.onclick = () => {
+								$("modal").classList.add("hidden");
+								viewUser(Number(el.dataset.user));
+							};
+						});
+					}, 0);
 				}
 				async function addComment(id, text) {
 					await supabase.from("comments").insert([{
@@ -2256,8 +2327,15 @@
 						author: currentUser.id,
 						time: new Date().toISOString()
 					}]);
-					const postDiv = document.querySelector(`.post [data-comment="${id}"]`)?.closest(".post");
+					const postDiv = document.querySelector(
+						`.post [data-comment="${id}"]`
+					)?.closest(".post");
 					if (postDiv) {
+						const input = postDiv.querySelector("[data-input]");
+						if (input) {
+							input.value = "";
+							input.blur();
+						}
 						renderComments(id, postDiv.querySelector(".commentList"));
 					}
 					await changeCoins(currentUser.id, 3);
@@ -2430,6 +2508,7 @@
 					let text = String(content || "");
 					let bg = null;
 					let warn = false;
+					let warnText = "可能包含不适宜的内容";
 					let changed = true;
 					while (changed) {
 						changed = false;
@@ -2440,15 +2519,18 @@
 							changed = true;
 							continue;
 						}
-						if (text.startsWith("[[warn]]")) {
+						const warnMatch = text.match(/^\[\[warn(?::([^\]]+))?\]\]/);
+						if (warnMatch) {
 							warn = true;
-							text = text.slice(8);
+							warnText = warnMatch[1] || warnText;
+							text = text.slice(warnMatch[0].length);
 							changed = true;
 						}
 					}
 					return {
 						bg,
 						warn,
+						warnText,
 						content: text
 					};
 				}
@@ -2558,6 +2640,7 @@
 					<p>3. 点赞 +1 金币</p>
 					<p>4. 踩 + (-1) 金币</p>
 					<p>5. 删除帖子、内容或取消点赞，减少对应数量金币</p>
+					<p>金币用途：提升等级、购买彩色帖子背景</p>
 						`);
 					}
 					container.innerHTML = "";
@@ -2584,12 +2667,12 @@
 							'</div>';
 						const bodyBox = div.querySelector(".postContent");
 						if (meta.warn) {
-							bodyBox.innerHTML = `
-								<div class="postWarnGate">
-									<div>本帖子可能包含引起不适的内容</div>
-									<button type="button" class="revealWarnBtn">显示内容</button>
-								</div>
-							`;
+							bodyBox.innerHTML =
+								'<div class="postWarnGate">' +
+								'<div class="warnMsg"></div>' +
+								'<button type="button" class="revealWarnBtn">显示内容</button>' +
+								'</div>';
+							bodyBox.querySelector(".warnMsg").textContent = meta.warnText || "可能包含不适宜的内容";
 							bodyBox.querySelector(".revealWarnBtn").onclick = () => {
 								renderPostBody(bodyBox, meta.content);
 							};
