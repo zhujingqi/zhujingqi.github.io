@@ -952,6 +952,14 @@
 				background: var(--bg);
 			}
 
+			.onlineAvatar {
+				width: 22px;
+				height: 22px;
+				border-radius: 50%;
+				object-fit: cover;
+				flex-shrink: 0;
+			}
+
 			.sensitiveWrap {
 				margin-top: 8px;
 				display: flex;
@@ -1080,6 +1088,16 @@
 				line-height: 1.5;
 			}
 
+			.rankAvatar {
+				width: 28px;
+				height: 28px;
+				flex: 0 0 auto;
+			}
+
+			#fortuneToggleBtn {
+				display: none;
+			}
+
 			@keyframes loadingDot {
 
 				0%,
@@ -1135,9 +1153,90 @@
 					font-size: 12px;
 				}
 
+				#toggleNoticeBtn,
+				#fortuneToggleBtn {
+					display: none !important;
+				}
+
+				#mobileSideBtn {
+					display: flex;
+					position: fixed;
+					right: 12px;
+					bottom: 72px;
+					width: 46px;
+					height: 46px;
+					border-radius: 50%;
+					align-items: center;
+					justify-content: center;
+					background: var(--card);
+					box-shadow: 0 6px 18px rgba(0, 0, 0, .18);
+					z-index: 4000;
+					font-size: 18px;
+				}
+
 				#notice,
-				#newUsers,
 				#fortuneBox {
+					display: block;
+					position: fixed;
+					top: 70px;
+					z-index: 3000;
+					transition: transform .28s ease, opacity .28s ease;
+					will-change: transform, opacity;
+					opacity: 0;
+					pointer-events: none;
+				}
+
+				#notice {
+					left: 0;
+					width: min(72vw, 280px);
+					max-height: calc(100vh - 140px);
+					overflow: auto;
+					border-radius: 0 18px 18px 0;
+					padding: 14px 12px;
+					transform: translateX(calc(-100% + 16px));
+				}
+
+				#fortuneBox {
+					right: 0;
+					width: min(50vw, 100px);
+					max-height: 140px;
+					overflow: hidden;
+					border-radius: 18px 0 0 18px;
+					padding: 10px 10px 12px 10px;
+					text-align: left;
+					transform: translateX(calc(100% - 16px));
+					bottom: auto;
+				}
+
+				#notice.mobile-open,
+				#fortuneBox.mobile-open {
+					opacity: 1;
+					pointer-events: auto;
+					transform: translateX(0);
+				}
+
+				#fortuneBtn {
+					width: 100%;
+					height: 34px;
+					font-size: 13px;
+					margin-top: 8px;
+					box-sizing: border-box;
+				}
+
+				#fortuneResult {
+					margin-top: 6px;
+				}
+
+				#fortuneLevel {
+					font-size: 18px;
+				}
+
+				.fortuneList {
+					font-size: 12px;
+					margin: 3px 0;
+				}
+
+				#newUsers {
 					display: none;
 				}
 
@@ -1248,6 +1347,11 @@
 					padding: 0 10px;
 				}
 
+				.onlineAvatar {
+					width: 18px;
+					height: 18px;
+				}
+
 				.warnText {
 					height: 34px;
 					font-size: 13px;
@@ -1298,6 +1402,11 @@
 
 				.discoverIcon {
 					margin-bottom: -5px;
+				}
+
+				.rankAvatar {
+					width: 22px;
+					height: 22px;
 				}
 			}
 		</style>
@@ -1539,6 +1648,7 @@
 		</div>
 		<div id="coinMsg">
 		</div>
+		<div id="mobileSideBtn">☰</div>
 		<div id="viewer" onclick="closeViewer()">
 			<img id="viewerImg">
 		</div>
@@ -1605,32 +1715,48 @@
 				}
 				async function loadStats() {
 					try {
-						const {
-							count: userCount,
-							error: userErr
-						} = await supabase
-							.from("users")
-							.select("id", {
+						const [{
+								count: userCount,
+								error: userErr
+							},
+							{
+								count: postCount,
+								error: postErr
+							},
+							{
+								count: commentCount,
+								error: commentErr
+							}
+						] = await Promise.all([
+							supabase.from("users").select("id", {
 								count: "exact",
 								head: true
-							});
-						const {
-							count: postCount,
-							error: postErr
-						} = await supabase
-							.from("posts")
-							.select("id", {
+							}),
+							supabase.from("posts").select("id", {
 								count: "exact",
 								head: true
-							});
+							}),
+							supabase.from("comments").select("id", {
+								count: "exact",
+								head: true
+							})
+						]);
 						if (!userErr) $("totalUsers").textContent = userCount || 0;
 						if (!postErr) $("totalPosts").textContent = postCount || 0;
+						const statsBox = $("statsBox");
+						if (statsBox) {
+							statsBox.innerHTML = `
+								<strong>全站统计</strong><br>
+								用户数：${userCount || 0}<br>
+								帖子数：${postCount || 0}<br>
+								评论数：${commentCount || 0}<br>
+							`;
+						}
 						if (!postErr) {
 							totalPostCount = postCount || 0;
 							renderPager();
 						}
 					} catch (e) {
-						console.error("Stats Error", e);
 						$("totalUsers").textContent = "—";
 						$("totalPosts").textContent = "—";
 					}
@@ -2133,7 +2259,7 @@
 						error
 					} = await supabase
 						.from("users")
-						.select("id, name, last_seen, coins")
+						.select("id, name, last_seen, coins, avatar")
 						.gte("last_seen", cutoff)
 						.order("last_seen", {
 							ascending: false
@@ -2154,10 +2280,16 @@
 								 style="text-align:left;max-height:320px;overflow:auto;padding-right:4px;">
 								${onlineUsersCache.map(u => `
 									<div class="onlineUser" data-user="${u.id}">
-										${u.name}
+										<img
+											class="avatar onlineAvatar"
+											src="${getAvatar(u)}"
+											onerror="this.onerror=null;this.src='head.svg'"
+										>
+										<span>${u.name}</span>
 										<span class="userLevel">
 											${getUserLevel(u.coins || 0)}
 										</span>
+										${getVerifiedBadge(u)}
 									</div>
 								`).join("")}
 							</div>
@@ -2279,6 +2411,39 @@
 						}
 					};
 				}
+				const mobileSideBtn = $("mobileSideBtn");
+
+				function syncMobilePanels() {
+					if (window.innerWidth > 800) {
+						notice.classList.remove("mobile-open");
+						$("fortuneBox")?.classList.remove("mobile-open");
+						if (mobileSideBtn) mobileSideBtn.style.display = "none";
+						return;
+					}
+					if (mobileSideBtn) mobileSideBtn.style.display = "flex";
+					notice.classList.remove("mobile-open");
+					$("fortuneBox")?.classList.remove("mobile-open");
+				}
+				if (mobileSideBtn) {
+					mobileSideBtn.onclick = () => {
+						const noticeOpen = notice.classList.toggle("mobile-open");
+						$("fortuneBox")?.classList.toggle("mobile-open", noticeOpen);
+					};
+				}
+				window.addEventListener("resize", syncMobilePanels);
+				syncMobilePanels();
+				$("toggleNoticeBtn").onclick = () => {
+					$("notice").classList.toggle("open");
+				};
+				$("toggleNoticeBtn").onclick = () => {
+					notice.classList.toggle("collapsed");
+					notice.classList.toggle("open");
+					if (notice.classList.contains("collapsed")) {
+						toggleBtn.innerHTML = "<b>></b>";
+					} else {
+						toggleBtn.innerHTML = "<b><</b>";
+					}
+				};
 				async function loadPosts(page = 1, container = $("posts")) {
 					const token = ++currentLoadToken;
 					container.innerHTML =
@@ -2794,13 +2959,20 @@
 						else if (rank === 2) rankDisplay = `<span style="color: #a3a3a3">2</span>`;
 						else if (rank === 3) rankDisplay = `<span style="color: #c68326">3</span>`;
 						else rankDisplay = `<span class="rank-num">${rank}</span>`;
+						const avatar = getAvatar(u);
 						div.innerHTML = `
-				            <div style="width: 40px; font-weight: bold; text-align: center;">${rankDisplay}</div>
-				            <div style="flex:1">
-				                ${u.name} <span class="userLevel">${getUserLevel(u.coins || 0)}</span>
-				            </div>
-				            <div style="width:100px; text-align:right;">${u.coins || 0}</div>
-				        `;
+							<div style="width: 40px; font-weight: bold; text-align: center;">${rankDisplay}</div>
+							<div style="flex:1; display:flex; align-items:center; gap:8px; min-width:0;">
+								<img class="avatar rankAvatar" src="${avatar}" onerror="this.onerror=null;this.src='head.svg'">
+								<div style="min-width:0;">
+									<div style="display:flex; align-items:center; gap:4px; flex-wrap:wrap;">
+										<span>${u.name}</span>
+										<span class="userLevel">${getUserLevel(u.coins || 0)}</span>
+									</div>
+								</div>
+							</div>
+							<div style="width:100px; text-align:right;">${u.coins || 0}</div>
+						`;
 						div.onclick = () => viewUser(u.id);
 						box.appendChild(div);
 					});
