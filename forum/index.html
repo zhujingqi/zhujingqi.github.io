@@ -449,6 +449,7 @@
 				font-weight: bold;
 				color: var(--green);
 				cursor: pointer;
+				margin-bottom: 5px;
 			}
 
 			.postHeaderTop .time {
@@ -595,7 +596,7 @@
 			.userLevel {
 				font-size: 14px;
 				color: #888;
-				margin-left: 4px;
+				margin-left: 1px;
 			}
 
 			body.dark .userLevel {
@@ -608,7 +609,7 @@
 				justify-content: center;
 				height: 16px;
 				padding: 0 6px;
-				margin-left: 6px;
+				margin-left: 1px;
 				border-radius: 999px;
 				font-size: 10px;
 				font-weight: 700;
@@ -995,6 +996,90 @@
 				color: var(--green);
 			}
 
+			.avatar {
+				width: 32px;
+				height: 32px;
+				border-radius: 50%;
+				object-fit: cover;
+				flex: 0 0 auto;
+				background: var(--bg);
+				border: 1px solid rgba(0, 0, 0, 0.08);
+			}
+
+			.avatar.big {
+				width: 120px;
+				height: 120px;
+				border-width: 2px;
+			}
+
+			.comment .avatar {
+				width: 20px;
+				height: 20px;
+				vertical-align: middle;
+			}
+
+			.userLinkWithAvatar {
+				display: inline-flex;
+				align-items: center;
+				gap: 1px;
+			}
+
+			.profileAvatarWrap {
+				display: flex;
+				justify-content: center;
+				margin: 10px 0 16px 0;
+			}
+
+			#profileAvatar {
+				cursor: zoom-in;
+			}
+
+			.discoverGrid {
+				width: 100%;
+				box-sizing: border-box;
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+				gap: 16px;
+				padding: 20px;
+			}
+
+			.discoverCard {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				min-height: 180px;
+				padding: 28px;
+				box-sizing: border-box;
+				background: var(--card);
+				border-radius: 24px;
+				text-decoration: none;
+				color: inherit;
+				box-shadow: 0 4px 12px rgba(0, 0, 0, .08);
+				transition: all .2s ease;
+			}
+
+			.discoverCard:hover {
+				transform: translateY(-4px);
+				box-shadow: 0 10px 24px rgba(0, 0, 0, .12);
+			}
+
+			.discoverIcon {
+				font-size: 42px;
+				margin-bottom: 14px;
+			}
+
+			.discoverCard h3 {
+				margin: 0 0 8px 0;
+				font-size: 24px;
+			}
+
+			.discoverCard p {
+				margin: 0;
+				color: var(--sub);
+				font-size: 15px;
+				line-height: 1.5;
+			}
+
 			@keyframes loadingDot {
 
 				0%,
@@ -1180,6 +1265,40 @@
 				.voteWhoRow {
 					font-size: 11px;
 				}
+
+				.avatar {
+					width: 26px;
+					height: 26px;
+				}
+
+				.avatar.big {
+					width: 92px;
+					height: 92px;
+				}
+
+				.discoverGrid {
+					grid-template-columns: 1fr;
+					padding: 12px;
+					gap: 12px;
+				}
+
+				.discoverCard {
+					min-height: 140px;
+					padding: 22px;
+				}
+
+				.discoverCard h3 {
+					font-size: 22px;
+				}
+
+				.discoverIcon img {
+					width: 50px;
+					height: 50px;
+				}
+
+				.discoverIcon {
+					margin-bottom: -5px;
+				}
 			}
 		</style>
 	</head>
@@ -1188,7 +1307,7 @@
 			<button id="homeBtn">首页</button>
 			<button id="editorBtn">发布</button>
 			<button id="showUsersBtn">用户</button>
-			<button id="chatBtn">聊天</button>
+			<button id="discoverBtn">探索</button>
 			<button id="profileBtn">我的</button>
 			<button id="moreBtn">更多</button>
 		</div>
@@ -1257,12 +1376,11 @@
 				<div class="noticeItem">
 					<details>
 						<summary><b>近期更新</b></summary>
-						· 显示点赞、踩帖的具体用户
-						· 评论不刷新
-						· 自定义不适宜遮罩内容
-						· 取消折叠评论功能
-						· 在线人数和用户<br>
-						· 点赞 / 踩 不刷新页面<br>
+						· 用户头像<br>
+						· 图片查看器放大缩小图片<br>
+						· 显示点赞、踩帖的具体用户<br>
+						· 评论不刷新<br>
+						· 自定义不适宜遮罩内容<br>
 					</details>
 				</div>
 				<br>
@@ -1297,6 +1415,12 @@
 			<div id="postPager" class="pager"></div>
 		</div>
 		<div id="editorPage" class="hidden center">
+			<div id="logoRow">
+				<div id="logo">
+					<img src="icon.svg">
+					发布
+				</div>
+			</div>
 			<div class="card" style="width:95%;max-width:600px;">
 				<textarea id="text" placeholder="发布新鲜事（最多5000字符）" style="width:100%;" maxlength="5000"></textarea>
 				<div style="display:flex;gap:6px;margin-top:8px;">
@@ -1326,7 +1450,12 @@
 		</div>
 		<div id="userListPage" class="hidden" style="display:flex;flex-direction:column;height:100vh;">
 			<div style="padding:20px;flex:1;overflow-y:auto;">
-				<h2 style="color:var(--green);">排行榜</h2>
+				<div id="logoRow">
+					<div id="logo">
+						<img src="icon.svg">
+						排行榜
+					</div>
+				</div>
 				<div
 					style="display:flex;font-weight:bold;padding:8px 0;border-bottom:1px solid #ccc;width:100%;max-width:500px;">
 					<div style="flex:1;">用户名</div>
@@ -1339,6 +1468,9 @@
 		<div id="profilePage" class="hidden" style="display:flex;flex-direction:column;height:100vh;">
 			<div id="backBtn">←</div>
 			<div class="postHeader" style="justify-content:flex-start;align-items:center;">
+				<div class="profileAvatarWrap">
+					<img id="profileAvatar" class="avatar big" src="head.svg">
+				</div>
 				<h2 id="pname"></h2>
 				<button id="logoutBtn" style="margin-left:20px;">登出</button>
 			</div>
@@ -1346,6 +1478,46 @@
 			<div id="userDescription" style=""></div>
 			<br>
 			<div id="userPosts"></div>
+		</div>
+		<div id="discoverPage" class="hidden page">
+			<div id="logoRow">
+				<div id="logo">
+					<img src="icon.svg">
+					探索
+				</div>
+			</div>
+			<div class="discoverGrid">
+				<a class="discoverCard" href="/index.html">
+					<div class="discoverIcon"><img src="https://zhujingqi.com/img/zjq.svg" /></div>
+					<h3>Zhujingqi</h3>
+					<p>网站首页</p>
+				</a>
+				<a class="discoverCard" href="/hub/">
+					<div class="discoverIcon"><img src="https://zhujingqi.com/img/zjq.svg" /></div>
+					<h3>社区</h3>
+					<p>Zhujingqi 社区</p>
+				</a>
+				<a class="discoverCard" href="/game/">
+					<div class="discoverIcon"><img src="https://zhujingqi.com/img/zjq.svg" /></div>
+					<h3>游戏中心</h3>
+					<p>Zhujingqi Game</p>
+				</a>
+				<a class="discoverCard" href="/tool/">
+					<div class="discoverIcon"><img src="https://zhujingqi.com/img/zjq.svg" /></div>
+					<h3>工具大全</h3>
+					<p>Zhujingqi Tool</p>
+				</a>
+				<a class="discoverCard" href="/chat/">
+					<div class="discoverIcon"><img src="https://zhujingqi.com/chat/icon.svg" /></div>
+					<h3>Jacky Chat</h3>
+					<p>在线聊天网页App</p>
+				</a>
+				<a class="discoverCard" href="#">
+					<div class="discoverIcon">?</div>
+					<h3>Jackypedia</h3>
+					<p>杰基百科（即将推出）</p>
+				</a>
+			</div>
 		</div>
 		<div id="moreMenu" class="moreMenu hidden">
 			<div id="aboutBtn">关于</div>
@@ -1466,7 +1638,7 @@
 
 				function show(p) {
 					currentPage = p;
-					["welcomePage", "registerPage", "main", "editorPage", "profilePage", "userListPage"]
+					["welcomePage", "registerPage", "main", "editorPage", "profilePage", "userListPage", "discoverPage"]
 					.forEach(id => $(id).classList.add("hidden"));
 					$(p).classList.remove("hidden");
 				}
@@ -1516,8 +1688,8 @@
 					loadUserList();
 					setActive("showUsersBtn");
 				};
-				$("chatBtn").onclick = () => {
-					window.location.href = "https://zhujingqi.com/chat/";
+				$("discoverBtn").onclick = () => {
+					show("discoverPage");
 				};
 				$("profileBtn").onclick = () => {
 					if (currentUser) viewUser(currentUser.id);
@@ -1665,7 +1837,8 @@
 							name: u,
 							pass: passHash,
 							time: new Date().toISOString(),
-							coins: 0
+							coins: 0,
+							avatar: null
 						}])
 						.select();
 					if (error) return modal("注册失败：" + error.message);
@@ -2055,13 +2228,15 @@
 					let query = supabase
 						.from("posts")
 						.select(`
-							id,
-							content,
-							time,
-							author,
-							tag,
-							users:author(id, name, coins)
-						`)
+						    id,
+						    content,
+						    time,
+						    author,
+						    tag,
+							users:author(id, name, coins, avatar)
+						`, {
+							count: "exact"
+						})
 						.order("id", {
 							ascending: false
 						})
@@ -2081,11 +2256,13 @@
 					}
 					let {
 						data,
+						count,
 						error
 					} = await query;
 					if (error) throw error;
 					return {
-						posts: data || []
+						posts: data || [],
+						count: count || 0
 					};
 				}
 				const notice = $("notice");
@@ -2110,6 +2287,8 @@
 						postPage = page;
 						renderPager();
 						const pageData = await fetchPostPage(page);
+						totalPostCount = pageData.count || 0;
+						renderPager();
 						if (token !== currentLoadToken) return;
 						const posts = pageData.posts || [];
 						container.innerHTML = "";
@@ -2159,9 +2338,12 @@
 								postDiv.style.setProperty("--custom-bg", meta.bg);
 								postDiv.classList.add("custom-bg");
 							}
+							const avatar = getAvatar(p.users);
 							postDiv.innerHTML =
 								'<div class="postHeaderTop"><div class="userInfo">' +
-								'<span class="userLink" data-user="' + p.author + '">' +
+								'<span class="userLink userLinkWithAvatar" data-user="' + p.author + '">' +
+								'<img class="avatar" src="' + avatar +
+								'" onerror="this.onerror=null;this.src=\'head.svg\'">' +
 								(p.users?.name || "未知") +
 								'<span class="userLevel">' + getUserLevel(p.users?.coins || 0) + '</span>' +
 								'<span>' + getVerifiedBadge(p.users) + '</span>' +
@@ -2246,7 +2428,7 @@
 						data
 					} = await supabase
 						.from("comments")
-						.select("*, users(id, name, coins)")
+						.select("*, users(id, name, coins, avatar)")
 						.eq("postid", postId)
 						.order("id", {
 							ascending: true
@@ -2254,12 +2436,15 @@
 					const comments = data || [];
 					for (let c of comments) {
 						let div = document.createElement("div");
+						const avatar = getAvatar(c.users);
 						div.className = "comment";
 						div.innerHTML =
-							`<b class="userLink" data-user="${c.author}">${c.users?.name || "未知"}` +
+							`<span class="userLink userLinkWithAvatar" data-user="${c.author}">` +
+							`<img class="avatar" src="${avatar}" onerror="this.onerror=null;this.src='head.svg'">` +
+							`<b>${c.users?.name || "未知"}</b>` +
 							`<span class="userLevel">${getUserLevel(c.users?.coins || 0)}</span>` +
 							getVerifiedBadge(c.users) +
-							`</b>: ${c.content}` +
+							`</span>: ${c.content}` +
 							(currentUser && c.author === currentUser.id ?
 								`<button class="commentDel" data-cdel="${c.id}">删除</button>` :
 								"");
@@ -2574,6 +2759,19 @@
 						showCoinMsg("已应用背景，金币 -15");
 					};
 				}
+				const DEFAULT_AVATAR = "head.svg";
+
+				function getAvatar(user) {
+					return user?.avatar?.trim() || DEFAULT_AVATAR;
+				}
+
+				function escapeAttr(s) {
+					return String(s ?? "")
+						.replace(/&/g, "&amp;")
+						.replace(/"/g, "&quot;")
+						.replace(/</g, "&lt;")
+						.replace(/>/g, "&gt;");
+				}
 				async function loadUserList() {
 					let box = $("userItems");
 					box.innerHTML = "<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
@@ -2614,9 +2812,27 @@
 					let {
 						data: user
 					} = await supabase.from("users").select("*").eq("id", uid).single();
-					$("pname").innerHTML = user.name +
-						`<span class="userLevel">${getUserLevel(user.coins)}</span>` + getVerifiedBadge(user) +
+					const avatarUrl = getAvatar(user);
+					$("profileAvatar").src = avatarUrl;
+					$("profileAvatar").onclick = () => openViewer(avatarUrl);
+					container.innerHTML = "";
+					let {
+						data: posts
+					} = await supabase.from("posts").select("*").eq("author", uid).order("time", {
+						ascending: true
+					});
+					const isSelf = currentUser && uid === currentUser.id;
+					$("pname").innerHTML =
+						user.name +
+						`<span class="userLevel">${getUserLevel(user.coins)}</span>` +
+						getVerifiedBadge(user) +
+						(isSelf ? "&ensp;<button id='editAvatarBtn'>修改头像</button>" : "") +
 						"&ensp;<button class='helpBtn' id='levelBtn'>?</button>";
+					if (isSelf) {
+						$("editAvatarBtn").onclick = () => {
+							openAvatarEditor();
+						};
+					}
 					$("moreInfo").innerHTML =
 						"金币：" + (user.coins || 0) +
 						"&ensp;<button class='helpBtn' id='coinBtn'>?</button>" +
@@ -2643,13 +2859,6 @@
 					<p>金币用途：提升等级、购买彩色帖子背景</p>
 						`);
 					}
-					container.innerHTML = "";
-					let {
-						data: posts
-					} = await supabase.from("posts").select("*").eq("author", uid).order("time", {
-						ascending: true
-					});
-					const isSelf = currentUser && uid === currentUser.id;
 					for (let i = posts.length - 1; i >= 0; i--) {
 						let p = posts[i];
 						let div = document.createElement("div");
@@ -2721,6 +2930,48 @@
 						};
 					}
 					show("profilePage");
+				}
+
+				function openAvatarEditor() {
+					const oldUrl = currentUser?.avatar || "";
+					document.querySelector(".modalBox").style.width = "420px";
+					modal(`
+						<h3>修改头像</h3>
+						<img id="avatarPreview" class="avatar big" src="${escapeAttr(oldUrl || DEFAULT_AVATAR)}"
+							style="display:block;margin:0 auto 12px auto;">
+						<input id="avatarUrlInput" placeholder="头像链接（http/https）" value="${escapeAttr(oldUrl)}">
+						<div style="display:flex;gap:8px;margin-top:14px;">
+							<button id="avatarSaveBtn">保存</button>
+							<button id="avatarCancelBtn">取消</button>
+						</div>
+					`);
+					const input = $("avatarUrlInput");
+					const preview = $("avatarPreview");
+					input.oninput = () => {
+						preview.src = input.value.trim() || DEFAULT_AVATAR;
+					};
+					$("avatarCancelBtn").onclick = () => {
+						$("modal").classList.add("hidden");
+					};
+					$("avatarSaveBtn").onclick = async () => {
+						const url = input.value.trim();
+						if (url && !/^https?:\/\//i.test(url)) {
+							return modal("头像链接必须以 http:// 或 https:// 开头");
+						}
+						const {
+							error
+						} = await supabase
+							.from("users")
+							.update({
+								avatar: url || null
+							})
+							.eq("id", currentUser.id);
+						if (error) return modal("保存失败：" + error.message);
+						currentUser.avatar = url || null;
+						$("modal").classList.add("hidden");
+						loadPosts(postPage);
+						viewUser(currentUser.id);
+					};
 				}
 				async function changeCoins(uid, amount) {
 					const {
@@ -2904,11 +3155,35 @@
 					this.style.display = "none";
 				};
 
+				let viewerScale = 1;
+
 				function openViewer(src) {
-					const viewer = document.getElementById("viewer");
-					const viewerImg = document.getElementById("viewerImg");
+					const viewer = $("viewer");
+					const viewerImg = $("viewerImg");
 					viewerImg.src = src;
 					viewer.style.display = "flex";
+					viewerScale = 1;
+					viewerImg.style.transform = "scale(1)";
+					viewerImg.onwheel = e => {
+						e.preventDefault();
+						if (e.deltaY < 0) {
+							viewerScale *= 1.1;
+						} else {
+							viewerScale /= 1.1;
+						}
+						viewerScale = Math.max(
+							0.2,
+							Math.min(8, viewerScale)
+						);
+						viewerImg.style.transform =
+							`scale(${viewerScale})`;
+					};
+					viewerImg.ondblclick = () => {
+						viewerScale =
+							viewerScale === 1 ? 2 : 1;
+						viewerImg.style.transform =
+							`scale(${viewerScale})`;
+					};
 				}
 				window.closeViewer = function() {
 					document.getElementById("viewer").style.display = "none";
