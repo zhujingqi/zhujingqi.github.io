@@ -1118,6 +1118,37 @@
 				overflow: hidden;
 			}
 
+			#notifBtn {
+				height: 36px;
+				padding: 0 14px;
+				border-radius: 999px;
+				background: var(--card);
+				color: var(--text);
+				border: 1px solid #ccc;
+				font-size: 14px;
+				white-space: nowrap;
+			}
+
+			#notifBtn:hover {
+				background: var(--green);
+				color: #fff;
+			}
+
+			#notifBadge {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				min-width: 18px;
+				height: 18px;
+				padding: 0 5px;
+				margin-left: 6px;
+				border-radius: 999px;
+				background: #ff3b30;
+				color: #fff;
+				font-size: 12px;
+				font-weight: 700;
+			}
+
 			@keyframes loadingDot {
 
 				0%,
@@ -1361,10 +1392,22 @@
 					height: 50px;
 				}
 
-				#onlineMini {
+				#onlineMini,
+				#notifBtn {
 					height: 32px;
 					font-size: 12px;
 					padding: 0 10px;
+				}
+
+				#notifBtn {
+					min-width: 0;
+				}
+
+				#notifBtn span:first-child {
+					max-width: 56px;
+					overflow: hidden;
+					text-overflow: ellipsis;
+					white-space: nowrap;
 				}
 
 				.onlineAvatar {
@@ -1435,7 +1478,7 @@
 		<div class="bottom hidden" id="nav">
 			<button id="homeBtn">首页</button>
 			<button id="editorBtn">发布</button>
-			<button id="showUsersBtn">用户</button>
+			<button id="showUsersBtn">排行</button>
 			<button id="discoverBtn">探索</button>
 			<button id="profileBtn">我的</button>
 			<button id="moreBtn">更多</button>
@@ -1486,6 +1529,9 @@
 					Jacky 论坛
 				</div>
 				<button id="onlineMini" type="button">在线 0</button>
+				<button id="notifBtn" type="button">
+					通知 <span id="notifBadge" hidden>0</span>
+				</button>
 			</div>
 			<div id="postFilterBar" class="postFilterBar">
 				<div class="searchRow">
@@ -1819,6 +1865,7 @@
 					loadPosts(1);
 					loadOnlineUsers();
 					startPresence();
+					refreshNotificationBadge();
 					setActive("homeBtn");
 				};
 				$("editorBtn").onclick = () => {
@@ -1834,6 +1881,7 @@
 					loadUserList();
 					setActive("showUsersBtn");
 				};
+				$("notifBtn").onclick = openNotifications;
 				$("discoverBtn").onclick = () => {
 					show("discoverPage");
 				};
@@ -2114,6 +2162,7 @@
 					loadPosts(1);
 					loadOnlineUsers();
 					startPresence();
+					refreshNotificationBadge();
 					modal("欢迎 <b>" + data.name + "</b> 来到 <b>Jacky</b> 论坛！");
 				};
 				$("sendBtn").onclick = async () => {
@@ -2154,7 +2203,289 @@
 					setActive("homeBtn");
 					await changeCoins(currentUser.id, 5);
 				};
+				async function createNotification({
+					targetId,
+					actorId,
+					postId,
+					commentId = null,
+					type
+				}) {
+					if (!targetId || !actorId || targetId === actorId) return;
+					await supabase.from("notifications").insert([{
+						target_id: targetId,
+						actor_id: actorId,
+						post_id: postId,
+						comment_id: commentId,
+						type,
+						is_read: false,
+						created_at: new Date().toISOString()
+					}]);
+				}
 
+				function notifLabel(n) {
+					const actorName = n.actor?.name || "有人";
+					if (n.type === "comment") return `${actorName} 评论了你的帖子`;
+					if (n.type === "like") return `${actorName} 赞了你的帖子`;
+					if (n.type === "dislike") return `${actorName} 踩了你的帖子`;
+					return `${actorName} 有新通知`;
+				}
+
+				async function refreshNotificationBadge() {
+					if (!currentUser) return;
+					const {
+						count,
+						error
+					} = await supabase
+						.from("notifications")
+						.select("id", {
+							count: "exact",
+							head: true
+						})
+						.eq("target_id", currentUser.id)
+						.eq("is_read", false);
+					if (error) return;
+					const badge = $("notifBadge");
+					if (!badge) return;
+					const unread = count || 0;
+					badge.textContent = unread;
+					badge.hidden = unread === 0;
+				}
+				async function markNotificationRead(id) {
+					if (!currentUser || !id) return false;
+					const {
+						error
+					} = await supabase
+						.from("notifications")
+						.update({
+							is_read: true
+						})
+						.eq("id", id)
+						.eq("target_id", currentUser.id);
+					if (error) {
+						console.error("标记通知已读失败：", error);
+						return false;
+					}
+					return true;
+				}
+
+				function applyPostFilters(query) {
+					if (activePostTag === "其它") {
+						const excludedTags = ["公告", ...defaultTags];
+						query = query.or(
+							`tag.is.null,tag.not.in.(${excludedTags.map(t => `"${t}"`).join(",")})`
+						);
+					} else if (activePostTag !== "全部") {
+						query = query.eq("tag", activePostTag);
+					}
+					const q = postSearch.trim();
+					if (q) {
+						const safeQ = q.replace(/[%_,]/g, "");
+						query = query.or(`content.ilike.%${safeQ}%,tag.ilike.%${safeQ}%`);
+					}
+					return query;
+				}
+				async function openNotificationPost(postId) {
+					$("modal").classList.add("hidden");
+					const {
+						data: post,
+						error
+					} = await supabase
+						.from("posts")
+						.select("id")
+						.eq("id", postId)
+						.single();
+					if (error || !post) {
+						modal("帖子不存在或已删除");
+						return;
+					}
+					activePostTag = "全部";
+					postSearch = "";
+					renderPostFilters();
+					show("main");
+					const {
+						count,
+						error: countErr
+					} = await applyPostFilters(
+						supabase
+						.from("posts")
+						.select("id", {
+							count: "exact",
+							head: true
+						})
+						.order("id", {
+							ascending: false
+						})
+						.gt("id", postId)
+					);
+					if (countErr) {
+						modal("定位帖子失败：" + countErr.message);
+						return;
+					}
+					const page = Math.floor((count || 0) / POSTS_PER_PAGE) + 1;
+					await loadPosts(page);
+					setTimeout(() => {
+						const target = document.querySelector(`.post[data-post-id="${postId}"]`);
+						if (!target) {
+							modal("帖子不存在或已删除");
+							return;
+						}
+						target.scrollIntoView({
+							behavior: "smooth",
+							block: "center"
+						});
+						target.classList.add("postHighlight");
+						setTimeout(() => target.classList.remove("postHighlight"), 2000);
+					}, 200);
+				}
+				async function openNotifications() {
+					if (!currentUser) return;
+					await cleanupNotifications();
+					const {
+						data,
+						error
+					} = await supabase
+						.from("notifications")
+						.select(`
+			id,
+			type,
+			is_read,
+			created_at,
+			post_id,
+			comment_id,
+			actor:actor_id(id, name, coins, avatar)
+		`)
+						.eq("target_id", currentUser.id)
+						.order("created_at", {
+							ascending: false
+						})
+						.limit(30);
+					if (error) {
+						modal("通知加载失败：" + error.message);
+						return;
+					}
+					const rows = data || [];
+					const notifHtml = rows.length ?
+						rows.map(n => {
+							const a = n.actor || {};
+							const avatar = getAvatar(a);
+							const levelHtml = getUserLevel(a.coins || 0);
+							const verifiedHtml = getVerifiedBadge(a);
+							const unreadStyle = n.is_read ?
+								"" :
+								"font-weight:700;background:rgba(0,0,0,.03);";
+							return `
+								<div class="notifItem"
+									data-nid="${n.id}"
+									data-post="${n.post_id}"
+									style="padding:10px 12px;border-bottom:1px solid var(--bg);cursor:pointer;border-radius:20px;${unreadStyle}">
+									<div style="display:flex;align-items:center;gap:10px;">
+										<img class="avatar notifAvatar"
+											src="${avatar}"
+											onerror="this.onerror=null;this.src='head.svg'">
+										<div style="min-width:0;flex:1;">
+											<div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+												<b>${a.name || "有人"}</b>
+												${levelHtml}
+												${verifiedHtml}
+											</div>
+											<div>${notifLabel(n)}</div>
+											<div class="time">
+												${new Date(n.created_at).toLocaleString()}
+											</div>
+										</div>
+									</div>
+								</div>
+							`;
+						}).join("") :
+						`<div style="color:var(--sub);padding:8px 0;">暂无通知</div>`;
+					document.querySelector(".modalBox").style.width = "460px";
+					modal(`
+							<h3>通知</h3>
+							<div style="max-height:340px;overflow:auto;text-align:left;">
+								${notifHtml}
+							</div>
+							<div style="margin-top:14px;display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;">
+								<button id="clearNotifBtn">清除通知</button>
+								<button id="markAllReadBtn">全部已读</button>
+							</div>
+						`);
+					$("markAllReadBtn").onclick = async () => {
+						await supabase
+							.from("notifications")
+							.update({
+								is_read: true
+							})
+							.eq("target_id", currentUser.id);
+						await refreshNotificationBadge();
+						openNotifications();
+					};
+					$("clearNotifBtn").onclick = askClearNotifications;
+					async function askClearNotifications() {
+						document.querySelector(".modalBox").style.width = "360px";
+						modal(`
+							<h3>清除通知</h3>
+							<div style="margin-top:8px;color:var(--sub);">
+								确定要删除全部通知吗？
+							</div>
+							<div style="margin-top:16px;display:flex;gap:8px;justify-content:center;">
+								<button id="cancelClearNotifBtn">取消</button>
+								<button id="okClearNotifBtn">确定清除</button>
+							</div>
+						`);
+						$("cancelClearNotifBtn").onclick = () => {
+							$("modal").classList.add("hidden");
+						};
+						$("okClearNotifBtn").onclick = async () => {
+							const {
+								error
+							} = await supabase
+								.from("notifications")
+								.delete()
+								.eq("target_id", currentUser.id);
+							if (error) {
+								modal("清除失败：" + error.message);
+								return;
+							}
+							$("modal").classList.add("hidden");
+							await refreshNotificationBadge();
+							openNotifications();
+						};
+					}
+					document.querySelectorAll(".notifItem").forEach(el => {
+						el.onclick = async () => {
+							await markNotificationRead(Number(el.dataset.nid));
+							await refreshNotificationBadge();
+							await openNotificationPost(Number(el.dataset.post));
+						};
+					});
+				}
+				async function cleanupNotifications() {
+					if (!currentUser) return;
+					const { data } = await supabase
+						.from("notifications")
+						.select("id")
+						.eq("target_id", currentUser.id)
+						.order("created_at", { ascending: false });
+					if (!data) return;
+					const oldIds = data
+						.slice(100)
+						.map(x => x.id);
+					if (oldIds.length) {
+						await supabase
+							.from("notifications")
+							.delete()
+							.in("id", oldIds);
+					}
+					await supabase
+						.from("notifications")
+						.delete()
+						.lt(
+							"created_at",
+							new Date(
+								Date.now() - 60 * 24 * 60 * 60 * 1000
+							).toISOString()
+						);
+				}
 				function sanitizePostHtml(txt) {
 					const safeTags = {
 						b: [],
@@ -2203,7 +2534,7 @@
 								return match;
 							}
 							if (closing) {
-								return `</${tagName}>`;
+								return ` < /${tagName}>`;
 							}
 							let allowedAttrs = "";
 							for (const attr of safeTags[tagName]) {
@@ -2253,8 +2584,7 @@
 								allowedAttrs += ` ${attr}="${value}"`;
 							}
 							return `<${tagName}${allowedAttrs}>`;
-						}
-					);
+						});
 					return txt;
 				}
 				async function loadNewUsers(limit = 10) {
@@ -2553,8 +2883,10 @@
 						}
 						for (let p of posts) {
 							if (token !== currentLoadToken) return;
-							let postDiv = document.createElement("div");
+							const postDiv = document.createElement("div");
 							postDiv.className = "post";
+							postDiv.dataset.postId = p.id;
+							postDiv.dataset.authorId = p.author;
 							let {
 								count: likeCount
 							} = await supabase
@@ -2585,8 +2917,8 @@
 								.eq("postid", p.id)
 								.eq("liker", currentUser.id);
 							if (token !== currentLoadToken) return;
-							let liked = userVotes?.some(x => x.type == 1);
-							let disliked = userVotes?.some(x => x.type == -1);
+							const liked = userVotes?.some(x => x.type == 1);
+							const disliked = userVotes?.some(x => x.type == -1);
 							const meta = getPostMeta(p.content);
 							if (meta.bg) {
 								postDiv.style.setProperty("--custom-bg", meta.bg);
@@ -2651,11 +2983,11 @@
 							});
 							postDiv.querySelector(".like").onclick = () => likePost(p.id, postDiv);
 							postDiv.querySelector(".dislike").onclick = () => dislikePost(p.id, postDiv);
-							let delBtn = postDiv.querySelector("[data-del]");
+							const delBtn = postDiv.querySelector("[data-del]");
 							if (delBtn) delBtn.onclick = () => deletePost(p.id);
 							postDiv.querySelector("[data-comment]").onclick = () => {
-								let text = postDiv.querySelector("[data-input]").value.trim();
-								if (text) addComment(p.id, text);
+								const text = postDiv.querySelector("[data-input]").value.trim();
+								if (text) addComment(p.id, text, p.author);
 							};
 							const tagEl = postDiv.querySelector("[data-tag]");
 							if (tagEl) {
@@ -2736,22 +3068,22 @@
 					const rows = (data || []).filter(x => x.type === (kind === "like" ? 1 : -1));
 					document.querySelector(".modalBox").style.width = "360px";
 					modal(`
-						<h3>谁${kind === "like" ? "赞了" : "踩了"}</h3>
-						<div style="max-height:320px;overflow:auto;text-align:left;">
-							${
-								rows.length
-									? rows.map(x => `
-										<div class="onlineUser voteUser" data-user="${x.users?.id}" style="display:flex;align-items:center;gap:8px;">
-											<img class="avatar onlineAvatar" src="${getAvatar(x.users)}" onerror="this.onerror=null;this.src='head.svg'">
-											<span>${x.users?.name || "未知"}</span>
-											<span class="userLevel">${getUserLevel(x.users?.coins || 0)}</span>
-											${getVerifiedBadge(x.users)}
-										</div>
-									`).join("")
-									: `<div style="color:var(--sub);padding:8px 0;">暂无</div>`
-							}
-						</div>
-					`);
+											<h3>谁${kind === "like" ? "赞了" : "踩了"}</h3>
+											<div style="max-height:320px;overflow:auto;text-align:left;">
+												${
+													rows.length
+														? rows.map(x => `
+															<div class="onlineUser voteUser" data-user="${x.users?.id}" style="display:flex;align-items:center;gap:8px;">
+																<img class="avatar onlineAvatar" src="${getAvatar(x.users)}" onerror="this.onerror=null;this.src='head.svg'">
+																<span>${x.users?.name || "未知"}</span>
+																<span class="userLevel">${getUserLevel(x.users?.coins || 0)}</span>
+																${getVerifiedBadge(x.users)}
+															</div>
+														`).join("")
+														: `<div style="color:var(--sub);padding:8px 0;">暂无</div>`
+												}
+											</div>
+										`);
 					setTimeout(() => {
 						document.querySelectorAll(".voteUser").forEach(el => {
 							el.onclick = () => {
@@ -2761,16 +3093,32 @@
 						});
 					}, 0);
 				}
-				async function addComment(id, text) {
-					await supabase.from("comments").insert([{
-						postid: id,
-						content: text,
-						author: currentUser.id,
-						time: new Date().toISOString()
-					}]);
-					const postDiv = document.querySelector(
-						`.post [data-comment="${id}"]`
-					)?.closest(".post");
+				async function addComment(id, text, postAuthorId) {
+					const {
+						data,
+						error
+					} = await supabase
+						.from("comments")
+						.insert([{
+							postid: id,
+							content: text,
+							author: currentUser.id,
+							time: new Date().toISOString()
+						}])
+						.select("id")
+						.single();
+					if (error) {
+						modal("评论失败：" + error.message);
+						return;
+					}
+					await createNotification({
+						targetId: postAuthorId,
+						actorId: currentUser.id,
+						postId: id,
+						commentId: data.id,
+						type: "comment"
+					});
+					const postDiv = document.querySelector(`.post[data - comment = "${id}"] `)?.closest(".post");
 					if (postDiv) {
 						const input = postDiv.querySelector("[data-input]");
 						if (input) {
@@ -2830,7 +3178,6 @@
 								.eq("postid", id)
 								.eq("liker", currentUser.id)
 								.eq("type", -1);
-
 							await supabase
 								.from("likes")
 								.insert([{
@@ -2839,7 +3186,12 @@
 									type: 1,
 									time: new Date().toISOString()
 								}]);
-
+							await createNotification({
+								targetId: postDiv.dataset.authorId,
+								actorId: currentUser.id,
+								postId: id,
+								type: "like"
+							});
 							await changeCoins(currentUser.id, hasDislike ? 2 : 1);
 						}
 					} catch (e) {
@@ -2908,6 +3260,12 @@
 									type: -1,
 									time: new Date().toISOString()
 								}]);
+							await createNotification({
+								targetId: postDiv.dataset.authorId,
+								actorId: currentUser.id,
+								postId: id,
+								type: "dislike"
+							});
 							await changeCoins(currentUser.id, hasLike ? -2 : -1);
 						}
 					} catch (e) {
@@ -2949,16 +3307,19 @@
 					if (!currentUser) return;
 					document.querySelector(".modalBox").style.width = "420px";
 					let picked = "";
-					modal(`
-						<h3>背景</h3>
-						<div style="font-size:14px;color:var(--sub);">
-							花 15 金币，给这一条帖子加个彩色背景
-						</div>
-						<div id="bgPickerGrid" class="bgPickerGrid"></div>
-						<div style="margin-top:14px;text-align:center;">
-							<button id="bgApplyBtn" disabled>确定</button>
-						</div>
-					`);
+					modal(` <
+							h3 > 背景 < /h3> <
+						div style = "font-size:14px;color:var(--sub);" >
+							花 15 金币， 给这一条帖子加个彩色背景 <
+							/div> <
+						div id = "bgPickerGrid"
+						class = "bgPickerGrid" > < /div> <
+						div style = "margin-top:14px;text-align:center;" >
+							<
+							button id = "bgApplyBtn"
+						disabled > 确定 < /button> < /
+						div >
+							`);
 					const grid = $("bgPickerGrid");
 					for (const color of POST_BG_OPTIONS) {
 						const item = document.createElement("div");
@@ -3015,7 +3376,7 @@
 						let div = document.createElement("div");
 						div.className = "userItem";
 						let rankDisplay;
-						if (rank === 1) rankDisplay = `<span style="color: #ffaa00;">1</span>`;
+						if (rank === 1) rankDisplay = ` <span style="color: #ffaa00;">1</span>`;
 						else if (rank === 2) rankDisplay = `<span style="color: #a3a3a3">2</span>`;
 						else if (rank === 3) rankDisplay = `<span style="color: #c68326">3</span>`;
 						else rankDisplay = `<span class="rank-num">${rank}</span>`;
@@ -3458,6 +3819,7 @@
 								loadStats();
 								loadOnlineUsers();
 								startPresence();
+								refreshNotificationBadge();
 								loadPosts(1);
 							} else {
 								show("welcomePage");
