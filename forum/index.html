@@ -1098,6 +1098,26 @@
 				display: none;
 			}
 
+			.musicCard {
+				margin: 8px 0 10px 0;
+				padding: 10px;
+				border-radius: 16px;
+				background: rgba(0, 0, 0, 0.04);
+				border: 1px solid rgba(0, 0, 0, 0.08);
+				overflow: hidden;
+			}
+
+			body.dark .musicCard {
+				background: rgba(255, 255, 255, 0.06);
+				border-color: rgba(255, 255, 255, 0.08);
+			}
+
+			.musicIframe {
+				display: block;
+				border-radius: 12px;
+				overflow: hidden;
+			}
+
 			@keyframes loadingDot {
 
 				0%,
@@ -1485,11 +1505,10 @@
 				<div class="noticeItem">
 					<details>
 						<summary><b>近期更新</b></summary>
+						· 分享音乐<br>
 						· 用户头像<br>
 						· 图片查看器放大缩小图片<br>
 						· 显示点赞、踩帖的具体用户<br>
-						· 评论不刷新<br>
-						· 自定义不适宜遮罩内容<br>
 					</details>
 				</div>
 				<br>
@@ -1520,6 +1539,7 @@
 					</div>
 				</div>
 			</div>
+			<div id="mobileSideBtn">☰</div>
 			<div id="posts"></div>
 			<div id="postPager" class="pager"></div>
 		</div>
@@ -1535,6 +1555,7 @@
 				<div style="display:flex;gap:6px;margin-top:8px;">
 					<input id="imgUrlInput" placeholder="图片链接" style="flex:1;height:36px;font-size:14px;">
 					<button id="insertImgBtn" type="button">插图</button>
+					<button id="insertMusicBtn" type="button">插入音乐</button>
 				</div>
 				<div class="tagBarContainer"
 					style="display:flex;align-items:center;gap:6px;flex-wrap:nowrap;margin-top:8px;">
@@ -1648,7 +1669,6 @@
 		</div>
 		<div id="coinMsg">
 		</div>
-		<div id="mobileSideBtn">☰</div>
 		<div id="viewer" onclick="closeViewer()">
 			<img id="viewerImg">
 		</div>
@@ -1936,6 +1956,94 @@
 					$("imgUrlInput").value = "";
 				};
 
+				function openMusicPicker() {
+					document.querySelector(".modalBox").style.width = "420px";
+					modal(`
+		<h3>插入音乐</h3>
+		<input id="musicUrlInput" placeholder="网易云链接，例如 https://music.163.com/song?id=123456" style="width:100%;">
+		<div style="margin-top:8px;font-size:12px;color:var(--sub);text-align:left;">
+			提示：支持网易云音乐歌曲链接
+		</div>
+		<div style="margin-top:14px;">
+			<button id="musicApplyBtn">插入</button>
+		</div>
+					`);
+					$("musicApplyBtn").onclick = () => {
+						const url = $("musicUrlInput").value.trim();
+						if (!url) return modal("请输入网易云链接");
+						if (!/music\.163\.com/i.test(url)) return modal("请填写网易云音乐链接");
+						const textArea = $("text");
+						const idMatch = url.match(/id=(\d+)/);
+						if (!idMatch) return modal("没找到歌曲 id");
+						const songId = idMatch[1];
+						const marker = `[[music:${songId}]]`;
+						textArea.value += (textArea.value ? "\n" : "") + marker + "\n";
+						$("modal").classList.add("hidden");
+					};
+				}
+				$("insertMusicBtn").onclick = openMusicPicker;
+
+				function getPostMeta(content) {
+					let text = String(content || "").trim();
+					let bg = null,
+						warn = false,
+						warnText = "可能包含不适宜的内容",
+						music = null;
+					const prefixMatch = text.match(/^(\[\[bg:(.+?)\]\]|\[\[warn(?::([^\]]+))?\]\])+/);
+					if (prefixMatch) {
+						let prefix = prefixMatch[0];
+						text = text.slice(prefix.length).trim();
+						if (prefix.includes("[[bg:")) bg = prefix.match(/\[\[bg:(.+?)\]\]/)[1];
+						if (prefix.includes("[[warn")) {
+							warn = true;
+							const w = prefix.match(/\[\[warn(?::([^\]]+))?\]\]/);
+							if (w && w[1]) warnText = w[1];
+						}
+					}
+					const musicMatch = text.match(/\[\[music:(\d+)\]\]/);
+					if (musicMatch) {
+						music = musicMatch[1];
+						text = text.replace(/\[\[music:\d+\]\]/g, "").trim();
+					}
+					return {
+						bg,
+						warn,
+						warnText,
+						music,
+						content: text
+					};
+				}
+
+				function renderPostBody(box, fullContent) {
+					const meta = getPostMeta(fullContent);
+					const hasHtml = /<[^>]+>/.test(meta.content);
+					const plainText = meta.content.replace(/<[^>]*>/g, "");
+					const needFold = !hasHtml && plainText.length > 300;
+					const foldedText = needFold ? plainText.slice(0, 300) + " ..." : "";
+					let html = "";
+					if (meta.music) {
+						html += renderMusicCard(meta.music) + '<div style="height:12px"></div>';
+					}
+					html += needFold ?
+						`<span class="longPostText">${foldedText}</span><button class="toggleLongPost inline">展开</button>` :
+						(meta.content || "");
+					box.innerHTML = html;
+					const t = box.querySelector(".toggleLongPost");
+					if (t) {
+						let e = false;
+						t.onclick = () => {
+							e = !e;
+							const l = box.querySelector(".longPostText");
+							if (l) l.innerHTML = e ? meta.content : foldedText;
+							t.textContent = e ? "收起" : "展开";
+						};
+					}
+				}
+
+				function renderMusicCard(id) {
+					return `<div class="musicCard"><iframe class="musicIframe" src="https://music.163.com/outchain/player?type=2&id=${id}&auto=0&height=86" width="100%" height="106" frameborder="0" allow="autoplay; encrypted-media" loading="lazy"></iframe></div>`;
+				}
+
 				function setActive(id) {
 					["homeBtn", "editorBtn", "showUsersBtn", "profileBtn", "moreBtn"]
 					.forEach(b => $(b).classList.remove("active"));
@@ -2222,25 +2330,6 @@
 					}
 					pager.appendChild(makeBtn("›", postPage + 1, "navBtn", postPage >= maxPage));
 					pager.appendChild(makeBtn("»", maxPage, "navBtn", postPage >= maxPage));
-				}
-
-				function renderPostBody(box, content) {
-					const hasHtml = /<[^>]+>/.test(content);
-					const plainText = content.replace(/<[^>]*>/g, "");
-					const needFold = !hasHtml && plainText.length > 300;
-					const foldedText = needFold ? plainText.slice(0, 300) + "..." : plainText;
-					box.innerHTML = needFold ?
-						`<span class="longPostText">${foldedText}</span><button class="toggleLongPost inline">展开</button>` :
-						content;
-					const toggleBtn = box.querySelector(".toggleLongPost");
-					if (toggleBtn) {
-						let expanded = false;
-						toggleBtn.onclick = () => {
-							expanded = !expanded;
-							box.querySelector(".longPostText").innerHTML = expanded ? content : foldedText;
-							toggleBtn.textContent = expanded ? "收起" : "展开";
-						};
-					}
 				}
 				let presenceTimer = null;
 				async function touchPresence() {
@@ -2552,10 +2641,10 @@
 									'</div>';
 								bodyBox.querySelector(".warnMsg").textContent = meta.warnText || "可能包含不适宜的内容";
 								bodyBox.querySelector(".revealWarnBtn").onclick = () => {
-									renderPostBody(bodyBox, meta.content);
+									renderPostBody(bodyBox, p.content);
 								};
 							} else {
-								renderPostBody(bodyBox, meta.content);
+								renderPostBody(bodyBox, p.content);
 							}
 							postDiv.querySelectorAll("[data-vote-list]").forEach(el => {
 								el.onclick = () => openVotePeople(p.id, el.dataset.voteList);
@@ -2604,15 +2693,16 @@
 						const avatar = getAvatar(c.users);
 						div.className = "comment";
 						div.innerHTML =
-							`<span class="userLink userLinkWithAvatar" data-user="${c.author}">` +
-							`<img class="avatar" src="${avatar}" onerror="this.onerror=null;this.src='head.svg'">` +
-							`<b>${c.users?.name || "未知"}</b>` +
-							`<span class="userLevel">${getUserLevel(c.users?.coins || 0)}</span>` +
-							getVerifiedBadge(c.users) +
-							`</span>: ${c.content}` +
-							(currentUser && c.author === currentUser.id ?
-								`<button class="commentDel" data-cdel="${c.id}">删除</button>` :
-								"");
+							`<span class="userLink userLinkWithAvatar" data-user="${c.author}">
+								<img class="avatar" src="${avatar}" onerror="this.onerror=null;this.src='head.svg'">
+								<b>${c.users?.name || "未知"}</b>
+								<span class="userLevel">${getUserLevel(c.users?.coins || 0)}</span>
+								${getVerifiedBadge(c.users)}
+							</span>: <span class="commentContent"></span>
+							${currentUser && c.author === currentUser.id
+								? `<button class="commentDel" data-cdel="${c.id}">删除</button>`
+								: ""}`;
+						div.querySelector(".commentContent").textContent = c.content || "";
 						container.appendChild(div);
 						const userLink = div.querySelector(".userLink");
 						if (userLink) {
@@ -2634,7 +2724,7 @@
 						error
 					} = await supabase
 						.from("likes")
-						.select("type, time, users:liker(id, name, coins)")
+						.select("type, time, users:liker(id, name, coins, avatar)")
 						.eq("postid", postId)
 						.order("time", {
 							ascending: true
@@ -2651,8 +2741,9 @@
 							${
 								rows.length
 									? rows.map(x => `
-										<div class="onlineUser" data-user="${x.users?.id}">
-											${x.users?.name || "未知"}
+										<div class="onlineUser voteUser" data-user="${x.users?.id}" style="display:flex;align-items:center;gap:8px;">
+											<img class="avatar onlineAvatar" src="${getAvatar(x.users)}" onerror="this.onerror=null;this.src='head.svg'">
+											<span>${x.users?.name || "未知"}</span>
 											<span class="userLevel">${getUserLevel(x.users?.coins || 0)}</span>
 											${getVerifiedBadge(x.users)}
 										</div>
@@ -2662,7 +2753,7 @@
 						</div>
 					`);
 					setTimeout(() => {
-						document.querySelectorAll(".onlineUser").forEach(el => {
+						document.querySelectorAll(".voteUser").forEach(el => {
 							el.onclick = () => {
 								$("modal").classList.add("hidden");
 								viewUser(Number(el.dataset.user));
@@ -2854,37 +2945,6 @@
 					loadPosts(1);
 				}
 
-				function getPostMeta(content) {
-					let text = String(content || "");
-					let bg = null;
-					let warn = false;
-					let warnText = "可能包含不适宜的内容";
-					let changed = true;
-					while (changed) {
-						changed = false;
-						const bgMatch = text.match(/^\[\[bg:(.+?)\]\]/);
-						if (bgMatch) {
-							bg = bgMatch[1];
-							text = text.slice(bgMatch[0].length);
-							changed = true;
-							continue;
-						}
-						const warnMatch = text.match(/^\[\[warn(?::([^\]]+))?\]\]/);
-						if (warnMatch) {
-							warn = true;
-							warnText = warnMatch[1] || warnText;
-							text = text.slice(warnMatch[0].length);
-							changed = true;
-						}
-					}
-					return {
-						bg,
-						warn,
-						warnText,
-						content: text
-					};
-				}
-
 				function openPostBgPicker() {
 					if (!currentUser) return;
 					document.querySelector(".modalBox").style.width = "420px";
@@ -3055,10 +3115,10 @@
 								'</div>';
 							bodyBox.querySelector(".warnMsg").textContent = meta.warnText || "可能包含不适宜的内容";
 							bodyBox.querySelector(".revealWarnBtn").onclick = () => {
-								renderPostBody(bodyBox, meta.content);
+								renderPostBody(bodyBox, p.content);
 							};
 						} else {
-							renderPostBody(bodyBox, meta.content);
+							renderPostBody(bodyBox, p.content);
 						}
 						container.appendChild(div);
 						const delBtn = div.querySelector("[data-del]");
