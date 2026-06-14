@@ -1781,19 +1781,19 @@
 				}
 				async function loadStats() {
 					try {
+						const totalUsersEl = $("totalUsers");
+						const totalPostsEl = $("totalPosts");
+						const statsBox = $("statsBox");
 						const [{
-								count: userCount,
-								error: userErr
-							},
-							{
-								count: postCount,
-								error: postErr
-							},
-							{
-								count: commentCount,
-								error: commentErr
-							}
-						] = await Promise.all([
+							count: userCount,
+							error: userErr
+						}, {
+							count: postCount,
+							error: postErr
+						}, {
+							count: commentCount,
+							error: commentErr
+						}] = await Promise.all([
 							supabase.from("users").select("id", {
 								count: "exact",
 								head: true
@@ -1807,9 +1807,8 @@
 								head: true
 							})
 						]);
-						if (!userErr) $("totalUsers").textContent = userCount || 0;
-						if (!postErr) $("totalPosts").textContent = postCount || 0;
-						const statsBox = $("statsBox");
+						if (totalUsersEl && !userErr) totalUsersEl.textContent = userCount || 0;
+						if (totalPostsEl && !postErr) totalPostsEl.textContent = postCount || 0;
 						if (statsBox) {
 							statsBox.innerHTML = `
 								<strong>全站统计</strong><br>
@@ -1823,8 +1822,11 @@
 							renderPager();
 						}
 					} catch (e) {
-						$("totalUsers").textContent = "—";
-						$("totalPosts").textContent = "—";
+						const totalUsersEl = $("totalUsers");
+						const totalPostsEl = $("totalPosts");
+						if (totalUsersEl) totalUsersEl.textContent = "—";
+						if (totalPostsEl) totalPostsEl.textContent = "—";
+						console.error(e);
 					}
 				}
 
@@ -2461,11 +2463,15 @@
 				}
 				async function cleanupNotifications() {
 					if (!currentUser) return;
-					const { data } = await supabase
+					const {
+						data
+					} = await supabase
 						.from("notifications")
 						.select("id")
 						.eq("target_id", currentUser.id)
-						.order("created_at", { ascending: false });
+						.order("created_at", {
+							ascending: false
+						});
 					if (!data) return;
 					const oldIds = data
 						.slice(100)
@@ -2486,6 +2492,7 @@
 							).toISOString()
 						);
 				}
+
 				function sanitizePostHtml(txt) {
 					const safeTags = {
 						b: [],
@@ -2986,7 +2993,8 @@
 							const delBtn = postDiv.querySelector("[data-del]");
 							if (delBtn) delBtn.onclick = () => deletePost(p.id);
 							postDiv.querySelector("[data-comment]").onclick = () => {
-								const text = postDiv.querySelector("[data-input]").value.trim();
+								const input = postDiv.querySelector("[data-input]");
+								const text = input ? input.value.trim() : "";
 								if (text) addComment(p.id, text, p.author);
 							};
 							const tagEl = postDiv.querySelector("[data-tag]");
@@ -3093,41 +3101,48 @@
 						});
 					}, 0);
 				}
-				async function addComment(id, text, postAuthorId) {
-					const {
-						data,
-						error
-					} = await supabase
-						.from("comments")
-						.insert([{
-							postid: id,
-							content: text,
-							author: currentUser.id,
-							time: new Date().toISOString()
-						}])
-						.select("id")
-						.single();
-					if (error) {
-						modal("评论失败：" + error.message);
-						return;
-					}
-					await createNotification({
-						targetId: postAuthorId,
-						actorId: currentUser.id,
-						postId: id,
-						commentId: data.id,
-						type: "comment"
-					});
-					const postDiv = document.querySelector(`.post[data - comment = "${id}"] `)?.closest(".post");
-					if (postDiv) {
-						const input = postDiv.querySelector("[data-input]");
-						if (input) {
-							input.value = "";
-							input.blur();
+				async function addComment(postId, content, postAuthorId) {
+					const text = String(content || "").trim();
+					if (!text) return;
+					try {
+						const {
+							data,
+							error
+						} = await supabase
+							.from("comments")
+							.insert([{
+								postid: postId,
+								content: sanitizePostHtml(text),
+								author: currentUser.id,
+								time: new Date().toISOString()
+							}])
+							.select("id")
+							.single();
+						if (error) throw error;
+						await createNotification({
+							targetId: postAuthorId,
+							actorId: currentUser.id,
+							postId: postId,
+							commentId: data?.id || null,
+							type: "comment"
+						});
+						const postDiv = document.querySelector(`.post[data-post-id="${postId}"]`);
+						if (postDiv) {
+							const input = postDiv.querySelector("[data-input]");
+							if (input) {
+								input.value = "";
+								input.blur();
+							}
+							const list = postDiv.querySelector(".commentList");
+							if (list) await renderComments(postId, list);
 						}
-						renderComments(id, postDiv.querySelector(".commentList"));
+						await changeCoins(currentUser.id, 3);
+						await refreshNotificationBadge();
+						await loadStats();
+					} catch (e) {
+						console.error(e);
+						modal("评论失败：" + e.message);
 					}
-					await changeCoins(currentUser.id, 3);
 				}
 				async function likePost(id, postDiv) {
 					const likeBtn = postDiv.querySelector(".like");
@@ -3307,19 +3322,16 @@
 					if (!currentUser) return;
 					document.querySelector(".modalBox").style.width = "420px";
 					let picked = "";
-					modal(` <
-							h3 > 背景 < /h3> <
-						div style = "font-size:14px;color:var(--sub);" >
-							花 15 金币， 给这一条帖子加个彩色背景 <
-							/div> <
-						div id = "bgPickerGrid"
-						class = "bgPickerGrid" > < /div> <
-						div style = "margin-top:14px;text-align:center;" >
-							<
-							button id = "bgApplyBtn"
-						disabled > 确定 < /button> < /
-						div >
-							`);
+					modal(`
+						<h3>背景</h3>
+						<div style="font-size:14px;color:var(--sub);margin-bottom:12px;">
+							花 15 金币，给这条帖子加一个彩色背景
+						</div>
+						<div id="bgPickerGrid" class="bgPickerGrid"></div>
+						<div style="margin-top:14px;text-align:center;">
+							<button id="bgApplyBtn" disabled>确定</button>
+						</div>
+					`);
 					const grid = $("bgPickerGrid");
 					for (const color of POST_BG_OPTIONS) {
 						const item = document.createElement("div");
