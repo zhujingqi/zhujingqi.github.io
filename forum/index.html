@@ -1149,6 +1149,46 @@
 				font-weight: 700;
 			}
 
+			.mentionLink {
+				color: var(--green);
+				font-weight: 700;
+				cursor: pointer;
+			}
+
+			.mentionBox {
+				position: fixed;
+				z-index: 100000;
+				background: var(--card);
+				border: 1px solid rgba(0, 0, 0, .12);
+				box-shadow: 0 10px 30px rgba(0, 0, 0, .18);
+				border-radius: 14px;
+				overflow: hidden;
+				min-width: 220px;
+				max-width: min(320px, calc(100vw - 20px));
+			}
+
+			.mentionBox.hidden {
+				display: none;
+			}
+
+			.mentionItem {
+				display: flex;
+				align-items: center;
+				gap: 8px;
+				padding: 8px 10px;
+				cursor: pointer;
+			}
+
+			.mentionItem:hover,
+			.mentionItem.active {
+				background: var(--bg);
+			}
+
+			.mentionItem .avatar {
+				width: 22px;
+				height: 22px;
+			}
+
 			@keyframes loadingDot {
 
 				0%,
@@ -1535,7 +1575,7 @@
 			</div>
 			<div id="postFilterBar" class="postFilterBar">
 				<div class="searchRow">
-					<input id="postSearch" class="postSearch" placeholder="搜索帖子内容或标签...">
+					<input id="postSearch" class="postSearch" placeholder="搜索帖子内容或标签，或输入 @用户名">
 					<button id="searchBtn">搜索</button>
 				</div>
 				<div id="postTagBar" class="postTagBar"></div>
@@ -1551,10 +1591,10 @@
 				<div class="noticeItem">
 					<details>
 						<summary><b>近期更新</b></summary>
+						· 搜索用户<br>
+						· 艾特用户<br>
 						· 分享音乐<br>
 						· 用户头像<br>
-						· 图片查看器放大缩小图片<br>
-						· 显示点赞、踩帖的具体用户<br>
 					</details>
 				</div>
 				<br>
@@ -1597,7 +1637,8 @@
 				</div>
 			</div>
 			<div class="card" style="width:95%;max-width:600px;">
-				<textarea id="text" placeholder="发布新鲜事（最多5000字符）" style="width:100%;" maxlength="5000"></textarea>
+				<textarea id="text" data-mention-input="1" placeholder="发布新鲜事（最多5000字符）" style="width:100%;"
+					maxlength="5000"></textarea>
 				<div style="display:flex;gap:6px;margin-top:8px;">
 					<input id="imgUrlInput" placeholder="图片链接" style="flex:1;height:36px;font-size:14px;">
 					<button id="insertImgBtn" type="button">插图</button>
@@ -1715,6 +1756,7 @@
 		</div>
 		<div id="coinMsg">
 		</div>
+		<div id="mentionBox" class="mentionBox hidden"></div>
 		<div id="viewer" onclick="closeViewer()">
 			<img id="viewerImg">
 		</div>
@@ -1859,9 +1901,182 @@
 					if (!isVerified(user)) return "";
 					return '<span class="verifiedBadge"></span>';
 				}
+				let allUsersCache = [];
+				let mentionState = {
+					el: null,
+					start: 0,
+					end: 0,
+					items: [],
+					activeIndex: 0
+				};
+				async function ensureAllUsersCache() {
+					if (allUsersCache.length) return allUsersCache;
+					const {
+						data,
+						error
+					} = await supabase
+						.from("users")
+						.select("id, name, coins, avatar");
+					if (error) return [];
+					allUsersCache = data || [];
+					return allUsersCache;
+				}
+
+				function hideMentionBox() {
+					const box = $("mentionBox");
+					if (!box) return;
+					box.classList.add("hidden");
+					box.innerHTML = "";
+					mentionState.el = null;
+					mentionState.items = [];
+					mentionState.activeIndex = 0;
+				}
+
+				function showMentionBox(el, items, start, end) {
+					const box = $("mentionBox");
+					if (!box) return;
+					const rect = el.getBoundingClientRect();
+					mentionState.el = el;
+					mentionState.start = start;
+					mentionState.end = end;
+					mentionState.items = items;
+					mentionState.activeIndex = 0;
+					box.classList.remove("hidden");
+					box.style.left = Math.min(rect.left, window.innerWidth - 340) + "px";
+					box.style.top = (rect.bottom + 6) + "px";
+					box.innerHTML = items.map((u, idx) => `
+						<div class="mentionItem ${idx === 0 ? "active" : ""}" data-index="${idx}" data-uid="${u.id}" data-uname="${u.name}">
+							<img class="avatar" src="${getAvatar(u)}" onerror="this.onerror=null;this.src='head.svg'">
+							<div style="min-width:0;">
+								<div><b>${u.name}</b></div>
+								<div class="time">点一下插入</div>
+							</div>
+						</div>
+					`).join("");
+					box.onmousedown = e => e.preventDefault();
+					box.querySelectorAll(".mentionItem").forEach(item => {
+						item.onclick = () => insertMentionFromBox(Number(item.dataset.uid), item.dataset.uname);
+					});
+				}
+
+				function getMentionContext(el) {
+					const caret = el.selectionStart ?? 0;
+					const text = el.value.slice(0, caret);
+					const match = text.match(/(^|[\s(])@([\p{L}\p{N}_-]{0,32})$/u);
+					if (!match) return null;
+					return {
+						start: caret - match[2].length - 1,
+						end: caret,
+						query: match[2]
+					};
+				}
+				async function updateMentionBox(el) {
+					const ctx = getMentionContext(el);
+					if (!ctx) {
+						hideMentionBox();
+						return;
+					}
+					const users = await ensureAllUsersCache();
+					const q = ctx.query.toLowerCase();
+					const items = users
+						.filter(u => u.name && u.name.toLowerCase().includes(q))
+						.slice(0, 6);
+					if (!items.length) {
+						hideMentionBox();
+						return;
+					}
+					showMentionBox(el, items, ctx.start, ctx.end);
+				}
+
+				function insertMentionFromBox(userId, userName) {
+					const el = mentionState.el;
+					if (!el) return;
+					const before = el.value.slice(0, mentionState.start);
+					const after = el.value.slice(mentionState.end);
+					el.value = before + "@" + userName + " " + after;
+					const pos = (before + "@" + userName + " ").length;
+					el.focus();
+					el.setSelectionRange(pos, pos);
+					hideMentionBox();
+					el.dispatchEvent(new Event("input", {
+						bubbles: true
+					}));
+				}
+
+				function linkifyMentions(root) {
+					if (!root) return;
+					const users = allUsersCache;
+					if (!users.length) return;
+					const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+					const nodes = [];
+					while (walker.nextNode()) nodes.push(walker.currentNode);
+					for (const node of nodes) {
+						if (!node.parentElement) continue;
+						if (node.parentElement.closest(".mentionLink,script,style")) continue;
+						const text = node.nodeValue;
+						if (!text || !text.includes("@")) continue;
+						const frag = document.createDocumentFragment();
+						let last = 0;
+						const reg = /(^|[\s(])@([\p{L}\p{N}_-]{1,32})/gu;
+						let m;
+						while ((m = reg.exec(text))) {
+							const full = m[0];
+							const prefix = m[1] || "";
+							const uname = m[2];
+							const found = users.find(u => u.name && u.name.toLowerCase() === uname.toLowerCase());
+							const before = text.slice(last, m.index);
+							if (before) frag.appendChild(document.createTextNode(before));
+							if (found) {
+								if (prefix) frag.appendChild(document.createTextNode(prefix));
+								const span = document.createElement("span");
+								span.className = "mentionLink";
+								span.textContent = "@" + found.name;
+								span.onclick = () => viewUser(found.id);
+								frag.appendChild(span);
+							} else {
+								frag.appendChild(document.createTextNode(full));
+							}
+							last = m.index + full.length;
+						}
+						const tail = text.slice(last);
+						if (tail) frag.appendChild(document.createTextNode(tail));
+						node.parentNode.replaceChild(frag, node);
+					}
+				}
+				async function notifyMentions(rawText, postId, commentId = null) {
+					const users = await ensureAllUsersCache();
+					const plain = String(rawText || "")
+						.replace(/<[^>]*>/g, "");
+					const matches = [...plain.matchAll(/@([\p{L}\p{N}_-]{1,32})/gu)];
+					const targetIds = [];
+					for (const m of matches) {
+						const uname = m[1].trim().toLowerCase();
+						const u = users.find(
+							x =>
+							x.name &&
+							x.name.trim().toLowerCase() === uname
+						);
+						if (u && !targetIds.includes(u.id)) {
+							targetIds.push(u.id);
+						}
+					}
+					for (const targetId of targetIds) {
+						await createNotification({
+							targetId,
+							actorId: currentUser.id,
+							postId,
+							commentId,
+							type: "mention"
+						});
+					}
+				}
 				$("homeBtn").onclick = () => {
 					show("main");
 					$("moreMenu").classList.add("hidden");
+					activePostTag = "全部";
+					postSearch = "";
+					const search = $("postSearch");
+					if (search) search.value = "";
 					renderPostFilters();
 					loadStats();
 					loadPosts(1);
@@ -1886,6 +2101,7 @@
 				$("notifBtn").onclick = openNotifications;
 				$("discoverBtn").onclick = () => {
 					show("discoverPage");
+					setActive("discoverBtn");
 				};
 				$("profileBtn").onclick = () => {
 					if (currentUser) viewUser(currentUser.id);
@@ -2064,7 +2280,7 @@
 					};
 				}
 
-				function renderPostBody(box, fullContent) {
+				async function renderPostBody(box, fullContent) {
 					const meta = getPostMeta(fullContent);
 					const hasHtml = /<[^>]+>/.test(meta.content);
 					const plainText = meta.content.replace(/<[^>]*>/g, "");
@@ -2078,6 +2294,8 @@
 						`<span class="longPostText">${foldedText}</span><button class="toggleLongPost inline">展开</button>` :
 						(meta.content || "");
 					box.innerHTML = html;
+					await ensureAllUsersCache();
+					linkifyMentions(box);
 					const t = box.querySelector(".toggleLongPost");
 					if (t) {
 						let e = false;
@@ -2085,6 +2303,7 @@
 							e = !e;
 							const l = box.querySelector(".longPostText");
 							if (l) l.innerHTML = e ? meta.content : foldedText;
+							linkifyMentions(box);
 							t.textContent = e ? "收起" : "展开";
 						};
 					}
@@ -2181,16 +2400,18 @@
 					if (selectedPostBg) {
 						finalContent = `[[bg:${selectedPostBg}]]` + finalContent;
 					}
+					const postId = Date.now();
 					let {
 						error
 					} = await supabase.from("posts").insert([{
-						id: Date.now(),
+						id: postId,
 						content: finalContent,
 						time: new Date().toISOString(),
 						author: currentUser.id,
 						tag: tag
 					}]);
 					if (error) return modal("发帖失败：" + error.message);
+					await notifyMentions(finalContent, postId, null);
 					$("text").value = "";
 					$("customTag").value = "";
 					selectedTags = [];
@@ -2213,6 +2434,7 @@
 					type
 				}) {
 					if (!targetId || !actorId || targetId === actorId) return;
+					if (type !== "comment" && type !== "mention") return;
 					await supabase.from("notifications").insert([{
 						target_id: targetId,
 						actor_id: actorId,
@@ -2225,11 +2447,9 @@
 				}
 
 				function notifLabel(n) {
-					const actorName = n.actor?.name || "有人";
-					if (n.type === "comment") return `${actorName} 评论了你的帖子`;
-					if (n.type === "like") return `${actorName} 赞了你的帖子`;
-					if (n.type === "dislike") return `${actorName} 踩了你的帖子`;
-					return `${actorName} 有新通知`;
+					if (n.type === "comment") return "评论了你的帖子";
+					if (n.type === "mention") return "@ 了你";
+					return "有新通知";
 				}
 
 				async function refreshNotificationBadge() {
@@ -2278,11 +2498,6 @@
 						);
 					} else if (activePostTag !== "全部") {
 						query = query.eq("tag", activePostTag);
-					}
-					const q = postSearch.trim();
-					if (q) {
-						const safeQ = q.replace(/[%_,]/g, "");
-						query = query.or(`content.ilike.%${safeQ}%,tag.ilike.%${safeQ}%`);
 					}
 					return query;
 				}
@@ -2348,14 +2563,14 @@
 					} = await supabase
 						.from("notifications")
 						.select(`
-			id,
-			type,
-			is_read,
-			created_at,
-			post_id,
-			comment_id,
-			actor:actor_id(id, name, coins, avatar)
-		`)
+							id,
+							type,
+							is_read,
+							created_at,
+							post_id,
+							comment_id,
+							actor:actor_id(id, name, coins, avatar)
+						`)
 						.eq("target_id", currentUser.id)
 						.order("created_at", {
 							ascending: false
@@ -2370,50 +2585,39 @@
 						rows.map(n => {
 							const a = n.actor || {};
 							const avatar = getAvatar(a);
-							const levelHtml = getUserLevel(a.coins || 0);
-							const verifiedHtml = getVerifiedBadge(a);
-							const unreadStyle = n.is_read ?
-								"" :
-								"font-weight:700;background:rgba(0,0,0,.03);";
+							const unreadClass = n.is_read ? "" : "font-weight:700;background:rgba(0,0,0,.03);";
 							return `
 								<div class="notifItem"
 									data-nid="${n.id}"
 									data-post="${n.post_id}"
-									style="padding:10px 12px;border-bottom:1px solid var(--bg);cursor:pointer;border-radius:20px;${unreadStyle}">
-									<div style="display:flex;align-items:center;gap:10px;">
-										<img class="avatar notifAvatar"
-											src="${avatar}"
-											onerror="this.onerror=null;this.src='head.svg'">
+									style="padding:8px 10px;border-bottom:1px solid var(--bg);cursor:pointer;border-radius:14px;${unreadClass}">
+									<div style="display:flex;align-items:center;gap:8px;">
+										<img class="avatar notifAvatar" src="${avatar}" onerror="this.onerror=null;this.src='head.svg'">
 										<div style="min-width:0;flex:1;">
-											<div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;">
+											<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
 												<b>${a.name || "有人"}</b>
-												${levelHtml}
-												${verifiedHtml}
+												<span>${notifLabel(n)}</span>
 											</div>
-											<div>${notifLabel(n)}</div>
-											<div class="time">
-												${new Date(n.created_at).toLocaleString()}
-											</div>
+											<div class="time">${new Date(n.created_at).toLocaleString()}</div>
 										</div>
 									</div>
 								</div>
 							`;
 						}).join("") :
 						`<div style="color:var(--sub);padding:8px 0;">暂无通知</div>`;
-					document.querySelector(".modalBox").style.width = "460px";
+					document.querySelector(".modalBox").style.width = "420px";
 					modal(`
-							<h3>通知</h3>
-							<div style="max-height:340px;overflow:auto;text-align:left;">
-								${notifHtml}
-							</div>
-							<div style="margin-top:14px;display:flex;gap:8px;justify-content:space-between;flex-wrap:wrap;">
-								<button id="clearNotifBtn">清除通知</button>
-								<button id="markAllReadBtn">全部已读</button>
-							</div>
-						`);
+						<h3>通知</h3>
+						<div style="max-height:320px;overflow:auto;text-align:left;">
+							${notifHtml}
+						</div>
+						<div style="margin-top:12px;display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap;">
+							<button id="clearNotifBtn">删除全部</button>
+							<button id="markAllReadBtn">全部已读</button>
+						</div>
+					`);
 					$("markAllReadBtn").onclick = async () => {
-						await supabase
-							.from("notifications")
+						await supabase.from("notifications")
 							.update({
 								is_read: true
 							})
@@ -2421,38 +2625,20 @@
 						await refreshNotificationBadge();
 						openNotifications();
 					};
-					$("clearNotifBtn").onclick = askClearNotifications;
-					async function askClearNotifications() {
-						document.querySelector(".modalBox").style.width = "360px";
-						modal(`
-							<h3>清除通知</h3>
-							<div style="margin-top:8px;color:var(--sub);">
-								确定要删除全部通知吗？
-							</div>
-							<div style="margin-top:16px;display:flex;gap:8px;justify-content:center;">
-								<button id="cancelClearNotifBtn">取消</button>
-								<button id="okClearNotifBtn">确定清除</button>
-							</div>
-						`);
-						$("cancelClearNotifBtn").onclick = () => {
-							$("modal").classList.add("hidden");
-						};
-						$("okClearNotifBtn").onclick = async () => {
-							const {
-								error
-							} = await supabase
-								.from("notifications")
-								.delete()
-								.eq("target_id", currentUser.id);
-							if (error) {
-								modal("清除失败：" + error.message);
-								return;
-							}
-							$("modal").classList.add("hidden");
-							await refreshNotificationBadge();
-							openNotifications();
-						};
-					}
+					$("clearNotifBtn").onclick = async () => {
+						const {
+							error
+						} = await supabase
+							.from("notifications")
+							.delete()
+							.eq("target_id", currentUser.id);
+						if (error) {
+							modal("删除失败：" + error.message);
+							return;
+						}
+						$("modal").classList.add("hidden");
+						await refreshNotificationBadge();
+					};
 					document.querySelectorAll(".notifItem").forEach(el => {
 						el.onclick = async () => {
 							await markNotificationRead(Number(el.dataset.nid));
@@ -2810,7 +2996,30 @@
 					const q = postSearch.trim();
 					if (q) {
 						const safeQ = q.replace(/[%_,]/g, "");
-						query = query.or(`content.ilike.%${safeQ}%,tag.ilike.%${safeQ}%`);
+						if (q.startsWith("@")) {
+							const uname = q.slice(1).trim();
+							if (!uname) return {
+								posts: [],
+								count: 0
+							};
+							const {
+								data: users,
+								error: userErr
+							} = await supabase
+								.from("users")
+								.select("id, name")
+								.ilike("name", `%${uname}%`)
+								.limit(20);
+							if (userErr) throw userErr;
+							const ids = [...new Set((users || []).map(u => u.id))];
+							if (!ids.length) return {
+								posts: [],
+								count: 0
+							};
+							query = query.in("author", ids);
+						} else {
+							query = query.or(`content.ilike.%${safeQ}%,tag.ilike.%${safeQ}%`);
+						}
 					}
 					let {
 						data,
@@ -2967,7 +3176,8 @@
 								'</div>' +
 								(p.author === currentUser.id ? '<button data-del="' + p.id + '">删除</button>' : "") +
 								'</div>' +
-								'<div class="commentRow"><input data-input="' + p.id + '" placeholder="评论...">' +
+								'<div class="commentRow"><input data-input="' + p.id +
+								'" data-mention-input="1" placeholder="评论...">' +
 								'<button data-comment="' + p.id + '">发送</button></div>' +
 								'<div class="commentList"></div>';
 							container.appendChild(postDiv);
@@ -3043,6 +3253,8 @@
 								? `<button class="commentDel" data-cdel="${c.id}">删除</button>`
 								: ""}`;
 						div.querySelector(".commentContent").textContent = c.content || "";
+						await ensureAllUsersCache();
+						linkifyMentions(div);
 						container.appendChild(div);
 						const userLink = div.querySelector(".userLink");
 						if (userLink) {
@@ -3119,6 +3331,7 @@
 							.select("id")
 							.single();
 						if (error) throw error;
+						await notifyMentions(text, postId, data?.id || null);
 						await createNotification({
 							targetId: postAuthorId,
 							actorId: currentUser.id,
@@ -3201,12 +3414,6 @@
 									type: 1,
 									time: new Date().toISOString()
 								}]);
-							await createNotification({
-								targetId: postDiv.dataset.authorId,
-								actorId: currentUser.id,
-								postId: id,
-								type: "like"
-							});
 							await changeCoins(currentUser.id, hasDislike ? 2 : 1);
 						}
 					} catch (e) {
@@ -3275,12 +3482,6 @@
 									type: -1,
 									time: new Date().toISOString()
 								}]);
-							await createNotification({
-								targetId: postDiv.dataset.authorId,
-								actorId: currentUser.id,
-								postId: id,
-								type: "dislike"
-							});
 							await changeCoins(currentUser.id, hasLike ? -2 : -1);
 						}
 					} catch (e) {
@@ -3625,9 +3826,12 @@
 				function getUserLevel(coins) {
 					let level = "LV0",
 						color = "#888";
-					if (coins > 2560) {
+					if (coins > 5120) {
+						level = "MAX";
+						color = "#000000";
+					} else if (coins > 2560) {
 						level = "LV9";
-						color = "#FFD700; background: black; padding: 2px; border-radius: 5px;";
+						color = "#55007f";
 					} else if (coins > 1280) {
 						level = "LV8";
 						color = "#9900ff";
@@ -3793,6 +3997,40 @@
 				window.closeViewer = function() {
 					document.getElementById("viewer").style.display = "none";
 				};
+				document.addEventListener("input", e => {
+					const el = e.target;
+					if (!el.matches || !el.matches("[data-mention-input]")) return;
+					updateMentionBox(el);
+				});
+				document.addEventListener("keydown", e => {
+					const box = $("mentionBox");
+					if (box.classList.contains("hidden")) return;
+					if (e.key === "Escape") {
+						hideMentionBox();
+						return;
+					}
+					if (e.key === "ArrowDown" || e.key === "ArrowUp" || e.key === "Enter") {
+						e.preventDefault();
+						const items = [...box.querySelectorAll(".mentionItem")];
+						if (!items.length) return;
+						if (e.key === "ArrowDown") mentionState.activeIndex = (mentionState.activeIndex + 1) %
+							items.length;
+						if (e.key === "ArrowUp") mentionState.activeIndex = (mentionState.activeIndex - 1 + items
+							.length) % items.length;
+						if (e.key === "Enter") {
+							const item = items[mentionState.activeIndex];
+							if (item) insertMentionFromBox(Number(item.dataset.uid), item.dataset.uname);
+							return;
+						}
+						items.forEach((el, idx) => el.classList.toggle("active", idx === mentionState
+							.activeIndex));
+					}
+				});
+				document.addEventListener("click", e => {
+					if (e.target.closest("#mentionBox")) return;
+					if (e.target.matches && e.target.matches("[data-mention-input]")) return;
+					hideMentionBox();
+				});
 				document.addEventListener("click", e => {
 					const img = e.target.closest(".zoomable");
 					if (img) {
