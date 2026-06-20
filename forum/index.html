@@ -1189,6 +1189,65 @@
 				height: 22px;
 			}
 
+			#posts.denseLayout {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+				width: min(100%, 1100px);
+				max-width: 1100px;
+				margin: 0 auto;
+				gap: 10px;
+				padding: 0 12px 20px;
+				box-sizing: border-box;
+				align-items: stretch;
+			}
+
+			#posts.denseLayout .post {
+				width: 100%;
+				margin: 0;
+				padding: 14px;
+				border-radius: 18px;
+				font-size: 15px;
+				box-sizing: border-box;
+			}
+
+			#posts.denseLayout .postHeaderTop {
+				align-items: flex-start;
+			}
+
+			#posts.denseLayout .postContent {
+				margin: 6px 0;
+				line-height: 1.6;
+			}
+
+			#posts.denseLayout .postActions {
+				margin-top: 8px;
+			}
+
+			#posts.denseLayout .commentList .comment {
+				font-size: 13px;
+				line-height: 1.3;
+			}
+
+			@keyframes postFadeIn {
+				from {
+					opacity: 0;
+					transform: translateY(10px) scale(.98)
+				}
+
+				to {
+					opacity: 1;
+					transform: translateY(0) scale(1)
+				}
+			}
+
+			.post.postEnter {
+				animation: postFadeIn .32s ease both;
+			}
+
+			#posts.denseLayout .post.postEnter {
+				animation: postFadeIn .32s ease both;
+			}
+
 			@keyframes loadingDot {
 
 				0%,
@@ -1304,6 +1363,7 @@
 					opacity: 1;
 					pointer-events: auto;
 					transform: translateX(0);
+					font-size: 14px;
 				}
 
 				#fortuneBtn {
@@ -1511,6 +1571,10 @@
 					width: 22px;
 					height: 22px;
 				}
+
+				#layoutBtn {
+					display: none;
+				}
 			}
 		</style>
 	</head>
@@ -1577,6 +1641,7 @@
 				<div class="searchRow">
 					<input id="postSearch" class="postSearch" placeholder="搜索帖子内容或标签，或输入 @用户名">
 					<button id="searchBtn">搜索</button>
+					<button id="layoutBtn" type="button">信息流</button>
 				</div>
 				<div id="postTagBar" class="postTagBar"></div>
 			</div>
@@ -1591,10 +1656,12 @@
 				<div class="noticeItem">
 					<details>
 						<summary><b>近期更新</b></summary>
+						· 信息流模式<br>
+						· 渐入动画<br>
+						· Enter发评论<br>
 						· 搜索用户<br>
 						· 艾特用户<br>
 						· 分享音乐<br>
-						· 用户头像<br>
 					</details>
 				</div>
 				<br>
@@ -1696,7 +1763,7 @@
 			<br>
 			<div id="userPosts"></div>
 		</div>
-		<div id="discoverPage" class="hidden page">
+		<div id="discoverPage" class="hidden">
 			<div id="logoRow">
 				<div id="logo">
 					<img src="icon.svg">
@@ -1771,7 +1838,11 @@
 				let currentPage = "home";
 				const defaultTags = ["学习", "日常", "搞笑", "提问"];
 				let selectedTags = [];
-				const POSTS_PER_PAGE = 5;
+				let postLayout = localStorage.getItem("postLayout") || "list";
+
+				function getPostsPerPage() {
+					return postLayout === "dense" ? 15 : 5;
+				}
 				let postPage = 1;
 				let postTotalPages = 1;
 				let postPages = [];
@@ -1820,6 +1891,16 @@
 						};
 						bar.appendChild(span);
 					}
+				}
+
+				function syncLayoutBtn() {
+					const btn = $("layoutBtn");
+					if (!btn) return;
+					btn.textContent = postLayout === "dense" ? "常规" : "信息流（Beta）";
+				}
+
+				function syncLayoutMode() {
+					$("posts").classList.toggle("denseLayout", postLayout === "dense");
 				}
 				async function loadStats() {
 					try {
@@ -2099,6 +2180,13 @@
 					setActive("showUsersBtn");
 				};
 				$("notifBtn").onclick = openNotifications;
+				$("layoutBtn").onclick = () => {
+					postLayout = postLayout === "list" ? "dense" : "list";
+					localStorage.setItem("postLayout", postLayout);
+					syncLayoutMode();
+					syncLayoutBtn();
+					$("posts").classList.toggle("denseLayout", postLayout === "dense");
+				};
 				$("discoverBtn").onclick = () => {
 					show("discoverPage");
 					setActive("discoverBtn");
@@ -2284,7 +2372,7 @@
 					const meta = getPostMeta(fullContent);
 					const hasHtml = /<[^>]+>/.test(meta.content);
 					const plainText = meta.content.replace(/<[^>]*>/g, "");
-					const needFold = !hasHtml && plainText.length > 300;
+					const needFold = !hasHtml && plainText.length > (postLayout === "dense" ? 120 : 300);
 					const foldedText = needFold ? plainText.slice(0, 300) + " ..." : "";
 					let html = "";
 					if (meta.music) {
@@ -2314,7 +2402,7 @@
 				}
 
 				function setActive(id) {
-					["homeBtn", "editorBtn", "showUsersBtn", "profileBtn", "moreBtn"]
+					["homeBtn", "editorBtn", "showUsersBtn", "profileBtn", "discoverBtn", "moreBtn"]
 					.forEach(b => $(b).classList.remove("active"));
 					$(id).classList.add("active");
 				}
@@ -2379,6 +2467,8 @@
 					$("nav").classList.remove("hidden");
 					show("main");
 					renderPostFilters();
+					syncLayoutMode();
+					syncLayoutBtn();
 					loadStats();
 					loadPosts(1);
 					loadOnlineUsers();
@@ -2538,7 +2628,8 @@
 						modal("定位帖子失败：" + countErr.message);
 						return;
 					}
-					const page = Math.floor((count || 0) / POSTS_PER_PAGE) + 1;
+					const perPage = getPostsPerPage();
+					const page = Math.floor((count || 0) / perPage) + 1;
 					await loadPosts(page);
 					setTimeout(() => {
 						const target = document.querySelector(`.post[data-post-id="${postId}"]`);
@@ -2812,7 +2903,7 @@
 					const pager = $("postPager");
 					if (!pager) return;
 					pager.innerHTML = "";
-					const maxPage = Math.max(1, Math.ceil(totalPostCount / POSTS_PER_PAGE));
+					const maxPage = Math.max(1, Math.ceil(totalPostCount / getPostsPerPage()));
 					const makeBtn = (text, page, cls = "pageBtn", disabled = false, active = false) => {
 						const b = document.createElement("button");
 						b.className = cls + (active ? " active" : "");
@@ -2966,9 +3057,9 @@
 						}
 					};
 				}
-				async function fetchPostPage(page = 1) {
-					let from = (page - 1) * POSTS_PER_PAGE;
-					let to = from + POSTS_PER_PAGE - 1;
+				async function fetchPostPage(page = 1, perPage = getPostsPerPage()) {
+					let from = (page - 1) * perPage;
+					let to = from + perPage - 1;
 					let query = supabase
 						.from("posts")
 						.select(`
@@ -3049,15 +3140,20 @@
 				const mobileSideBtn = $("mobileSideBtn");
 
 				function syncMobilePanels() {
-					if (window.innerWidth > 800) {
+					const isMobile = window.innerWidth <= 800;
+					const dense = postLayout === "dense";
+					if (isMobile) {
+						if (mobileSideBtn) mobileSideBtn.style.display = "flex";
 						notice.classList.remove("mobile-open");
 						$("fortuneBox")?.classList.remove("mobile-open");
+					} else {
 						if (mobileSideBtn) mobileSideBtn.style.display = "none";
-						return;
+						notice.classList.remove("mobile-open");
+						$("fortuneBox")?.classList.remove("mobile-open");
 					}
-					if (mobileSideBtn) mobileSideBtn.style.display = "flex";
-					notice.classList.remove("mobile-open");
-					$("fortuneBox")?.classList.remove("mobile-open");
+					document.body.classList.toggle("denseFeed", dense);
+					const tagBar = $("postTagBar");
+					if (tagBar) tagBar.style.display = dense ? "none" : "";
 				}
 				if (mobileSideBtn) {
 					mobileSideBtn.onclick = () => {
@@ -3081,12 +3177,13 @@
 				};
 				async function loadPosts(page = 1, container = $("posts")) {
 					const token = ++currentLoadToken;
+					const perPage = getPostsPerPage();
 					container.innerHTML =
 						"<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
 					try {
 						postPage = page;
 						renderPager();
-						const pageData = await fetchPostPage(page);
+						const pageData = await fetchPostPage(page, perPage);
 						totalPostCount = pageData.count || 0;
 						renderPager();
 						if (token !== currentLoadToken) return;
@@ -3097,7 +3194,8 @@
 								"<p style='text-align:center;color:var(--sub);margin-top:20px;'>暂无帖子</p>";
 							return;
 						}
-						for (let p of posts) {
+						for (let i = 0; i < posts.length; i++) {
+							let p = posts[i];
 							if (token !== currentLoadToken) return;
 							const postDiv = document.createElement("div");
 							postDiv.className = "post";
@@ -3181,6 +3279,11 @@
 								'<button data-comment="' + p.id + '">发送</button></div>' +
 								'<div class="commentList"></div>';
 							container.appendChild(postDiv);
+							postDiv.style.opacity = "0";
+							postDiv.classList.add("postEnter");
+							postDiv.style.animationDelay = `${i*45}ms`;
+							container.appendChild(postDiv);
+							requestAnimationFrame(() => postDiv.style.opacity = "1");
 							const bodyBox = postDiv.querySelector(".postContent");
 							if (meta.warn) {
 								bodyBox.innerHTML =
@@ -3202,11 +3305,13 @@
 							postDiv.querySelector(".dislike").onclick = () => dislikePost(p.id, postDiv);
 							const delBtn = postDiv.querySelector("[data-del]");
 							if (delBtn) delBtn.onclick = () => deletePost(p.id);
-							postDiv.querySelector("[data-comment]").onclick = () => {
-								const input = postDiv.querySelector("[data-input]");
-								const text = input ? input.value.trim() : "";
+							const submit = () => {
+								const text = postDiv.querySelector("[data-input]")?.value.trim();
 								if (text) addComment(p.id, text, p.author);
 							};
+							postDiv.querySelector("[data-comment]").onclick = submit;
+							postDiv.querySelector("[data-input]")?.addEventListener("keydown", e => e.key ===
+								"Enter" && submit());
 							const tagEl = postDiv.querySelector("[data-tag]");
 							if (tagEl) {
 								tagEl.onclick = () => {
@@ -4066,6 +4171,8 @@
 								$("nav").classList.remove("hidden");
 								show("main");
 								renderPostFilters();
+								syncLayoutBtn();
+								syncLayoutMode();
 								loadStats();
 								loadOnlineUsers();
 								startPresence();
