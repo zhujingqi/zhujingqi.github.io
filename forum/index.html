@@ -56,6 +56,7 @@
 				box-sizing: border-box;
 				height: 42px;
 				font-size: 18px;
+				user-select: none;
 			}
 
 			button:hover {
@@ -281,28 +282,6 @@
 				text-align: center;
 			}
 
-			.moreMenu {
-				position: absolute;
-				bottom: 50px;
-				right: -110px;
-				transform: translateX(-50%);
-				background: var(--card);
-				padding: 15px;
-				border-radius: 20px;
-				box-shadow: 0 5px 20px rgba(0, 0, 0, .2);
-				width: 240px;
-				text-align: center;
-			}
-
-			.moreMenu div {
-				padding: 8px;
-				cursor: pointer;
-			}
-
-			.moreMenu div:hover {
-				color: var(--green);
-			}
-
 			.userLink {
 				cursor: pointer;
 				color: var(--green);
@@ -500,7 +479,8 @@
 				background-color: #888;
 			}
 
-			#backBtn {
+			#backBtn,
+			#postBackBtn {
 				position: absolute;
 				left: 20px;
 				top: 20px;
@@ -511,9 +491,11 @@
 				border-radius: 20px;
 				cursor: pointer;
 				transition: 0.2s;
+				z-index: 100;
 			}
 
-			#backBtn:hover {
+			#backBtn:hover,
+			#postBackBtn:hover {
 				background: var(--green);
 				color: #fff;
 			}
@@ -1228,6 +1210,50 @@
 				line-height: 1.3;
 			}
 
+			.profileBtnGrid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+				gap: 10px;
+				width: 100%;
+				max-width: 600px;
+				margin: 16px auto 40px auto;
+				padding: 0 20px;
+				box-sizing: border-box;
+			}
+
+			.profileBtnGrid .pbtn {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: 0 12px;
+				border-radius: 20px;
+				background: var(--card);
+				color: var(--text);
+				border: none;
+				cursor: pointer;
+				font-size: 15px;
+				text-align: center;
+				transition: .2s;
+				height: 44px;
+				user-select: none;
+			}
+
+			.profileBtnGrid .pbtn:hover {
+				background: var(--green);
+				color: #fff;
+			}
+
+			.themeRow {
+				display: flex;
+				gap: 8px;
+				grid-column: 1 / -1;
+			}
+
+			.themeRow button {
+				flex: 1;
+				height: 42px;
+			}
+
 			@keyframes postFadeIn {
 				from {
 					opacity: 0;
@@ -1272,6 +1298,10 @@
 				.bottom button {
 					height: 100%;
 					padding-bottom: 40px;
+				}
+
+				.profileBtnGrid {
+					margin-bottom: 70px;
 				}
 
 				#pname {
@@ -1412,19 +1442,6 @@
 					padding: 6px 12px;
 					font-size: 14px;
 				}
-
-				#moreMenu {
-					width: 180px;
-					right: -90px;
-					padding: 10px;
-					font-size: 14px;
-					bottom: 50px;
-				}
-
-				#moreMenu div {
-					padding: 6px;
-				}
-
 				.pager {
 					gap: 4px;
 					padding-bottom: 60px;
@@ -1585,7 +1602,6 @@
 			<button id="showUsersBtn">排行</button>
 			<button id="discoverBtn">探索</button>
 			<button id="profileBtn">我的</button>
-			<button id="moreBtn">更多</button>
 		</div>
 		<div id="welcomePage" class="center">
 			<div class="big">
@@ -1656,12 +1672,14 @@
 				<div class="noticeItem">
 					<details>
 						<summary><b>近期更新</b></summary>
+						· 支持QQ音乐<br>
+						· 移除更多菜单<br>
+						· 大改用户主页<br>
+						· 插入图片调整<br>
 						· 信息流模式<br>
 						· 渐入动画<br>
 						· Enter发评论<br>
 						· 搜索用户<br>
-						· 艾特用户<br>
-						· 分享音乐<br>
 					</details>
 				</div>
 				<br>
@@ -1707,7 +1725,6 @@
 				<textarea id="text" data-mention-input="1" placeholder="发布新鲜事（最多5000字符）" style="width:100%;"
 					maxlength="5000"></textarea>
 				<div style="display:flex;gap:6px;margin-top:8px;">
-					<input id="imgUrlInput" placeholder="图片链接" style="flex:1;height:36px;font-size:14px;">
 					<button id="insertImgBtn" type="button">插图</button>
 					<button id="insertMusicBtn" type="button">插入音乐</button>
 				</div>
@@ -1803,18 +1820,11 @@
 				</a>
 			</div>
 		</div>
-		<div id="moreMenu" class="moreMenu hidden">
-			<div id="aboutBtn">关于</div>
-			<hr>
-			<div id="sponsorBtn">赞助</div>
-			<hr>
-			<div id="downloadBtn">获取应用版</div>
-			<hr>
-			<p>主题</p>
-			<div id="sysTheme">跟随系统</div>
-			<div id="lightTheme">浅色模式</div>
-			<div id="darkTheme">深色模式</div>
+		<div id="postPage" class="hidden" style="display:flex;flex-direction:column;height:100vh;">
+			<div id="postBackBtn">←</div>
+			<div id="singlePost" style="width:100%;max-width:800px;overflow-y:auto;overflow-x:hidden;flex:1;padding:20px 0;margin:0 auto;box-sizing:border-box;"></div>
 		</div>
+		
 		<div id="modal" class="modal hidden">
 			<div class="modalBox">
 				<div id="modalText"></div>
@@ -1955,9 +1965,12 @@
 
 				function show(p) {
 					currentPage = p;
-					["welcomePage", "registerPage", "main", "editorPage", "profilePage", "userListPage", "discoverPage"]
+					["welcomePage", "registerPage", "main", "editorPage", "profilePage", "userListPage", "discoverPage", "postPage"]
 					.forEach(id => $(id).classList.add("hidden"));
 					$(p).classList.remove("hidden");
+					if (p !== "profilePage" && p !== "postPage") {
+						history.replaceState(null, "", location.pathname);
+					}
 				}
 
 				function modal(t) {
@@ -2153,7 +2166,7 @@
 				}
 				$("homeBtn").onclick = () => {
 					show("main");
-					$("moreMenu").classList.add("hidden");
+					
 					activePostTag = "全部";
 					postSearch = "";
 					const search = $("postSearch");
@@ -2168,14 +2181,14 @@
 				};
 				$("editorBtn").onclick = () => {
 					show("editorPage");
-					$("moreMenu").classList.add("hidden");
+					
 					setActive("editorBtn");
 					renderTagBar();
 				};
 				$("showUsersBtn").onclick = () => {
 					show("userListPage");
 					loadNewUsers();
-					$("moreMenu").classList.add("hidden");
+					
 					loadUserList();
 					setActive("showUsersBtn");
 				};
@@ -2193,19 +2206,16 @@
 				};
 				$("profileBtn").onclick = () => {
 					if (currentUser) viewUser(currentUser.id);
-					$("moreMenu").classList.add("hidden");
+					
 					setActive("profileBtn");
 				};
-				$("moreBtn").onclick = e => {
-					$("moreMenu").classList.toggle("hidden");
-				};
-				$("backBtn").onclick = () => {
-					show("main");
-					$("moreMenu").classList.add("hidden");
-					renderPostFilters();
-					loadPosts(postPage);
-					setActive("homeBtn");
-				};
+			$("backBtn").onclick = () => {
+				show("main");
+				renderPostFilters();
+				loadPosts(postPage);
+				setActive("homeBtn");
+			};
+				$("postBackBtn").onclick = () => history.back();
 				$("goRegister").onclick = () => show("registerPage");
 				$("backLogin").onclick = () => show("welcomePage");
 				$("logoutBtn").onclick = () => {
@@ -2214,29 +2224,6 @@
 					currentUser = null;
 					$("nav").classList.add("hidden");
 					show("welcomePage");
-				};
-				$("aboutBtn").onclick = () => {
-					document.querySelector(".modalBox").style.width = "800px";
-					modal(`
-<h2>关于</h2>
-<div style="text-align: left;">
-<b>Jacky 论坛</b>是一款网页论坛，前端使用 HTML、CSS 与 JavaScript 编写，数据库使用SQL。<br>
-<br>
-<b>【原理】</b>用户、帖子、评论、点赞数据存储在数据库，通过 API 读取和更新内容。<br>
-<b>【功能】</b>用户登录注册系统、发帖和评论、点赞和删除、用户列表、个人主页、主题切换。<br>
-<b>【提醒】</b>请勿发布违法内容，请勿滥用。<br>
-<br>
-如遇BUG，欢迎汇报至 <a href="mailto:jacky@zhujingqi.com">jacky@zhujingqi.com</a> 或 <a href="https://zhujingqi.com/me/contact.html">联系</a><br>
-</div>
-<h6><a href="#">Jacky 论坛</a> · <a href="https://zhujingqi.com">Zhujingqi</a></h6>
-<h6>© Jacky Forum. All rights reserved.</h6>
-					`);
-				};
-				$("sponsorBtn").onclick = () => {
-					modal(`
-<h2>赞助</h2>
-<a href="https://zhujingqi.com/money.html">点击此处赞助 Jacky</a>
-					`);
 				};
 				$("termsBtn").onclick = () => {
 					document.querySelector(".modalBox").style.width = "800px";
@@ -2254,39 +2241,7 @@
 <p>如有疑问，请联系 <a href="mailto:jacky@zhujingqi.com">jacky@zhujingqi.com</a></p>
 					`);
 				}
-				$("downloadBtn").onclick = () => {
-					document.querySelector(".modalBox").style.width = "800px";
-					modal(`
-					<h3>获取应用版 Jacky 论坛</h3>
-					<h4>Windows系统</h4>
-					<details>
-					<summary>如何安装？</summary>
-					<p>
-						1. <a href="https://github.com/zhujingqi/download/releases/download/1.0.0/Jacky.Forum.Setup.1.0.0.exe">点击<b>下载EXE安装程序</b></a><br>
-						2. 双击安装程序，安装<b>桌面版 Jacky 论坛</b><br>
-						3. 更加便捷地使用 <b>Jacky 论坛</b> 吧！
-						<h6>注：国内下载可能<del>较慢</del>非常慢！</h6>
-					</p>
-					</details>
-					<h4>iOS系统</h4>
-					<details>
-						<summary>如何安装？</summary>
-						使用Safari浏览器访问 <b>Jacky 论坛</b><br>
-						<img src="1.jpg" style="width:100px;margin-top:10px;" class="zoomable" />
-						<img src="2.jpg" style="width:100px;margin-top:10px;" class="zoomable" />
-						<img src="3.jpg" style="width:100px;margin-top:10px;" class="zoomable" />
-					</details>
-					`);
-				}
-				$("lightTheme").onclick = () => {
-					document.body.classList.remove("dark");
-				};
-				$("darkTheme").onclick = () => {
-					document.body.classList.add("dark");
-				};
-				$("sysTheme").onclick = () => {
-					document.body.classList.remove("dark");
-				};
+
 				$("bgBuyBtn").textContent = selectedPostBg ? "已使用" : "背景";
 				$("bgBuyBtn").onclick = openPostBgPicker;
 				const warnTextInput = $("warnText");
@@ -2300,23 +2255,36 @@
 						warnTextInput.value = "";
 					}
 				};
-				$("insertImgBtn").onclick = () => {
-					const url = $("imgUrlInput").value.trim();
-					if (!url) return modal("请输入图片链接");
-					if (!/^https?:\/\//i.test(url)) return modal("图片链接必须以 http:// 或 https:// 开头");
-					const textArea = $("text");
-					const insert = `<img src="${url}" class="zoomable" style="max-width:60%;border-radius:12px;">`;
-					textArea.value += (textArea.value ? "\n" : "") + insert + "\n";
-					$("imgUrlInput").value = "";
-				};
+				function openImagePicker() {
+					document.querySelector(".modalBox").style.width = "420px";
+					modal(`
+		<h3>插入图片</h3>
+		<input id="imgUrlInput" placeholder="图片链接（http/https）" style="width:100%;">
+		<div style="margin-top:8px;font-size:12px;color:var(--sub);text-align:left;">
+			提示：支持 http/https 图片链接
+		</div>
+		<div style="margin-top:14px;">
+			<button id="imgApplyBtn">插入</button>
+		</div>
+					`);
+					$("imgApplyBtn").onclick = () => {
+						const url = $("imgUrlInput").value.trim();
+						if (!url) return modal("请输入图片链接");
+						if (!/^https?:\/\//i.test(url)) return modal("图片链接必须以 http:// 或 https:// 开头");
+						const textArea = $("text");
+						textArea.value += (textArea.value ? "\n" : "") + `[img:${url}]` + "\n";
+						$("modal").classList.add("hidden");
+					};
+				}
+				$("insertImgBtn").onclick = openImagePicker;
 
 				function openMusicPicker() {
 					document.querySelector(".modalBox").style.width = "420px";
 					modal(`
 		<h3>插入音乐</h3>
-		<input id="musicUrlInput" placeholder="网易云链接，例如 https://music.163.com/song?id=123456" style="width:100%;">
+		<input id="musicUrlInput" placeholder="网易云/QQ音乐链接" style="width:100%;">
 		<div style="margin-top:8px;font-size:12px;color:var(--sub);text-align:left;">
-			提示：支持网易云音乐歌曲链接
+			提示：支持网易云音乐和 QQ 音乐歌曲链接
 		</div>
 		<div style="margin-top:14px;">
 			<button id="musicApplyBtn">插入</button>
@@ -2324,13 +2292,20 @@
 					`);
 					$("musicApplyBtn").onclick = () => {
 						const url = $("musicUrlInput").value.trim();
-						if (!url) return modal("请输入网易云链接");
-						if (!/music\.163\.com/i.test(url)) return modal("请填写网易云音乐链接");
+						if (!url) return modal("请输入音乐链接");
 						const textArea = $("text");
-						const idMatch = url.match(/id=(\d+)/);
-						if (!idMatch) return modal("没找到歌曲 id");
-						const songId = idMatch[1];
-						const marker = `[[music:${songId}]]`;
+						let marker;
+						if (/music\.163\.com/i.test(url)) {
+							const idMatch = url.match(/id=(\d+)/);
+							if (!idMatch) return modal("没找到歌曲 id");
+							marker = `[[music:netease:${idMatch[1]}]]`;
+						} else if (/y\.qq\.com/i.test(url)) {
+							const idMatch = url.match(/songid=(\d+)/);
+							if (!idMatch) return modal("没找到歌曲 id");
+							marker = `[[music:qq:${idMatch[1]}]]`;
+						} else {
+							return modal("请填写网易云音乐或 QQ 音乐链接");
+						}
 						textArea.value += (textArea.value ? "\n" : "") + marker + "\n";
 						$("modal").classList.add("hidden");
 					};
@@ -2342,7 +2317,8 @@
 					let bg = null,
 						warn = false,
 						warnText = "可能包含不适宜的内容",
-						music = null;
+						music = null,
+						img = null;
 					const prefixMatch = text.match(/^(\[\[bg:(.+?)\]\]|\[\[warn(?::([^\]]+))?\]\])+/);
 					if (prefixMatch) {
 						let prefix = prefixMatch[0];
@@ -2354,16 +2330,24 @@
 							if (w && w[1]) warnText = w[1];
 						}
 					}
-					const musicMatch = text.match(/\[\[music:(\d+)\]\]/);
+					const musicMatch = text.match(/\[\[music:(netease|qq):(\d+)\]\]/) || text.match(/\[\[music:(\d+)\]\]/);
 					if (musicMatch) {
-						music = musicMatch[1];
-						text = text.replace(/\[\[music:\d+\]\]/g, "").trim();
+						music = musicMatch[1] === "netease" || musicMatch[1] === "qq"
+							? { type: musicMatch[1], id: musicMatch[2] }
+							: { type: "netease", id: musicMatch[1] };
+						text = text.replace(/\[\[music:(?:netease|qq):\d+\]\]|\[\[music:\d+\]\]/g, "").trim();
+					}
+					const imgMatch = text.match(/\[img:(.*?)\]/);
+					if (imgMatch) {
+						img = imgMatch[1];
+						text = text.replace(/\[img:.*?\]/g, "").trim();
 					}
 					return {
 						bg,
 						warn,
 						warnText,
 						music,
+						img,
 						content: text
 					};
 				}
@@ -2378,12 +2362,22 @@
 					if (meta.music) {
 						html += renderMusicCard(meta.music) + '<div style="height:12px"></div>';
 					}
+					if (meta.img) {
+						html += `<div style="margin:8px 0;"><button class="loadImgBtn" data-src="${escapeAttr(meta.img)}" style="width:100%;padding:12px;border-radius:20px;background:var(--card);color:var(--text);font-size:16px;cursor:pointer;border:1px solid #ccc;text-align:center;transition:.2s;" onmouseover="this.style.background='var(--grad)';this.style.color='#fff'" onmouseout="this.style.background='';this.style.color=''">点击加载图片</button></div>`;
+					}
 					html += needFold ?
 						`<span class="longPostText">${foldedText}</span><button class="toggleLongPost inline">展开</button>` :
 						(meta.content || "");
 					box.innerHTML = html;
 					await ensureAllUsersCache();
 					linkifyMentions(box);
+					const loadBtn = box.querySelector(".loadImgBtn");
+					if (loadBtn) {
+						loadBtn.onclick = () => {
+							const src = loadBtn.dataset.src;
+							loadBtn.outerHTML = `<img src="${src}" class="zoomable" style="max-width:60%;border-radius:12px;display:block;">`;
+						};
+					}
 					const t = box.querySelector(".toggleLongPost");
 					if (t) {
 						let e = false;
@@ -2397,12 +2391,16 @@
 					}
 				}
 
-				function renderMusicCard(id) {
+				function renderMusicCard(music) {
+					const id = typeof music === "string" ? music : music.id;
+					if (typeof music === "object" && music.type === "qq") {
+						return `<div class="musicCard"><iframe class="musicIframe" src="https://i.y.qq.com/n2/m/outchain/player/index.html?songid=${id}&songtype=0" width="100%" height="86" frameborder="0" allow="autoplay; encrypted-media" loading="lazy"></iframe></div>`;
+					}
 					return `<div class="musicCard"><iframe class="musicIframe" src="https://music.163.com/outchain/player?type=2&id=${id}&auto=0&height=86" width="100%" height="106" frameborder="0" allow="autoplay; encrypted-media" loading="lazy"></iframe></div>`;
 				}
 
 				function setActive(id) {
-					["homeBtn", "editorBtn", "showUsersBtn", "profileBtn", "discoverBtn", "moreBtn"]
+					["homeBtn", "editorBtn", "showUsersBtn", "profileBtn", "discoverBtn"]
 					.forEach(b => $(b).classList.remove("active"));
 					$(id).classList.add("active");
 				}
@@ -2645,6 +2643,123 @@
 						setTimeout(() => target.classList.remove("postHighlight"), 2000);
 					}, 200);
 				}
+				async function openSinglePost(postId) {
+					show("postPage");
+					const container = $("singlePost");
+					container.innerHTML = "<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
+					const { data: post, error } = await supabase
+						.from("posts")
+						.select("*, users:author(id, name, coins, avatar)")
+						.eq("id", postId)
+						.single();
+					if (error || !post) {
+						container.innerHTML = "<p style='text-align:center;color:var(--sub);margin-top:20px;'>帖子不存在或已删除</p>";
+						return;
+					}
+					const [{ count: likeCount }, { count: dislikeCount }, { data: userVotes }] = await Promise.all([
+						supabase.from("likes").select("*", { count: "exact", head: true }).eq("postid", post.id).eq("type", 1),
+						supabase.from("likes").select("*", { count: "exact", head: true }).eq("postid", post.id).eq("type", -1),
+						currentUser ? supabase.from("likes").select("*").eq("postid", post.id).eq("liker", currentUser.id) : Promise.resolve({ data: [] })
+					]);
+					const liked = userVotes?.some(x => x.type == 1);
+					const disliked = userVotes?.some(x => x.type == -1);
+					const meta = getPostMeta(post.content);
+					const avatar = getAvatar(post.users);
+					const postDiv = document.createElement("div");
+					postDiv.className = "post";
+					postDiv.dataset.postId = post.id;
+					postDiv.dataset.authorId = post.author;
+					if (meta.bg) {
+						postDiv.style.setProperty("--custom-bg", meta.bg);
+						postDiv.classList.add("custom-bg");
+					}
+					postDiv.innerHTML =
+						'<div class="postHeaderTop"><div class="userInfo">' +
+						'<span class="userLink userLinkWithAvatar" data-user="' + post.author + '">' +
+						'<img class="avatar" src="' + avatar +
+						'" onerror="this.onerror=null;this.src=\'head.svg\'">' +
+						(post.users?.name || "未知") +
+						'<span class="userLevel">' + getUserLevel(post.users?.coins || 0) + '</span>' +
+						'<span>' + getVerifiedBadge(post.users) + '</span>' +
+						'</span>' +
+						'<span class="time">' + new Date(post.time).toLocaleString() + '</span>' +
+						'</div></div>' +
+						'<div class="postTags">' +
+						(post.tag ? '<span class="postTag" data-tag="' + post.tag + '">' + post.tag + '</span>' : "") +
+						'</div>' +
+						'<div class="postContent"></div>' +
+						'<div class="postActions">' +
+						'<div class="voteGroup">' +
+						'<span class="like ' + (liked ? "liked" : "") + '" data-id="' + post.id + '">' +
+						'<svg viewBox="0 0 24 24" class="voteIcon"><path d="M12 21s-6.7-4.35-9.33-8A5.4 5.4 0 0 1 12 4.2A5.4 5.4 0 0 1 21.33 13C18.7 16.65 12 21 12 21z"/></svg> ' +
+						'<span class="voteNum">' + likeCount + '</span>' +
+						'</span>' +
+						'<span class="dislike ' + (disliked ? "disliked" : "") + '" data-dislike="' + post.id +
+						'">' +
+						'<svg viewBox="0 0 24 24" class="voteIcon"><path d="M12 21l-8-8h5V3h6v10h5l-8 8z"/></svg> ' +
+						'<span class="voteNum">' + dislikeCount + '</span>' +
+						'</span>' +
+						'</div>' +
+						'<div class="voteWhoRow">' +
+						'<span class="voteWhoLink" data-vote-list="like" data-post="' + post.id +
+						'">点赞者</span>' +
+						'<span class="voteWhoLink" data-vote-list="dislike" data-post="' + post.id +
+						'">踩帖者</span>' +
+						'</div>' +
+						(currentUser && post.author === currentUser.id ? '<button data-del="' + post.id + '">删除</button>' : "") +
+						'</div>' +
+						'<div class="commentRow"><input data-input="' + post.id +
+						'" data-mention-input="1" placeholder="评论...">' +
+						'<button data-comment="' + post.id + '">发送</button></div>' +
+						'<div class="commentList"></div>';
+					container.innerHTML = "";
+					container.appendChild(postDiv);
+					const bodyBox = postDiv.querySelector(".postContent");
+					if (meta.warn) {
+						bodyBox.innerHTML = `
+							<div class="postWarnGate">
+								<div class="warnMsg"></div>
+								<button type="button" class="revealWarnBtn">显示内容</button>
+							</div>
+						`;
+						bodyBox.querySelector(".warnMsg").textContent = meta.warnText || "可能包含不适宜的内容";
+						bodyBox.querySelector(".revealWarnBtn").onclick = () => {
+							renderPostBody(bodyBox, post.content);
+						};
+					} else {
+						renderPostBody(bodyBox, post.content);
+					}
+					postDiv.querySelectorAll("[data-vote-list]").forEach(el => {
+						el.onclick = () => openVotePeople(post.id, el.dataset.voteList);
+					});
+					postDiv.querySelector(".like").onclick = () => likePost(post.id, postDiv);
+					postDiv.querySelector(".dislike").onclick = () => dislikePost(post.id, postDiv);
+					const delBtn = postDiv.querySelector("[data-del]");
+					if (delBtn) delBtn.onclick = () => deletePost(post.id);
+					const submit = () => {
+						const text = postDiv.querySelector("[data-input]")?.value.trim();
+						if (text) addComment(post.id, text, post.author);
+					};
+					postDiv.querySelector("[data-comment]").onclick = submit;
+					postDiv.querySelector("[data-input]")?.addEventListener("keydown", e => e.key === "Enter" && submit());
+					const tagEl = postDiv.querySelector("[data-tag]");
+					if (tagEl) {
+						tagEl.onclick = () => {
+							activePostTag = post.tag;
+							postSearch = "";
+							$("postSearch").value = "";
+							renderPostFilters();
+							loadStats();
+							loadPosts(1);
+							show("main");
+							setActive("homeBtn");
+						};
+					}
+					postDiv.querySelector(".userLink").onclick = () => viewUser(post.author);
+					renderComments(post.id, postDiv.querySelector(".commentList"));
+					container.style.paddingBottom = "60px";
+				}
+
 				async function openNotifications() {
 					if (!currentUser) return;
 					await cleanupNotifications();
@@ -3727,11 +3842,7 @@
 					$("profileAvatar").src = avatarUrl;
 					$("profileAvatar").onclick = () => openViewer(avatarUrl);
 					container.innerHTML = "";
-					let {
-						data: posts
-					} = await supabase.from("posts").select("*").eq("author", uid).order("time", {
-						ascending: true
-					});
+					history.pushState(null, "", "?uid=" + uid);
 					const isSelf = currentUser && uid === currentUser.id;
 					$("pname").innerHTML =
 						user.name +
@@ -3770,43 +3881,37 @@
 					<p>金币用途：提升等级、购买彩色帖子背景</p>
 						`);
 					}
-					for (let i = posts.length - 1; i >= 0; i--) {
-						let p = posts[i];
-						let div = document.createElement("div");
-						const meta = getPostMeta(p.content);
-						div.className = "post";
-						if (meta.bg) {
-							div.style.setProperty("--custom-bg", meta.bg);
-							div.classList.add("custom-bg");
-						}
-						div.innerHTML =
-							'<span class="time">' + new Date(p.time).toLocaleString() + '</span>' +
-							'<div class="postContent"></div>' +
-							'<div class="postActions">' +
-							(isSelf ? '<button class="deleteBtn" data-del="' + p.id + '">删除</button>' : '') +
-							'</div>';
-						const bodyBox = div.querySelector(".postContent");
-						if (meta.warn) {
-							bodyBox.innerHTML =
-								'<div class="postWarnGate">' +
-								'<div class="warnMsg"></div>' +
-								'<button type="button" class="revealWarnBtn">显示内容</button>' +
-								'</div>';
-							bodyBox.querySelector(".warnMsg").textContent = meta.warnText || "可能包含不适宜的内容";
-							bodyBox.querySelector(".revealWarnBtn").onclick = () => {
-								renderPostBody(bodyBox, p.content);
-							};
-						} else {
-							renderPostBody(bodyBox, p.content);
-						}
-						container.appendChild(div);
-						const delBtn = div.querySelector("[data-del]");
-						if (delBtn) {
-							delBtn.onclick = async () => {
-								await deletePost(p.id);
-								await viewUser(uid);
-							};
-						}
+					container.className = "profileBtnGrid";
+					container.innerHTML =
+						'<div class="pbtn" data-action="search">查看' + (isSelf ? "我的" : "TA的") + '帖子</div>' +
+						(isSelf ? '<div class="pbtn" data-action="about">关于</div>' : '') +
+						(isSelf ? '<div class="pbtn" data-action="sponsor">赞助</div>' : '') +
+						(isSelf ? '<div class="pbtn" data-action="download">获取应用版</div>' : '') +
+						(isSelf ? '<div class="themeRow"><button id="sysTheme2">跟随系统</button><button id="lightTheme2">浅色</button><button id="darkTheme2">深色</button></div>' : '');
+					container.querySelector("[data-action='search']").onclick = () => {
+						show("main");
+						$("postSearch").value = "@" + user.name;
+						postSearch = "@" + user.name;
+						activePostTag = "全部";
+						renderPostFilters();
+						loadPosts(1);
+						setActive("homeBtn");
+					};
+					if (isSelf) {
+						container.querySelector("[data-action='about']").onclick = () => {
+							document.querySelector(".modalBox").style.width = "800px";
+							modal(`<h2>关于</h2><div style="text-align:left;"><b>Jacky 论坛</b>是一款网页论坛，前端使用 HTML、CSS 与 JavaScript 编写，数据库使用SQL。<br><br><b>【原理】</b>用户、帖子、评论、点赞数据存储在数据库，通过 API 读取和更新内容。<br><b>【功能】</b>用户登录注册系统、发帖和评论、点赞和删除、用户列表、个人主页、主题切换。<br><b>【提醒】</b>请勿发布违法内容，请勿滥用。<br><br>如遇BUG，欢迎汇报至 <a href="mailto:jacky@zhujingqi.com">jacky@zhujingqi.com</a> 或 <a href="https://zhujingqi.com/me/contact.html">联系</a><br></div><h6><a href="#">Jacky 论坛</a> · <a href="https://zhujingqi.com">Zhujingqi</a></h6><h6>© Jacky Forum. All rights reserved.</h6>`);
+						};
+						container.querySelector("[data-action='sponsor']").onclick = () => {
+							modal(`<h2>赞助</h2><a href="https://zhujingqi.com/money.html">点击此处赞助 Jacky</a>`);
+						};
+						container.querySelector("[data-action='download']").onclick = () => {
+							document.querySelector(".modalBox").style.width = "800px";
+							modal(`<h3>获取应用版 Jacky 论坛</h3><h4>Windows系统</h4><details><summary>如何安装？</summary><p>1. <a href="https://github.com/zhujingqi/download/releases/download/1.0.0/Jacky.Forum.Setup.1.0.0.exe">点击<b>下载EXE安装程序</b></a><br>2. 双击安装程序，安装<b>桌面版 Jacky 论坛</b><br>3. 更加便捷地使用 <b>Jacky 论坛</b> 吧！<h6>注：国内下载可能<del>较慢</del>非常慢！</h6></p></details><h4>iOS系统</h4><details><summary>如何安装？</summary>使用Safari浏览器访问 <b>Jacky 论坛</b><br><img src="1.jpg" style="width:100px;margin-top:10px;" class="zoomable" /><img src="2.jpg" style="width:100px;margin-top:10px;" class="zoomable" /><img src="3.jpg" style="width:100px;margin-top:10px;" class="zoomable" /></details>`);
+						};
+						$("sysTheme2").onclick = () => document.body.classList.remove("dark");
+						$("lightTheme2").onclick = () => document.body.classList.remove("dark");
+						$("darkTheme2").onclick = () => document.body.classList.add("dark");
 					}
 					$("logoutBtn").style.display = (uid === currentUser.id) ? "inline-block" : "none";
 					$("userDescription").innerText = user.description || "暂无简介";
@@ -4148,6 +4253,23 @@
 						if (currentPage === "main") loadOnlineUsers();
 					}
 				});
+				function getUrlParam(name) {
+					const params = new URLSearchParams(window.location.search);
+					return params.get(name);
+				}
+
+				function handleUrlRoute() {
+					const pid = getUrlParam("pid");
+					const uid = getUrlParam("uid");
+					if (pid) {
+						const postId = Number(pid);
+						if (!isNaN(postId)) openSinglePost(postId);
+					} else if (uid) {
+						const userId = Number(uid);
+						if (!isNaN(userId)) viewUser(userId);
+					}
+				}
+
 				(async () => {
 					const mask = document.createElement("div");
 					mask.className = "loadingMask";
@@ -4178,11 +4300,15 @@
 								startPresence();
 								refreshNotificationBadge();
 								loadPosts(1);
-							} else {
-								show("welcomePage");
+								handleUrlRoute();
+								return;
 							}
-						} else {
-							show("welcomePage");
+						}
+						show("welcomePage");
+						const uid = getUrlParam("uid");
+						if (uid) {
+							const userId = Number(uid);
+							if (!isNaN(userId)) viewUser(userId);
 						}
 					} finally {
 						mask.classList.add("fadeOut");
