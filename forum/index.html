@@ -650,6 +650,30 @@
 				color: #aaa;
 			}
 
+			.userLevel.lv10 {
+				background: linear-gradient(90deg, #e08720, #f5b342, #e08720);
+				background-size: 200% 100%;
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+				animation: lvShimmer 4s ease-in-out infinite;
+			}
+
+			.userLevel.lv11 {
+				background: linear-gradient(90deg, #4a30a0, #b088ff, #4a30a0);
+				background-size: 200% 100%;
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+				animation: lvShimmer 4s ease-in-out infinite;
+			}
+
+			@keyframes lvShimmer {
+				0% { background-position: 0% 50%; }
+				50% { background-position: 100% 50%; }
+				100% { background-position: 0% 50%; }
+			}
+
 			.roleBadge {
 				display: inline-flex;
 				align-items: center;
@@ -1055,6 +1079,18 @@
 				gap: 6px;
 				flex-wrap: wrap;
 				padding-bottom: 25px;
+				overflow-x: auto;
+				scrollbar-width: none;
+				-ms-overflow-style: none;
+			}
+
+			.pager::-webkit-scrollbar {
+				display: none;
+			}
+
+			.pager .jumpInput,
+			.pager .jumpGo {
+				flex-shrink: 0;
 			}
 
 			.pager .pageBtn,
@@ -1094,6 +1130,43 @@
 				padding: 0 4px;
 				color: var(--sub);
 				user-select: none;
+			}
+
+			.pager .jumpInput {
+				width: 56px;
+				height: 40px;
+				padding: 0 8px;
+				border-radius: 12px;
+				border: 1px solid transparent;
+				background: var(--card);
+				color: var(--text);
+				font-size: 16px;
+				text-align: center;
+				outline: none;
+				box-sizing: border-box;
+			}
+
+			.pager .jumpInput:focus {
+				border-color: var(--green);
+			}
+
+			.pager .jumpGo {
+				min-width: 40px;
+				height: 40px;
+				padding: 0 12px;
+				border-radius: 12px;
+				border: 1px solid transparent;
+				background: var(--card);
+				color: var(--text);
+				font-size: 16px;
+				cursor: pointer;
+				transition: .2s;
+			}
+
+			.pager .jumpGo:hover {
+				background: var(--green);
+				color: #fff;
+				border-color: var(--green);
 			}
 
 			.zoomable {
@@ -1855,9 +1928,15 @@
 				}
 
 				.pager {
-					gap: 4px;
+					gap: 3px;
 					padding-bottom: 60px;
 					margin: 8px auto 14px auto;
+					flex-wrap: nowrap;
+					justify-content: flex-start;
+					padding-left: 8px;
+					padding-right: 8px;
+					overflow-x: auto;
+					-webkit-overflow-scrolling: touch;
 				}
 
 				.pager .pageBtn,
@@ -1867,11 +1946,29 @@
 					padding: 0 8px;
 					border-radius: 10px;
 					font-size: 12px;
+					flex-shrink: 0;
 				}
 
 				.pager .ellipsis {
 					font-size: 12px;
 					padding: 0 2px;
+					flex-shrink: 0;
+				}
+
+				.pager .jumpInput {
+					width: 44px;
+					height: 30px;
+					font-size: 12px;
+					padding: 0 4px;
+					border-radius: 10px;
+				}
+
+				.pager .jumpGo {
+					min-width: 30px;
+					height: 30px;
+					font-size: 12px;
+					padding: 0 8px;
+					border-radius: 10px;
 				}
 
 				.bgPickerGrid {
@@ -2024,7 +2121,8 @@
 				<input id="loginUser" placeholder="用户名" autofocus>
 				<input id="loginPass" type="password" placeholder="密码">
 				<button id="loginBtn">登录</button>
-				<div style="text-align:center;margin-top:10px">
+				<button id="guestBtn" style="background:transparent;color:var(--sub);font-size:14px;height:auto;padding:6px 0;margin-top:2px;">访客模式</button>
+				<div style="text-align:center;margin-top:2px">
 					<span style="color:var(--green);cursor:pointer" id="goRegister">没有账号？点击注册</span>
 				</div>
 				<span style="text-align:center; color:#aaa; font-size: 12px;">
@@ -2084,15 +2182,13 @@
 				<div class="noticeItem">
 					<details>
 						<summary><b>近期更新</b></summary>
-						· 优化排行榜<br>
-						· 徽章、礼物、抽奖<br>
+						· 访客模式<br>
+						· 优化排行<br>
+						· 金币抽奖<br>
 						· 商店系统<br>
 						· 分享帖子<br>
 						· 随机帖子<br>
-						· 删除帖子确认<br>
-						· 支持QQ音乐<br>
-						· 大改用户主页<br>
-						· 信息流模式<br>
+						· 删帖确认<br>
 					</details>
 				</div>
 				<br>
@@ -2263,6 +2359,7 @@
 				const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 				const $ = id => document.getElementById(id);
 				let currentUser = null;
+				let guestMode = false;
 				let currentPage = "home";
 				const defaultTags = ["学习", "日常", "搞笑", "提问"];
 				let selectedTags = [];
@@ -2323,7 +2420,7 @@
 				function syncLayoutBtn() {
 					const btn = $("layoutBtn");
 					if (!btn) return;
-					btn.textContent = postLayout === "dense" ? "常规" : "信息流（Beta）";
+					btn.textContent = postLayout === "dense" ? "常规" : "信息流";
 				}
 
 				function syncLayoutMode() {
@@ -2668,6 +2765,10 @@
 					stopPresence();
 					localStorage.removeItem("loginUser");
 					currentUser = null;
+					guestMode = false;
+					$("postFilterBar").style.display = "";
+					$("logoRow").querySelector("#onlineMini").style.display = "";
+					$("logoRow").querySelector("#notifBtn").style.display = "";
 					$("nav").classList.add("hidden");
 					show("welcomePage");
 				};
@@ -2917,8 +3018,12 @@
 					let passHash = await hash(p);
 					if (data.pass !== passHash) return modal("密码错误");
 					currentUser = data;
+					guestMode = false;
 					localStorage.setItem("loginUser", data.id);
 					$("nav").classList.remove("hidden");
+					$("postFilterBar").style.display = "";
+					$("logoRow").querySelector("#onlineMini").style.display = "";
+					$("logoRow").querySelector("#notifBtn").style.display = "";
 					show("main");
 					renderPostFilters();
 					syncLayoutMode();
@@ -2930,6 +3035,41 @@
 					refreshNotificationBadge();
 					modal("欢迎 <b>" + data.name + "</b> 来到 <b>Jacky</b> 论坛！");
 				};
+				$("guestBtn").onclick = () => {
+					guestMode = true;
+					show("main");
+					$("nav").classList.add("hidden");
+					$("postFilterBar").style.display = "none";
+					$("logoRow").querySelector("#onlineMini").style.display = "none";
+					$("logoRow").querySelector("#notifBtn").style.display = "none";
+					loadPosts(1);
+					loadStats();
+				};
+				document.addEventListener("click", e => {
+					if (!guestMode) return;
+					const t = e.target;
+					if (t.closest(".userLink") || t.closest("a") || t.closest("#viewer") || t.closest(".modal") || t.closest("#welcomePage") || t.closest("#registerPage") || t.closest("#backBtn") || t.closest("#postBackBtn")) return;
+					if (t.closest("button") || t.closest("input") || t.closest("textarea") || t.closest("select") || t.closest(".postTag") || t.closest(".shareBtnWrapper")) {
+						e.preventDefault();
+						e.stopPropagation();
+						modal("请先登录后再使用此功能");
+						const box = $("modalText");
+						if (!$("guestLoginRedirect")) {
+							const row = document.createElement("div");
+							row.style.cssText = "margin-top:14px;text-align:center;";
+							row.innerHTML = '<button id="guestLoginRedirect" style="background:var(--green);color:#fff;">去登录</button>';
+							box.appendChild(row);
+							$("guestLoginRedirect").onclick = () => {
+								$("modal").classList.add("hidden");
+								guestMode = false;
+								$("postFilterBar").style.display = "";
+								$("logoRow").querySelector("#onlineMini").style.display = "";
+								$("logoRow").querySelector("#notifBtn").style.display = "";
+								show("welcomePage");
+							};
+						}
+					}
+				}, true);
 				$("sendBtn").onclick = async () => {
 					let txt = $("text").value.trim();
 					if (!txt) return;
@@ -3161,13 +3301,14 @@
 						'<span>' + getRoleBadge(post.users) + '</span>' +
 						'</span>' +
 						'<span class="time">' + new Date(post.time).toLocaleString() + '</span>' +
-						'<div class="shareBtnWrapper"><button class="shareBtn" data-share="' + post.id + '">+</button><div class="sharePopover"><button data-copy="' + post.id + '">分享</button></div></div>' +
+						(guestMode ? '' : '<div class="shareBtnWrapper"><button class="shareBtn" data-share="' + post.id + '">+</button><div class="sharePopover"><button data-copy="' + post.id + '">分享</button></div></div>') +
 						'</div></div>' +
 						'<div class="postTags">' +
 						(post.tag ? '<span class="postTag" data-tag="' + post.tag + '">' + post.tag + '</span>' :
 						"") +
 						'</div>' +
 						'<div class="postContent"></div>' +
+						(guestMode ? '' :
 						'<div class="postActions">' +
 						'<div class="voteGroup">' +
 						'<span class="like ' + (liked ? "liked" : "") + '" data-id="' + post.id + '">' +
@@ -3188,10 +3329,10 @@
 						'</div>' +
 						(currentUser && (post.author === currentUser.id || (isAdmin(currentUser) && !post.users?.role?.includes?.('owner'))) ? '<button data-del="' + post.id +
 							'">删除</button>' : "") +
-						'</div>' +
-						'<div class="commentRow"><input data-input="' + post.id +
+						'</div>') +
+						(guestMode ? '' : '<div class="commentRow"><input data-input="' + post.id +
 						'" data-mention-input="1" placeholder="评论...">' +
-						'<button data-comment="' + post.id + '">发送</button></div>' +
+						'<button data-comment="' + post.id + '">发送</button></div>') +
 						'<div class="commentList"></div>';
 					container.innerHTML = "";
 					container.appendChild(postDiv);
@@ -3210,47 +3351,37 @@
 					} else {
 						renderPostBody(bodyBox, post.content);
 					}
-					postDiv.querySelectorAll("[data-vote-list]").forEach(el => {
-						el.onclick = () => openVotePeople(post.id, el.dataset.voteList);
-					});
-					postDiv.querySelector(".like").onclick = () => likePost(post.id, postDiv);
-					postDiv.querySelector(".dislike").onclick = () => dislikePost(post.id, postDiv);
-					const delBtn = postDiv.querySelector("[data-del]");
-					if (delBtn) delBtn.onclick = () => deletePost(post.id);
-					const shareBtn = postDiv.querySelector("[data-share]");
-					if (shareBtn) {
-						shareBtn.onclick = e => {
-							e.stopPropagation();
-							const pop = shareBtn.nextElementSibling;
-							pop.classList.toggle("show");
+					if (!guestMode) {
+						postDiv.querySelectorAll("[data-vote-list]").forEach(el => {
+							el.onclick = () => openVotePeople(post.id, el.dataset.voteList);
+						});
+						postDiv.querySelector(".like").onclick = () => likePost(post.id, postDiv);
+						postDiv.querySelector(".dislike").onclick = () => dislikePost(post.id, postDiv);
+						const delBtn = postDiv.querySelector("[data-del]");
+						if (delBtn) delBtn.onclick = () => deletePost(post.id);
+						const shareBtn = postDiv.querySelector("[data-share]");
+						if (shareBtn) {
+							shareBtn.onclick = e => {
+								e.stopPropagation();
+								const pop = shareBtn.nextElementSibling;
+								pop.classList.toggle("show");
+							};
+							const copyBtn = shareBtn.nextElementSibling.querySelector("[data-copy]");
+							copyBtn.onclick = e => {
+								e.stopPropagation();
+								const url = location.href.split('?')[0] + '?pid=' + copyBtn.dataset.copy;
+								navigator.clipboard.writeText(url);
+								showCoinMsg('已复制链接');
+								shareBtn.nextElementSibling.classList.remove("show");
+							};
+						}
+						const submit = () => {
+							const text = postDiv.querySelector("[data-input]")?.value.trim();
+							if (text) addComment(post.id, text, post.author);
 						};
-						const copyBtn = shareBtn.nextElementSibling.querySelector("[data-copy]");
-						copyBtn.onclick = e => {
-							e.stopPropagation();
-							const url = location.href.split('?')[0] + '?pid=' + copyBtn.dataset.copy;
-							navigator.clipboard.writeText(url);
-							showCoinMsg('已复制链接');
-							shareBtn.nextElementSibling.classList.remove("show");
-						};
-					}
-					const submit = () => {
-						const text = postDiv.querySelector("[data-input]")?.value.trim();
-						if (text) addComment(post.id, text, post.author);
-					};
-					postDiv.querySelector("[data-comment]").onclick = submit;
-					postDiv.querySelector("[data-input]")?.addEventListener("keydown", e => e.key === "Enter" &&
-						submit());
-					const tagEl = postDiv.querySelector("[data-tag]");
-					if (tagEl) {
-						tagEl.onclick = () => {
-							activePostTag = post.tag;
-							postSearch = "";
-							$("postSearch").value = "";
-							renderPostFilters();
-							loadPosts(1);
-							show("main");
-							setActive("homeBtn");
-						};
+						postDiv.querySelector("[data-comment]").onclick = submit;
+						postDiv.querySelector("[data-input]")?.addEventListener("keydown", e => e.key === "Enter" &&
+							submit());
 					}
 					postDiv.querySelector(".userLink").onclick = () => viewUser(post.author);
 					renderComments(post.id, postDiv.querySelector(".commentList"));
@@ -3520,6 +3651,28 @@
 				function renderPager() {
 					const pager = $("postPager");
 					if (!pager) return;
+					if (guestMode) {
+						pager.innerHTML = '<button class="navBtn" id="guestMoreBtn" style="min-width:120px;">查看更多 →</button>';
+						$("guestMoreBtn").onclick = () => {
+							modal("请先登录后再使用此功能");
+							const box = $("modalText");
+							if (!$("guestLoginRedirect")) {
+								const row = document.createElement("div");
+								row.style.cssText = "margin-top:14px;text-align:center;";
+								row.innerHTML = '<button id="guestLoginRedirect" style="background:var(--green);color:#fff;">去登录</button>';
+								box.appendChild(row);
+								$("guestLoginRedirect").onclick = () => {
+									$("modal").classList.add("hidden");
+									guestMode = false;
+									$("postFilterBar").style.display = "";
+									$("logoRow").querySelector("#onlineMini").style.display = "";
+									$("logoRow").querySelector("#notifBtn").style.display = "";
+									show("welcomePage");
+								};
+							}
+						};
+						return;
+					}
 					pager.innerHTML = "";
 					const maxPage = Math.max(1, Math.ceil(totalPostCount / getPostsPerPage()));
 					const makeBtn = (text, page, cls = "pageBtn", disabled = false, active = false) => {
@@ -3562,6 +3715,26 @@
 					}
 					pager.appendChild(makeBtn("›", postPage + 1, "navBtn", postPage >= maxPage));
 					pager.appendChild(makeBtn("»", maxPage, "navBtn", postPage >= maxPage));
+					const jumpInput = document.createElement("input");
+					jumpInput.type = "text";
+					jumpInput.className = "jumpInput";
+					jumpInput.placeholder = "跳转";
+					jumpInput.inputMode = "numeric";
+					const jumpGo = document.createElement("button");
+					jumpGo.className = "jumpGo";
+					jumpGo.textContent = "GO";
+					const doJump = () => {
+						const val = parseInt(jumpInput.value, 10);
+						if (!isNaN(val) && val >= 1 && val <= maxPage) {
+							loadPosts(val);
+						}
+					};
+					jumpInput.onkeydown = (e) => {
+						if (e.key === "Enter") doJump();
+					};
+					jumpGo.onclick = doJump;
+					pager.appendChild(jumpInput);
+					pager.appendChild(jumpGo);
 				}
 				let presenceTimer = null;
 				async function touchPresence() {
@@ -3793,6 +3966,7 @@
 					}
 				};
 				async function loadPosts(page = 1, container = $("posts")) {
+					if (guestMode) page = 1;
 					const token = ++currentLoadToken;
 					const perPage = getPostsPerPage();
 					container.innerHTML =
@@ -3840,13 +4014,15 @@
 								.eq("postid", p.id)
 								.eq("type", -1);
 							if (token !== currentLoadToken) return;
-							let {
-								data: userVotes
-							} = await supabase
-								.from("likes")
-								.select("*")
-								.eq("postid", p.id)
-								.eq("liker", currentUser.id);
+							let userVotes = [];
+							if (currentUser) {
+								let res = await supabase
+									.from("likes")
+									.select("*")
+									.eq("postid", p.id)
+									.eq("liker", currentUser.id);
+								userVotes = res.data || [];
+							}
 							if (token !== currentLoadToken) return;
 							const liked = userVotes?.some(x => x.type == 1);
 							const disliked = userVotes?.some(x => x.type == -1);
@@ -3866,12 +4042,13 @@
 								'<span>' + getRoleBadge(p.users) + '</span>' +
 								'</span>' +
 								'<span class="time">' + new Date(p.time).toLocaleString() + '</span>' +
-								'<div class="shareBtnWrapper"><button class="shareBtn" data-share="' + p.id + '">+</button><div class="sharePopover"><button data-copy="' + p.id + '">分享</button></div></div>' +
+								(guestMode ? '' : '<div class="shareBtnWrapper"><button class="shareBtn" data-share="' + p.id + '">+</button><div class="sharePopover"><button data-copy="' + p.id + '">分享</button></div></div>') +
 								'</div></div>' +
 								'<div class="postTags">' +
 								(p.tag ? `<span class="postTag" data-tag="${p.tag}">${p.tag}</span>` : "") +
 								'</div>' +
 								'<div class="postContent"></div>' +
+								(guestMode ? '' :
 								'<div class="postActions">' +
 								'<div class="voteGroup">' +
 								'<span class="like ' + (liked ? "liked" : "") + '" data-id="' + p.id + '">' +
@@ -3891,10 +4068,10 @@
 								'">踩帖者</span>' +
 								'</div>' +
 								(currentUser && (p.author === currentUser.id || (isAdmin(currentUser) && !p.users?.role?.includes?.('owner'))) ? '<button data-del="' + p.id + '">删除</button>' : "") +
-								'</div>' +
-								'<div class="commentRow"><input data-input="' + p.id +
+								'</div>') +
+								(guestMode ? '' : '<div class="commentRow"><input data-input="' + p.id +
 								'" data-mention-input="1" placeholder="评论...">' +
-								'<button data-comment="' + p.id + '">发送</button></div>' +
+								'<button data-comment="' + p.id + '">发送</button></div>') +
 								'<div class="commentList"></div>';
 							container.appendChild(postDiv);
 							postDiv.style.opacity = "0";
@@ -3916,46 +4093,37 @@
 							} else {
 								renderPostBody(bodyBox, p.content);
 							}
-							postDiv.querySelectorAll("[data-vote-list]").forEach(el => {
-								el.onclick = () => openVotePeople(p.id, el.dataset.voteList);
-							});
-							postDiv.querySelector(".like").onclick = () => likePost(p.id, postDiv);
-							postDiv.querySelector(".dislike").onclick = () => dislikePost(p.id, postDiv);
-							const delBtn = postDiv.querySelector("[data-del]");
-							if (delBtn) delBtn.onclick = () => deletePost(p.id);
-							const shareBtn = postDiv.querySelector("[data-share]");
-							if (shareBtn) {
-								shareBtn.onclick = e => {
-									e.stopPropagation();
-									const pop = shareBtn.nextElementSibling;
-									pop.classList.toggle("show");
+							if (!guestMode) {
+								postDiv.querySelectorAll("[data-vote-list]").forEach(el => {
+									el.onclick = () => openVotePeople(p.id, el.dataset.voteList);
+								});
+								postDiv.querySelector(".like").onclick = () => likePost(p.id, postDiv);
+								postDiv.querySelector(".dislike").onclick = () => dislikePost(p.id, postDiv);
+								const delBtn = postDiv.querySelector("[data-del]");
+								if (delBtn) delBtn.onclick = () => deletePost(p.id);
+								const shareBtn = postDiv.querySelector("[data-share]");
+								if (shareBtn) {
+									shareBtn.onclick = e => {
+										e.stopPropagation();
+										const pop = shareBtn.nextElementSibling;
+										pop.classList.toggle("show");
+									};
+									const copyBtn = shareBtn.nextElementSibling.querySelector("[data-copy]");
+									copyBtn.onclick = e => {
+										e.stopPropagation();
+										const url = location.href.split('?')[0] + '?pid=' + copyBtn.dataset.copy;
+										navigator.clipboard.writeText(url);
+										showCoinMsg('已复制链接');
+										shareBtn.nextElementSibling.classList.remove("show");
+									};
+								}
+								const submit = () => {
+									const text = postDiv.querySelector("[data-input]")?.value.trim();
+									if (text) addComment(p.id, text, p.author);
 								};
-								const copyBtn = shareBtn.nextElementSibling.querySelector("[data-copy]");
-								copyBtn.onclick = e => {
-									e.stopPropagation();
-									const url = location.href.split('?')[0] + '?pid=' + copyBtn.dataset.copy;
-									navigator.clipboard.writeText(url);
-									showCoinMsg('已复制链接');
-									shareBtn.nextElementSibling.classList.remove("show");
-								};
-							}
-							const submit = () => {
-								const text = postDiv.querySelector("[data-input]")?.value.trim();
-								if (text) addComment(p.id, text, p.author);
-							};
-							postDiv.querySelector("[data-comment]").onclick = submit;
-							postDiv.querySelector("[data-input]")?.addEventListener("keydown", e => e.key ===
-								"Enter" && submit());
-							const tagEl = postDiv.querySelector("[data-tag]");
-							if (tagEl) {
-								tagEl.onclick = () => {
-									activePostTag = p.tag;
-									postSearch = "";
-									$("postSearch").value = "";
-									renderPostFilters();
-									loadStats();
-									loadPosts(1);
-								};
+								postDiv.querySelector("[data-comment]").onclick = submit;
+								postDiv.querySelector("[data-input]")?.addEventListener("keydown", e => e.key ===
+									"Enter" && submit());
 							}
 							postDiv.querySelector(".userLink").onclick = () => viewUser(p.author);
 							renderComments(p.id, postDiv.querySelector(".commentList"));
@@ -4000,7 +4168,7 @@
 							userLink.onclick = () => viewUser(c.author);
 						}
 						const del = div.querySelector("[data-cdel]");
-						if (del) {
+						if (del && currentUser) {
 							del.onclick = async () => {
 								await supabase.from("comments").delete().eq("id", c.id);
 								renderComments(postId, container);
@@ -4266,7 +4434,7 @@
 						await supabase.from("comments").delete().eq("postid", id);
 						await supabase.from("likes").delete().eq("postid", id);
 						loadStats();
-						loadPosts(1);
+						loadPosts(postPage);
 					};
 				}
 
@@ -4413,7 +4581,7 @@
 						document.querySelector(".modalBox").style.width = "600px";
 						modal(`
 					<h3>等级规则</h3>
-					<p>1. 等级分为 LV0 - LV9 共 10 个等级</p>
+					<p>1. 等级分为 LV0 - LV11 共 12 个等级</p>
 					<p>2. 不同等级会有不同颜色区分</p>
 					<p>3. 金币到达某数量后，自动升级</p>
 					<p>4. 获取金币并提升等级吧！</p>
@@ -4428,7 +4596,7 @@
 					<p>3. 点赞 +1 金币</p>
 					<p>4. 踩 + (-1) 金币</p>
 					<p>5. 删除帖子、内容或取消点赞，减少对应数量金币</p>
-					<p>金币用途：提升等级、购买彩色帖子背景</p>
+					<p>金币用途：提升等级；购买彩色帖子背景；商店中购买徽章、礼物；金币抽奖</p>
 						`);
 					}
 					container.className = "profileBtnGrid";
@@ -4469,9 +4637,9 @@
 						$("lightTheme2").onclick = () => document.body.classList.remove("dark");
 						$("darkTheme2").onclick = () => document.body.classList.add("dark");
 					}
-					$("logoutBtn").style.display = (uid === currentUser.id) ? "inline-block" : "none";
+					$("logoutBtn").style.display = (currentUser && uid === currentUser.id) ? "inline-block" : "none";
 					$("userDescription").innerText = user.description || "暂无简介";
-					if (uid === currentUser.id) {
+					if (currentUser && uid === currentUser.id) {
 						let editBtn = document.createElement("button");
 						editBtn.innerText = "编辑";
 						let btnContainer = document.createElement("div");
@@ -5028,7 +5196,9 @@
 						{ min: 641, name: "LV7", color: "#ff55ff" },
 						{ min: 1281, name: "LV8", color: "#9900ff" },
 						{ min: 2561, name: "LV9", color: "#55007f" },
-						{ min: 5121, name: "MAX", color: "#000000" }
+						{ min: 5121, name: "LV10", color: "#d4a017", cssClass: "lv10" },
+						{ min: 10241, name: "LV11", color: "#ff4500", cssClass: "lv11" },
+						{ min: 20481, name: "MAX", color: "#000000" }
 					];
 					let current = levels[0];
 					let next = null;
@@ -5074,7 +5244,8 @@
 
 				function getUserLevel(coins) {
 					const info = getLevelInfo(coins);
-					return `<span class="userLevel" style="color:${info.current.color}">${info.current.name}</span>`;
+					const cls = info.current.cssClass ? ` ${info.current.cssClass}` : "";
+					return `<span class="userLevel${cls}" style="color:${info.current.color}">${info.current.name}</span>`;
 				}
 				const levels = ["大吉", "吉", "中平", "凶", "大凶"];
 				const things = [
@@ -5324,10 +5495,24 @@
 								return;
 							}
 						}
+						const guestPid = getUrlParam("pid");
 						const guestUid = getUrlParam("uid");
-						if (guestUid) {
-							const userId = Number(guestUid);
-							if (!isNaN(userId)) viewUser(userId);
+						if (guestPid || guestUid) {
+							guestMode = true;
+							show("main");
+							$("nav").classList.add("hidden");
+							$("postFilterBar").style.display = "none";
+							$("logoRow").querySelector("#onlineMini").style.display = "none";
+							$("logoRow").querySelector("#notifBtn").style.display = "none";
+							loadStats();
+							loadPosts(1);
+							if (guestPid) {
+								const pid = Number(guestPid);
+								if (!isNaN(pid)) openSinglePost(pid);
+							} else if (guestUid) {
+								const userId = Number(guestUid);
+								if (!isNaN(userId)) viewUser(userId);
+							}
 						} else {
 							show("welcomePage");
 						}
