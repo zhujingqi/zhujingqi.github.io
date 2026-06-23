@@ -28,6 +28,7 @@
 				--lottery-btn-bg: #2a2518;
 				--lottery-btn-text: #d4a017;
 			}
+
 			:root {
 				--lottery-bg: linear-gradient(135deg, #ffd700, #ff8c00);
 				--lottery-btn-bg: #fff;
@@ -296,12 +297,28 @@
 			}
 
 			.rankSearch {
-				width: 90%; max-width: 500px; padding: 10px 14px; border-radius: 20px;
-				border: 1px solid rgba(0,0,0,.15); font-size: 15px; box-sizing: border-box;
-				background: var(--card); color: var(--text); outline: none; margin: 8px 0;
+				width: 90%;
+				max-width: 500px;
+				padding: 10px 14px;
+				border-radius: 20px;
+				border: 1px solid rgba(0, 0, 0, .15);
+				font-size: 15px;
+				box-sizing: border-box;
+				background: var(--card);
+				color: var(--text);
+				outline: none;
+				margin: 8px 0;
 			}
-			.rankSearch:focus { border-color: var(--green); }
-			.userItem.highlight { background: rgba(0,170,0,.12); outline: 2px solid var(--green); border-radius: 12px; }
+
+			.rankSearch:focus {
+				border-color: var(--green);
+			}
+
+			.userItem.highlight {
+				background: rgba(0, 170, 0, .12);
+				outline: 2px solid var(--green);
+				border-radius: 12px;
+			}
 
 			.userItem {
 				width: 90%;
@@ -456,8 +473,10 @@
 				position: relative;
 				flex-shrink: 0;
 			}
+
 			.shareBtn {
-				width: 26px; height: 26px;
+				width: 26px;
+				height: 26px;
 				border-radius: 50%;
 				border: none;
 				background: var(--bg2);
@@ -471,7 +490,11 @@
 				opacity: .45;
 				transition: opacity .15s;
 			}
-			.shareBtn:hover { opacity: 1; }
+
+			.shareBtn:hover {
+				opacity: 1;
+			}
+
 			.sharePopover {
 				position: absolute;
 				top: calc(100% + 4px);
@@ -482,11 +505,15 @@
 				padding: 4px 0;
 				z-index: 200;
 				min-width: 70px;
-				box-shadow: 0 2px 10px rgba(0,0,0,.15);
+				box-shadow: 0 2px 10px rgba(0, 0, 0, .15);
 				display: none;
 				overflow: hidden;
 			}
-			.sharePopover.show { display: block; }
+
+			.sharePopover.show {
+				display: block;
+			}
+
 			.sharePopover button {
 				display: block;
 				width: 100%;
@@ -499,7 +526,10 @@
 				text-align: center;
 				white-space: nowrap;
 			}
-			.sharePopover button:hover { background: var(--bg2); }
+
+			.sharePopover button:hover {
+				background: var(--bg2);
+			}
 
 			.postContent {
 				margin: 4px 0 8px 0;
@@ -669,9 +699,17 @@
 			}
 
 			@keyframes lvShimmer {
-				0% { background-position: 0% 50%; }
-				50% { background-position: 100% 50%; }
-				100% { background-position: 0% 50%; }
+				0% {
+					background-position: 0% 50%;
+				}
+
+				50% {
+					background-position: 100% 50%;
+				}
+
+				100% {
+					background-position: 0% 50%;
+				}
 			}
 
 			.roleBadge {
@@ -688,26 +726,37 @@
 				vertical-align: middle;
 				user-select: none;
 			}
+
 			.roleBadge.owner {
 				background-color: #d4a017;
 				color: #fff;
 			}
+
 			.roleBadge.owner::before {
 				content: "V";
 				line-height: 1;
 			}
+
 			.roleBadge.admin {
-				background-color: #ff3b30;
+				background-color: #ff8a80;
 				color: #fff;
+				border-radius: 50%;
+				width: 18px;
+				height: 18px;
+				padding: 0;
+				font-size: 10px;
 			}
+
 			.roleBadge.admin::before {
 				content: "A";
 				line-height: 1;
 			}
+
 			.roleBadge.official {
 				background-color: #00aaff;
 				color: #fff;
 			}
+
 			.roleBadge.official::before {
 				content: "V";
 				line-height: 1;
@@ -717,36 +766,61 @@
 				background-color: #4caf50;
 				color: #fff;
 			}
+
 			.roleBadge.green_v::before {
 				content: "V";
 				line-height: 1;
 			}
+
 			.roleBadge.purple_star {
 				background-color: #9c27b0;
 				color: #fff;
 			}
+
 			.roleBadge.purple_star::before {
 				content: "★";
 				line-height: 1;
 			}
+
 			.roleBadge.blue_diamond {
 				background-color: #2196f3;
 				color: #fff;
 			}
+
 			.roleBadge.blue_diamond::before {
 				content: "◆";
 				line-height: 1;
 			}
 
+			body.dark .roleBadge.owner {
+				background-color: #b8941a;
+			}
+			body.dark .roleBadge.admin {
+				background-color: #d96a60;
+			}
+			body.dark .roleBadge.official {
+				background-color: #0088cc;
+			}
+			body.dark .roleBadge.green_v {
+				background-color: #3d8c40;
+			}
+			body.dark .roleBadge.purple_star {
+				background-color: #7b1fa2;
+			}
+			body.dark .roleBadge.blue_diamond {
+				background-color: #1976d2;
+			}
+
 			#shopModal {
 				position: fixed;
 				inset: 0;
-				background: rgba(0,0,0,.5);
+				background: rgba(0, 0, 0, .5);
 				display: flex;
 				justify-content: center;
 				align-items: center;
 				z-index: 99999;
 			}
+
 			#shopModal .shopBox {
 				background: var(--card);
 				border-radius: 24px;
@@ -755,20 +829,24 @@
 				overflow-y: auto;
 				padding: 30px;
 				box-sizing: border-box;
-				box-shadow: 0 16px 60px rgba(0,0,0,.25);
+				box-shadow: 0 16px 60px rgba(0, 0, 0, .25);
 			}
+
 			#shopModal h2 {
 				margin: 0 0 20px 0;
 				font-size: 26px;
 			}
+
 			.shopSection {
 				margin-bottom: 24px;
 			}
+
 			.shopSection h3 {
 				margin: 0 0 10px 0;
 				font-size: 18px;
 				color: var(--sub);
 			}
+
 			.shopItem {
 				display: flex;
 				align-items: center;
@@ -778,21 +856,26 @@
 				background: var(--bg);
 				margin-bottom: 8px;
 			}
+
 			.shopItem .preview {
 				flex-shrink: 0;
 			}
+
 			.shopItem .info {
 				flex: 1;
 				min-width: 0;
 			}
+
 			.shopItem .info .name {
 				font-weight: 700;
 				font-size: 16px;
 			}
+
 			.shopItem .info .desc {
 				font-size: 13px;
 				color: var(--sub);
 			}
+
 			.shopItem .buyBtn {
 				flex-shrink: 0;
 				height: 36px;
@@ -803,32 +886,39 @@
 				cursor: pointer;
 				transition: .2s;
 			}
+
 			.shopItem .buyBtn.owned {
 				background: var(--sub);
 				color: #fff;
 				cursor: default;
 			}
+
 			.shopItem .buyBtn.equipped {
 				background: var(--green);
 				color: #fff;
 			}
+
 			.shopItem .buyBtn.buy {
 				background: var(--green);
 				color: #fff;
 			}
+
 			.shopItem .buyBtn.buy:hover {
 				opacity: .8;
 			}
+
 			#shopModal .closeRow {
 				text-align: right;
 				margin-bottom: 6px;
 			}
+
 			#shopModal .closeRow button {
 				height: 36px;
 				padding: 0 16px;
 				border-radius: 18px;
 				font-size: 14px;
 			}
+
 			.shopPreviewBadge {
 				display: inline-flex;
 				align-items: center;
@@ -853,21 +943,38 @@
 				cursor: pointer;
 				transition: .2s;
 			}
-			.lotteryEntry:hover { opacity: .85; }
+
+			.lotteryEntry:hover {
+				opacity: .85;
+			}
+
 			.lotteryEntryIcon {
 				width: 42px;
 				height: 42px;
 				border-radius: 50%;
-				background: rgba(255,255,255,.3);
+				background: rgba(255, 255, 255, .3);
 				display: flex;
 				align-items: center;
 				justify-content: center;
 				color: #fff;
 				flex-shrink: 0;
 			}
-			.lotteryEntryInfo { flex: 1; }
-			.lotteryEntryTitle { font-weight: 700; font-size: 16px; color: #fff; }
-			.lotteryEntryDesc { font-size: 13px; color: rgba(255,255,255,.8); }
+
+			.lotteryEntryInfo {
+				flex: 1;
+			}
+
+			.lotteryEntryTitle {
+				font-weight: 700;
+				font-size: 16px;
+				color: #fff;
+			}
+
+			.lotteryEntryDesc {
+				font-size: 13px;
+				color: rgba(255, 255, 255, .8);
+			}
+
 			.lotteryEntryBtn {
 				flex-shrink: 0;
 				height: 36px;
@@ -882,43 +989,107 @@
 			}
 
 			#giftPicker {
-				position: fixed; inset: 0; z-index: 99999;
-				display: flex; align-items: center; justify-content: center;
-				background: rgba(0,0,0,.45);
+				position: fixed;
+				inset: 0;
+				z-index: 99999;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				background: rgba(0, 0, 0, .45);
 			}
+
 			#giftPicker .giftBox {
-				background: var(--card); border-radius: 24px;
-				width: min(400px, 94vw); padding: 24px; box-sizing: border-box;
-				box-shadow: 0 16px 60px rgba(0,0,0,.25);
+				background: var(--card);
+				border-radius: 24px;
+				width: min(400px, 94vw);
+				padding: 24px;
+				box-sizing: border-box;
+				box-shadow: 0 16px 60px rgba(0, 0, 0, .25);
 			}
-			#giftPicker h3 { margin: 0 0 12px 0; font-size: 20px; }
+
+			#giftPicker h3 {
+				margin: 0 0 12px 0;
+				font-size: 20px;
+			}
+
 			#giftPicker .giftSearch {
-				width: 100%; padding: 10px 14px; border-radius: 12px;
-				border: 1px solid rgba(0,0,0,.15); font-size: 15px;
-				box-sizing: border-box; background: var(--card); color: var(--text);
+				width: 100%;
+				padding: 10px 14px;
+				border-radius: 12px;
+				border: 1px solid rgba(0, 0, 0, .15);
+				font-size: 15px;
+				box-sizing: border-box;
+				background: var(--card);
+				color: var(--text);
 				outline: none;
 			}
-			#giftPicker .giftSearch:focus { border-color: var(--green); }
+
+			#giftPicker .giftSearch:focus {
+				border-color: var(--green);
+			}
+
 			#giftPicker .giftUserList {
-				max-height: 280px; overflow-y: auto; margin: 12px 0;
+				max-height: 280px;
+				overflow-y: auto;
+				margin: 12px 0;
 			}
+
 			#giftPicker .giftUserItem {
-				display: flex; align-items: center; gap: 10px;
-				padding: 10px 12px; border-radius: 14px;
-				cursor: pointer; transition: .15s;
+				display: flex;
+				align-items: center;
+				gap: 10px;
+				padding: 10px 12px;
+				border-radius: 14px;
+				cursor: pointer;
+				transition: .15s;
 			}
+
 			#giftPicker .giftUserItem:hover,
-			#giftPicker .giftUserItem.selected { background: var(--bg); }
-			#giftPicker .giftUserItem .avatar { width: 32px; height: 32px; border-radius: 50%; }
-			#giftPicker .giftUserItem .name { font-weight: 600; font-size: 15px; }
-			#giftPicker .giftActions { display: flex; gap: 10px; justify-content: flex-end; }
-			#giftPicker .giftActions button {
-				height: 38px; padding: 0 20px; border-radius: 19px;
-				border: none; font-size: 14px; font-weight: 700; cursor: pointer;
+			#giftPicker .giftUserItem.selected {
+				background: var(--bg);
 			}
-			#giftPicker .giftActions .giftCancel { background: var(--sub); color: #fff; }
-			#giftPicker .giftActions .giftConfirm { background: var(--green); color: #fff; }
-			#giftPicker .giftActions .giftConfirm:disabled { opacity: .4; cursor: default; }
+
+			#giftPicker .giftUserItem .avatar {
+				width: 32px;
+				height: 32px;
+				border-radius: 50%;
+			}
+
+			#giftPicker .giftUserItem .name {
+				font-weight: 600;
+				font-size: 15px;
+			}
+
+			#giftPicker .giftActions {
+				display: flex;
+				gap: 10px;
+				justify-content: flex-end;
+			}
+
+			#giftPicker .giftActions button {
+				height: 38px;
+				padding: 0 20px;
+				border-radius: 19px;
+				border: none;
+				font-size: 14px;
+				font-weight: 700;
+				cursor: pointer;
+			}
+
+			#giftPicker .giftActions .giftCancel {
+				background: var(--sub);
+				color: #fff;
+			}
+
+			#giftPicker .giftActions .giftConfirm {
+				background: var(--green);
+				color: #fff;
+			}
+
+			#giftPicker .giftActions .giftConfirm:disabled {
+				opacity: .4;
+				cursor: default;
+			}
 
 			#lotteryModal {
 				position: fixed;
@@ -927,33 +1098,44 @@
 				display: flex;
 				align-items: center;
 				justify-content: center;
-				background: rgba(0,0,0,.45);
+				background: rgba(0, 0, 0, .45);
 			}
+
 			#lotteryModal .lotteryBox {
 				background: var(--card);
 				border-radius: 24px;
 				width: min(420px, 94vw);
 				padding: 30px;
 				box-sizing: border-box;
-				box-shadow: 0 16px 60px rgba(0,0,0,.25);
+				box-shadow: 0 16px 60px rgba(0, 0, 0, .25);
 				text-align: center;
 				max-height: 90vh;
 				overflow-y: auto;
 			}
+
 			@media (max-width:480px) {
-				#lotteryModal .lotteryBox { padding: 16px; }
+				#lotteryModal .lotteryBox {
+					padding: 16px;
+				}
 			}
+
 			#lotteryModal h2 {
 				margin: 0 0 6px 0;
 				font-size: 24px;
 			}
-			.lotteryCloseRow { text-align: right; margin-bottom: 6px; }
+
+			.lotteryCloseRow {
+				text-align: right;
+				margin-bottom: 6px;
+			}
+
 			.lotteryCloseRow button {
 				height: 36px;
 				padding: 0 16px;
 				border-radius: 18px;
 				font-size: 14px;
 			}
+
 			.wheelArea {
 				position: relative;
 				width: 100%;
@@ -961,11 +1143,13 @@
 				aspect-ratio: 1;
 				margin: 10px auto 16px;
 			}
+
 			.wheelWrapper {
 				position: relative;
 				width: 100%;
 				height: 100%;
 			}
+
 			.wheelWrapper .pointer {
 				position: absolute;
 				top: -6px;
@@ -977,21 +1161,32 @@
 				border-right: 10px solid transparent;
 				border-top: 16px solid #e74c3c;
 				z-index: 10;
-				filter: drop-shadow(0 2px 3px rgba(0,0,0,.3));
+				filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .3));
 			}
-			#wheelCanvas { width: 100%; height: 100%; display: block; }
+
+			#wheelCanvas {
+				width: 100%;
+				height: 100%;
+				display: block;
+			}
+
 			.lotteryCoins {
 				font-size: 15px;
 				color: var(--sub);
 				margin-bottom: 14px;
 			}
-			.lotteryCoins b { color: var(--green); }
+
+			.lotteryCoins b {
+				color: var(--green);
+			}
+
 			.lotteryBtns {
 				display: flex;
 				gap: 10px;
 				justify-content: center;
 				margin-bottom: 14px;
 			}
+
 			.lotteryBtn {
 				flex: 1;
 				height: 42px;
@@ -1002,30 +1197,59 @@
 				cursor: pointer;
 				transition: .2s;
 			}
-			.lotteryBtn:active { transform: scale(.96); }
-			#spinOnce { background: var(--green); color: #fff; }
-			#spinOnce:disabled { opacity: .4; cursor: default; }
-			#spinTen { background: #ff8c00; color: #fff; }
-			#spinTen:disabled { opacity: .4; cursor: default; }
-			.lotteryResult { min-height: 30px; }
+
+			.lotteryBtn:active {
+				transform: scale(.96);
+			}
+
+			#spinOnce {
+				background: var(--green);
+				color: #fff;
+			}
+
+			#spinOnce:disabled {
+				opacity: .4;
+				cursor: default;
+			}
+
+			#spinTen {
+				background: #ff8c00;
+				color: #fff;
+			}
+
+			#spinTen:disabled {
+				opacity: .4;
+				cursor: default;
+			}
+
+			.lotteryResult {
+				min-height: 30px;
+			}
+
 			.singleResult {
 				font-size: 18px;
 				font-weight: 700;
 				color: var(--green);
 				padding: 8px;
 			}
-			.tenResult { text-align: left; }
+
+			.tenResult {
+				text-align: left;
+			}
+
 			.tenTitle {
 				font-weight: 700;
 				font-size: 16px;
 				margin-bottom: 8px;
 				color: var(--text);
 			}
+
 			.tenGrid {
 				display: grid;
 				grid-template-columns: repeat(5, 1fr);
 				gap: 6px;
 			}
+
 			.tenItem {
 				padding: 8px 4px;
 				border-radius: 10px;
@@ -1034,6 +1258,7 @@
 				font-weight: 700;
 				color: #fff;
 			}
+
 			.tenTotal {
 				margin-top: 8px;
 				font-weight: 700;
@@ -2121,7 +2346,8 @@
 				<input id="loginUser" placeholder="用户名" autofocus>
 				<input id="loginPass" type="password" placeholder="密码">
 				<button id="loginBtn">登录</button>
-				<button id="guestBtn" style="background:transparent;color:var(--sub);font-size:14px;height:auto;padding:6px 0;margin-top:2px;">访客模式</button>
+				<button id="guestBtn"
+					style="background:transparent;color:var(--sub);font-size:14px;height:auto;padding:6px 0;margin-top:2px;">访客模式</button>
 				<div style="text-align:center;margin-top:2px">
 					<span style="color:var(--green);cursor:pointer" id="goRegister">没有账号？点击注册</span>
 				</div>
@@ -2185,10 +2411,6 @@
 						· 访客模式<br>
 						· 优化排行<br>
 						· 金币抽奖<br>
-						· 商店系统<br>
-						· 分享帖子<br>
-						· 随机帖子<br>
-						· 删帖确认<br>
 					</details>
 				</div>
 				<br>
@@ -2373,6 +2595,8 @@
 				let postPages = [];
 				let totalPostCount = 0;
 				let currentLoadToken = 0;
+				let statsCache = { data: null, time: 0 };
+				const STATS_TTL = 10 * 60 * 1000;
 				const POST_BG_COST = 15;
 				const POST_BG_OPTIONS = [
 					"#ffeaea",
@@ -2426,11 +2650,25 @@
 				function syncLayoutMode() {
 					$("posts").classList.toggle("denseLayout", postLayout === "dense");
 				}
-				async function loadStats() {
+				async function loadStats(force = false) {
+					const now = Date.now();
+					if (!force && statsCache.data && now - statsCache.time < STATS_TTL) {
+						const d = statsCache.data;
+						if ($("totalUsers")) $("totalUsers").textContent = d.userCount || 0;
+						if ($("totalPosts")) $("totalPosts").textContent = d.postCount || 0;
+						if ($("statsBox")) {
+							$("statsBox").innerHTML = `
+								<strong>全站统计</strong><br>
+								用户数：${d.userCount || 0}<br>
+								帖子数：${d.postCount || 0}<br>
+								评论数：${d.commentCount || 0}<br>
+							`;
+						}
+						totalPostCount = d.postCount || 0;
+						renderPager();
+						return;
+					}
 					try {
-						const totalUsersEl = $("totalUsers");
-						const totalPostsEl = $("totalPosts");
-						const statsBox = $("statsBox");
 						const [{
 							count: userCount,
 							error: userErr
@@ -2454,10 +2692,11 @@
 								head: true
 							})
 						]);
-						if (totalUsersEl && !userErr) totalUsersEl.textContent = userCount || 0;
-						if (totalPostsEl && !postErr) totalPostsEl.textContent = postCount || 0;
-						if (statsBox) {
-							statsBox.innerHTML = `
+						statsCache = { data: { userCount, postCount, commentCount }, time: Date.now() };
+						if ($("totalUsers") && !userErr) $("totalUsers").textContent = userCount || 0;
+						if ($("totalPosts") && !postErr) $("totalPosts").textContent = postCount || 0;
+						if ($("statsBox")) {
+							$("statsBox").innerHTML = `
 								<strong>全站统计</strong><br>
 								用户数：${userCount || 0}<br>
 								帖子数：${postCount || 0}<br>
@@ -2469,10 +2708,8 @@
 							renderPager();
 						}
 					} catch (e) {
-						const totalUsersEl = $("totalUsers");
-						const totalPostsEl = $("totalPosts");
-						if (totalUsersEl) totalUsersEl.textContent = "—";
-						if (totalPostsEl) totalPostsEl.textContent = "—";
+						if ($("totalUsers")) $("totalUsers").textContent = "—";
+						if ($("totalPosts")) $("totalPosts").textContent = "—";
 						console.error(e);
 					}
 				}
@@ -2507,30 +2744,80 @@
 				}
 
 				const ROLE_CONFIG = {
-					owner: { label: 'V', color: '#d4a017' },
-					official: { label: 'V', color: '#00aaff' },
-					green_v: { label: 'V', color: '#4caf50' },
-					purple_star: { label: '★', color: '#9c27b0' },
-					blue_diamond: { label: '◆', color: '#2196f3' },
+					owner: {
+						label: 'V',
+						color: '#d4a017',
+						title: '站长'
+					},
+					official: {
+						label: 'V',
+						color: '#00aaff',
+						title: '官方用户'
+					},
+					admin: {
+						label: 'A',
+						color: '#ff3b30',
+						title: '联席管理员'
+					},
+					green_v: {
+						label: 'V',
+						color: '#4caf50',
+						title: '绿V徽章'
+					},
+					purple_star: {
+						label: '★',
+						color: '#9c27b0',
+						title: '紫星徽章'
+					},
+					blue_diamond: {
+						label: '◆',
+						color: '#2196f3',
+						title: '蓝钻徽章'
+					},
 				};
 
 				function getRoleBadge(user) {
 					if (!user?.role || !Array.isArray(user.role)) return "";
 					for (const r of user.role) {
-						if (r === 'admin') continue;
 						const cfg = ROLE_CONFIG[r];
-						if (cfg) return `<span class="roleBadge ${r}"></span>`;
+						if (cfg) return `<span class="roleBadge ${r}" title="${cfg.title}"></span>`;
 					}
 					return "";
 				}
 
-				const SHOP_ITEMS = [
-					{ id: 'green_v', name: '绿色V标', price: 500 },
-					{ id: 'purple_star', name: '紫星徽章', price: 400 },
-					{ id: 'blue_diamond', name: '蓝钻徽章', price: 300 },
-					{ id: 'flower', name: '一束花', price: 20, gift: 18 },
-					{ id: 'chocolate', name: '巧克力', price: 30, gift: 27 },
-					{ id: 'cake', name: '蛋糕', price: 50, gift: 45 },
+				const SHOP_ITEMS = [{
+						id: 'green_v',
+						name: '绿色V标',
+						price: 500
+					},
+					{
+						id: 'purple_star',
+						name: '紫星徽章',
+						price: 400
+					},
+					{
+						id: 'blue_diamond',
+						name: '蓝钻徽章',
+						price: 300
+					},
+					// {
+					// 	id: 'flower',
+					// 	name: '一束花',
+					// 	price: 20,
+					// 	gift: 18
+					// },
+					// {
+					// 	id: 'chocolate',
+					// 	name: '巧克力',
+					// 	price: 30,
+					// 	gift: 27
+					// },
+					// {
+					// 	id: 'cake',
+					// 	name: '蛋糕',
+					// 	price: 50,
+					// 	gift: 45
+					// },
 				];
 
 				let allUsersCache = [];
@@ -2881,15 +3168,13 @@
 					const musicMatch = text.match(/\[\[music:(netease|qq):(\d+)\]\]/) || text.match(
 						/\[\[music:(\d+)\]\]/);
 					if (musicMatch) {
-						music = musicMatch[1] === "netease" || musicMatch[1] === "qq" ?
-							{
-								type: musicMatch[1],
-								id: musicMatch[2]
-							} :
-							{
-								type: "netease",
-								id: musicMatch[1]
-							};
+						music = musicMatch[1] === "netease" || musicMatch[1] === "qq" ? {
+							type: musicMatch[1],
+							id: musicMatch[2]
+						} : {
+							type: "netease",
+							id: musicMatch[1]
+						};
 						text = text.replace(/\[\[music:(?:netease|qq):\d+\]\]|\[\[music:\d+\]\]/g, "").trim();
 					}
 					const imgMatch = text.match(/\[img:(.*?)\]/);
@@ -3048,8 +3333,11 @@
 				document.addEventListener("click", e => {
 					if (!guestMode) return;
 					const t = e.target;
-					if (t.closest(".userLink") || t.closest("a") || t.closest("#viewer") || t.closest(".modal") || t.closest("#welcomePage") || t.closest("#registerPage") || t.closest("#backBtn") || t.closest("#postBackBtn")) return;
-					if (t.closest("button") || t.closest("input") || t.closest("textarea") || t.closest("select") || t.closest(".postTag") || t.closest(".shareBtnWrapper")) {
+					if (t.closest(".userLink") || t.closest("a") || t.closest("#viewer") || t.closest(
+						".modal") || t.closest("#welcomePage") || t.closest("#registerPage") || t.closest(
+							"#backBtn") || t.closest("#postBackBtn")) return;
+					if (t.closest("button") || t.closest("input") || t.closest("textarea") || t.closest(
+						"select") || t.closest(".postTag") || t.closest(".shareBtnWrapper")) {
 						e.preventDefault();
 						e.stopPropagation();
 						modal("请先登录后再使用此功能");
@@ -3057,7 +3345,8 @@
 						if (!$("guestLoginRedirect")) {
 							const row = document.createElement("div");
 							row.style.cssText = "margin-top:14px;text-align:center;";
-							row.innerHTML = '<button id="guestLoginRedirect" style="background:var(--green);color:#fff;">去登录</button>';
+							row.innerHTML =
+								'<button id="guestLoginRedirect" style="background:var(--green);color:#fff;">去登录</button>';
 							box.appendChild(row);
 							$("guestLoginRedirect").onclick = () => {
 								$("modal").classList.add("hidden");
@@ -3119,7 +3408,9 @@
 				}) {
 					if (!targetId || !actorId || targetId === actorId) return;
 					if (type !== "comment" && type !== "mention" && type !== "gift") return;
-					const { error } = await supabase.from("notifications").insert([{
+					const {
+						error
+					} = await supabase.from("notifications").insert([{
 						target_id: targetId,
 						actor_id: actorId,
 						post_id: postId,
@@ -3259,28 +3550,19 @@
 							"<p style='text-align:center;color:var(--sub);margin-top:20px;'>帖子不存在或已删除</p>";
 						return;
 					}
-					const [{
-						count: likeCount
-					}, {
-						count: dislikeCount
-					}, {
-						data: userVotes
-					}] = await Promise.all([
-						supabase.from("likes").select("*", {
-							count: "exact",
-							head: true
-						}).eq("postid", post.id).eq("type", 1),
-						supabase.from("likes").select("*", {
-							count: "exact",
-							head: true
-						}).eq("postid", post.id).eq("type", -1),
-						currentUser ? supabase.from("likes").select("*").eq("postid", post.id).eq("liker",
-							currentUser.id) : Promise.resolve({
-							data: []
-						})
-					]);
-					const liked = userVotes?.some(x => x.type == 1);
-					const disliked = userVotes?.some(x => x.type == -1);
+					const { data: allLikes } = await supabase
+						.from("likes")
+						.select("type, liker")
+						.eq("postid", post.id);
+					let likeCount = 0, dislikeCount = 0, liked = false, disliked = false;
+					for (const r of (allLikes || [])) {
+						if (r.type == 1) likeCount++;
+						else if (r.type == -1) dislikeCount++;
+						if (currentUser && r.liker === currentUser.id) {
+							if (r.type == 1) liked = true;
+							else if (r.type == -1) disliked = true;
+						}
+					}
 					const meta = getPostMeta(post.content);
 					const avatar = getAvatar(post.users);
 					const postDiv = document.createElement("div");
@@ -3301,38 +3583,41 @@
 						'<span>' + getRoleBadge(post.users) + '</span>' +
 						'</span>' +
 						'<span class="time">' + new Date(post.time).toLocaleString() + '</span>' +
-						(guestMode ? '' : '<div class="shareBtnWrapper"><button class="shareBtn" data-share="' + post.id + '">+</button><div class="sharePopover"><button data-copy="' + post.id + '">分享</button></div></div>') +
+						(guestMode ? '' : '<div class="shareBtnWrapper"><button class="shareBtn" data-share="' + post
+							.id + '">+</button><div class="sharePopover"><button data-copy="' + post.id +
+							'">分享</button></div></div>') +
 						'</div></div>' +
 						'<div class="postTags">' +
 						(post.tag ? '<span class="postTag" data-tag="' + post.tag + '">' + post.tag + '</span>' :
-						"") +
+							"") +
 						'</div>' +
 						'<div class="postContent"></div>' +
 						(guestMode ? '' :
-						'<div class="postActions">' +
-						'<div class="voteGroup">' +
-						'<span class="like ' + (liked ? "liked" : "") + '" data-id="' + post.id + '">' +
-						'<svg viewBox="0 0 24 24" class="voteIcon"><path d="M12 21s-6.7-4.35-9.33-8A5.4 5.4 0 0 1 12 4.2A5.4 5.4 0 0 1 21.33 13C18.7 16.65 12 21 12 21z"/></svg> ' +
-						'<span class="voteNum">' + likeCount + '</span>' +
-						'</span>' +
-						'<span class="dislike ' + (disliked ? "disliked" : "") + '" data-dislike="' + post.id +
-						'">' +
-						'<svg viewBox="0 0 24 24" class="voteIcon"><path d="M12 21l-8-8h5V3h6v10h5l-8 8z"/></svg> ' +
-						'<span class="voteNum">' + dislikeCount + '</span>' +
-						'</span>' +
-						'</div>' +
-						'<div class="voteWhoRow">' +
-						'<span class="voteWhoLink" data-vote-list="like" data-post="' + post.id +
-						'">点赞者</span>' +
-						'<span class="voteWhoLink" data-vote-list="dislike" data-post="' + post.id +
-						'">踩帖者</span>' +
-						'</div>' +
-						(currentUser && (post.author === currentUser.id || (isAdmin(currentUser) && !post.users?.role?.includes?.('owner'))) ? '<button data-del="' + post.id +
-							'">删除</button>' : "") +
-						'</div>') +
+							'<div class="postActions">' +
+							'<div class="voteGroup">' +
+							'<span class="like ' + (liked ? "liked" : "") + '" data-id="' + post.id + '">' +
+							'<svg viewBox="0 0 24 24" class="voteIcon"><path d="M12 21s-6.7-4.35-9.33-8A5.4 5.4 0 0 1 12 4.2A5.4 5.4 0 0 1 21.33 13C18.7 16.65 12 21 12 21z"/></svg> ' +
+							'<span class="voteNum">' + likeCount + '</span>' +
+							'</span>' +
+							'<span class="dislike ' + (disliked ? "disliked" : "") + '" data-dislike="' + post.id +
+							'">' +
+							'<svg viewBox="0 0 24 24" class="voteIcon"><path d="M12 21l-8-8h5V3h6v10h5l-8 8z"/></svg> ' +
+							'<span class="voteNum">' + dislikeCount + '</span>' +
+							'</span>' +
+							'</div>' +
+							'<div class="voteWhoRow">' +
+							'<span class="voteWhoLink" data-vote-list="like" data-post="' + post.id +
+							'">点赞者</span>' +
+							'<span class="voteWhoLink" data-vote-list="dislike" data-post="' + post.id +
+							'">踩帖者</span>' +
+							'</div>' +
+							(currentUser && (post.author === currentUser.id || (isAdmin(currentUser) && !post.users
+									?.role?.includes?.('owner'))) ? '<button data-del="' + post.id +
+								'">删除</button>' : "") +
+							'</div>') +
 						(guestMode ? '' : '<div class="commentRow"><input data-input="' + post.id +
-						'" data-mention-input="1" placeholder="评论...">' +
-						'<button data-comment="' + post.id + '">发送</button></div>') +
+							'" data-mention-input="1" placeholder="评论...">' +
+							'<button data-comment="' + post.id + '">发送</button></div>') +
 						'<div class="commentList"></div>';
 					container.innerHTML = "";
 					container.appendChild(postDiv);
@@ -3652,14 +3937,16 @@
 					const pager = $("postPager");
 					if (!pager) return;
 					if (guestMode) {
-						pager.innerHTML = '<button class="navBtn" id="guestMoreBtn" style="min-width:120px;">查看更多 →</button>';
+						pager.innerHTML =
+							'<button class="navBtn" id="guestMoreBtn" style="min-width:120px;">查看更多 →</button>';
 						$("guestMoreBtn").onclick = () => {
 							modal("请先登录后再使用此功能");
 							const box = $("modalText");
 							if (!$("guestLoginRedirect")) {
 								const row = document.createElement("div");
 								row.style.cssText = "margin-top:14px;text-align:center;";
-								row.innerHTML = '<button id="guestLoginRedirect" style="background:var(--green);color:#fff;">去登录</button>';
+								row.innerHTML =
+									'<button id="guestLoginRedirect" style="background:var(--green);color:#fff;">去登录</button>';
 								box.appendChild(row);
 								$("guestLoginRedirect").onclick = () => {
 									$("modal").classList.add("hidden");
@@ -3744,9 +4031,16 @@
 					}).eq("id", currentUser.id);
 				}
 				let onlineUsersCache = [];
+				let onlineUsersCacheTime = 0;
+				const ONLINE_TTL = 5 * 60 * 1000;
 				async function loadOnlineUsers() {
 					const mini = $("onlineMini");
 					if (!mini) return;
+					const now = Date.now();
+					if (now - onlineUsersCacheTime < ONLINE_TTL && onlineUsersCache.length) {
+						mini.textContent = `在线 ${onlineUsersCache.length}`;
+						return;
+					}
 					const cutoff = new Date(Date.now() - 2 * 60 * 1000).toISOString();
 					const {
 						data,
@@ -3761,6 +4055,7 @@
 						.limit(10);
 					if (error) return;
 					onlineUsersCache = data || [];
+					onlineUsersCacheTime = Date.now();
 					mini.textContent = `在线 ${onlineUsersCache.length}`;
 					mini.onclick = () => {
 						if (!onlineUsersCache.length) {
@@ -3802,12 +4097,13 @@
 				function startPresence() {
 					stopPresence();
 					touchPresence();
+					loadOnlineUsers();
 					presenceTimer = setInterval(() => {
 						if (document.visibilityState === "visible" && currentUser) {
 							touchPresence();
 							if (currentPage === "main") loadOnlineUsers();
 						}
-					}, 60 * 1000);
+					}, 5 * 60 * 1000);
 				}
 
 				function stopPresence() {
@@ -3985,6 +4281,23 @@
 								"<p style='text-align:center;color:var(--sub);margin-top:20px;'>暂无帖子</p>";
 							return;
 						}
+						const postIds = posts.map(p => p.id);
+						const [likesRes, userVotesRes] = await Promise.all([
+							supabase.from("likes").select("postid, type").in("postid", postIds),
+							currentUser
+								? supabase.from("likes").select("postid, type").in("postid", postIds).eq("liker", currentUser.id)
+								: Promise.resolve({ data: [] })
+						]);
+						if (token !== currentLoadToken) return;
+						const likeCounts = { likes: {}, dislikes: {} };
+						for (const row of (likesRes.data || [])) {
+							const key = row.type == 1 ? "likes" : "dislikes";
+							likeCounts[key][row.postid] = (likeCounts[key][row.postid] || 0) + 1;
+						}
+						const userVoteMap = {};
+						for (const row of (userVotesRes.data || [])) {
+							userVoteMap[row.postid] = row.type;
+						}
 						for (let i = 0; i < posts.length; i++) {
 							let p = posts[i];
 							if (token !== currentLoadToken) return;
@@ -3992,40 +4305,11 @@
 							postDiv.className = "post";
 							postDiv.dataset.postId = p.id;
 							postDiv.dataset.authorId = p.author;
-							let {
-								count: likeCount
-							} = await supabase
-								.from("likes")
-								.select("*", {
-									count: "exact",
-									head: true
-								})
-								.eq("postid", p.id)
-								.eq("type", 1);
-							if (token !== currentLoadToken) return;
-							let {
-								count: dislikeCount
-							} = await supabase
-								.from("likes")
-								.select("*", {
-									count: "exact",
-									head: true
-								})
-								.eq("postid", p.id)
-								.eq("type", -1);
-							if (token !== currentLoadToken) return;
-							let userVotes = [];
-							if (currentUser) {
-								let res = await supabase
-									.from("likes")
-									.select("*")
-									.eq("postid", p.id)
-									.eq("liker", currentUser.id);
-								userVotes = res.data || [];
-							}
-							if (token !== currentLoadToken) return;
-							const liked = userVotes?.some(x => x.type == 1);
-							const disliked = userVotes?.some(x => x.type == -1);
+							const likeCount = likeCounts.likes[p.id] || 0;
+							const dislikeCount = likeCounts.dislikes[p.id] || 0;
+							const userVote = userVoteMap[p.id];
+							const liked = userVote == 1;
+							const disliked = userVote == -1;
 							const meta = getPostMeta(p.content);
 							if (meta.bg) {
 								postDiv.style.setProperty("--custom-bg", meta.bg);
@@ -4042,36 +4326,42 @@
 								'<span>' + getRoleBadge(p.users) + '</span>' +
 								'</span>' +
 								'<span class="time">' + new Date(p.time).toLocaleString() + '</span>' +
-								(guestMode ? '' : '<div class="shareBtnWrapper"><button class="shareBtn" data-share="' + p.id + '">+</button><div class="sharePopover"><button data-copy="' + p.id + '">分享</button></div></div>') +
+								(guestMode ? '' :
+									'<div class="shareBtnWrapper"><button class="shareBtn" data-share="' + p.id +
+									'">+</button><div class="sharePopover"><button data-copy="' + p.id +
+									'">分享</button></div></div>') +
 								'</div></div>' +
 								'<div class="postTags">' +
 								(p.tag ? `<span class="postTag" data-tag="${p.tag}">${p.tag}</span>` : "") +
 								'</div>' +
 								'<div class="postContent"></div>' +
 								(guestMode ? '' :
-								'<div class="postActions">' +
-								'<div class="voteGroup">' +
-								'<span class="like ' + (liked ? "liked" : "") + '" data-id="' + p.id + '">' +
-								'<svg viewBox="0 0 24 24" class="voteIcon"><path d="M12 21s-6.7-4.35-9.33-8A5.4 5.4 0 0 1 12 4.2A5.4 5.4 0 0 1 21.33 13C18.7 16.65 12 21 12 21z"/></svg> ' +
-								'<span class="voteNum">' + likeCount + '</span>' +
-								'</span>' +
-								'<span class="dislike ' + (disliked ? "disliked" : "") + '" data-dislike="' + p.id +
-								'">' +
-								'<svg viewBox="0 0 24 24" class="voteIcon"><path d="M12 21l-8-8h5V3h6v10h5l-8 8z"/></svg> ' +
-								'<span class="voteNum">' + dislikeCount + '</span>' +
-								'</span>' +
-								'</div>' +
-								'<div class="voteWhoRow">' +
-								'<span class="voteWhoLink" data-vote-list="like" data-post="' + p.id +
-								'">点赞者</span>' +
-								'<span class="voteWhoLink" data-vote-list="dislike" data-post="' + p.id +
-								'">踩帖者</span>' +
-								'</div>' +
-								(currentUser && (p.author === currentUser.id || (isAdmin(currentUser) && !p.users?.role?.includes?.('owner'))) ? '<button data-del="' + p.id + '">删除</button>' : "") +
-								'</div>') +
+									'<div class="postActions">' +
+									'<div class="voteGroup">' +
+									'<span class="like ' + (liked ? "liked" : "") + '" data-id="' + p.id + '">' +
+									'<svg viewBox="0 0 24 24" class="voteIcon"><path d="M12 21s-6.7-4.35-9.33-8A5.4 5.4 0 0 1 12 4.2A5.4 5.4 0 0 1 21.33 13C18.7 16.65 12 21 12 21z"/></svg> ' +
+									'<span class="voteNum">' + likeCount + '</span>' +
+									'</span>' +
+									'<span class="dislike ' + (disliked ? "disliked" : "") + '" data-dislike="' + p
+									.id +
+									'">' +
+									'<svg viewBox="0 0 24 24" class="voteIcon"><path d="M12 21l-8-8h5V3h6v10h5l-8 8z"/></svg> ' +
+									'<span class="voteNum">' + dislikeCount + '</span>' +
+									'</span>' +
+									'</div>' +
+									'<div class="voteWhoRow">' +
+									'<span class="voteWhoLink" data-vote-list="like" data-post="' + p.id +
+									'">点赞者</span>' +
+									'<span class="voteWhoLink" data-vote-list="dislike" data-post="' + p.id +
+									'">踩帖者</span>' +
+									'</div>' +
+									(currentUser && (p.author === currentUser.id || (isAdmin(currentUser) && !p.users
+											?.role?.includes?.('owner'))) ? '<button data-del="' + p.id +
+										'">删除</button>' : "") +
+									'</div>') +
 								(guestMode ? '' : '<div class="commentRow"><input data-input="' + p.id +
-								'" data-mention-input="1" placeholder="评论...">' +
-								'<button data-comment="' + p.id + '">发送</button></div>') +
+									'" data-mention-input="1" placeholder="评论...">' +
+									'<button data-comment="' + p.id + '">发送</button></div>') +
 								'<div class="commentList"></div>';
 							container.appendChild(postDiv);
 							postDiv.style.opacity = "0";
@@ -4126,25 +4416,38 @@
 									"Enter" && submit());
 							}
 							postDiv.querySelector(".userLink").onclick = () => viewUser(p.author);
-							renderComments(p.id, postDiv.querySelector(".commentList"));
+						}
+						if (token !== currentLoadToken) return;
+						const { data: allComments } = await supabase
+							.from("comments")
+							.select("*, users(id, name, coins, avatar, role)")
+							.in("postid", postIds)
+							.order("id", { ascending: true });
+						if (token !== currentLoadToken) return;
+						const commentsByPost = {};
+						for (const c of (allComments || [])) {
+							if (!commentsByPost[c.postid]) commentsByPost[c.postid] = [];
+							commentsByPost[c.postid].push(c);
+						}
+						for (const p of posts) {
+							const commentList = document.querySelector(`[data-post-id="${p.id}"] .commentList`);
+							if (commentList) renderComments(p.id, commentList, commentsByPost[p.id] || []);
 						}
 					} catch (e) {
 						console.error(e);
 						modal("加载失败：" + e.message);
 					}
 				}
-				async function renderComments(postId, container) {
+				async function renderComments(postId, container, comments) {
 					container.innerHTML = "";
-					const {
-						data
-					} = await supabase
-						.from("comments")
-						.select("*, users(id, name, coins, avatar, role)")
-						.eq("postid", postId)
-						.order("id", {
-							ascending: true
-						});
-					const comments = data || [];
+					if (!comments) {
+						const { data } = await supabase
+							.from("comments")
+							.select("*, users(id, name, coins, avatar, role)")
+							.eq("postid", postId)
+							.order("id", { ascending: true });
+						comments = data || [];
+					}
 					for (let c of comments) {
 						let div = document.createElement("div");
 						const avatar = getAvatar(c.users);
@@ -4528,7 +4831,10 @@
 							<div style="width:100px; text-align:right;">${u.coins || 0}</div>
 						`;
 						div.onclick = () => viewUser(u.id);
-						items.push({ div, name: u.name.toLowerCase() });
+						items.push({
+							div,
+							name: u.name.toLowerCase()
+						});
 						box.appendChild(div);
 					});
 					const input = $("rankSearch");
@@ -4536,13 +4842,17 @@
 						input.value = "";
 						input.oninput = () => {
 							const q = input.value.trim().toLowerCase();
-							box.querySelectorAll(".userItem.highlight").forEach(el => el.classList.remove("highlight"));
+							box.querySelectorAll(".userItem.highlight").forEach(el => el.classList.remove(
+								"highlight"));
 							if (!q) return;
 							const found = items.find(it => it.name === q);
 							if (!found) return;
 							setTimeout(() => {
 								found.div.classList.add("highlight");
-								found.div.scrollIntoView({ behavior: "smooth", block: "center" });
+								found.div.scrollIntoView({
+									behavior: "smooth",
+									block: "center"
+								});
 								setTimeout(() => found.div.classList.remove("highlight"), 2000);
 							}, 50);
 						};
@@ -4554,7 +4864,8 @@
 						"<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
 					let {
 						data: user
-					} = await supabase.from("users").select("id, name, coins, avatar, description, time, role").eq("id", uid).single();
+					} = await supabase.from("users").select("id, name, coins, avatar, description, time, role").eq(
+						"id", uid).single();
 					const avatarUrl = getAvatar(user);
 					$("profileAvatar").src = avatarUrl;
 					$("profileAvatar").onclick = () => openViewer(avatarUrl);
@@ -4622,7 +4933,8 @@
 						container.querySelector("[data-action='about']").onclick = () => {
 							document.querySelector(".modalBox").style.width = "800px";
 							modal(
-								`<h2>关于</h2><div style="text-align:left;"><b>Jacky 论坛</b>是一款网页论坛，前端使用 HTML、CSS 与 JavaScript 编写，数据库使用SQL。<br><br><b>【原理】</b>用户、帖子、评论、点赞数据存储在数据库，通过 API 读取和更新内容。<br><b>【功能】</b>用户登录注册系统、发帖和评论、点赞和删除、用户列表、个人主页、主题切换。<br><b>【提醒】</b>请勿发布违法内容，请勿滥用。<br><br>如遇BUG，欢迎汇报至 <a href="mailto:jacky@zhujingqi.com">jacky@zhujingqi.com</a> 或 <a href="https://zhujingqi.com/me/contact.html">联系</a><br></div><h6><a href="#">Jacky 论坛</a> · <a href="https://zhujingqi.com">Zhujingqi</a></h6><h6>© Jacky Forum. All rights reserved.</h6>`);
+								`<h2>关于</h2><div style="text-align:left;"><b>Jacky 论坛</b>是一款网页论坛，前端使用 HTML、CSS 与 JavaScript 编写，数据库使用SQL。<br><br><b>【原理】</b>用户、帖子、评论、点赞数据存储在数据库，通过 API 读取和更新内容。<br><b>【功能】</b>用户登录注册系统、发帖和评论、点赞和删除、用户列表、个人主页、主题切换。<br><b>【提醒】</b>请勿发布违法内容，请勿滥用。<br><br>如遇BUG，欢迎汇报至 <a href="mailto:jacky@zhujingqi.com">jacky@zhujingqi.com</a> 或 <a href="https://zhujingqi.com/me/contact.html">联系</a><br></div><h6><a href="#">Jacky 论坛</a> · <a href="https://zhujingqi.com">Zhujingqi</a></h6><h6>© Jacky Forum. All rights reserved.</h6>`
+								);
 						};
 						container.querySelector("[data-action='sponsor']").onclick = () => {
 							modal(`<h2>赞助</h2><a href="https://zhujingqi.com/money.html">点击此处赞助 Jacky</a>`);
@@ -4631,7 +4943,8 @@
 						container.querySelector("[data-action='download']").onclick = () => {
 							document.querySelector(".modalBox").style.width = "800px";
 							modal(
-								`<h3>获取应用版 Jacky 论坛</h3><h4>Windows系统</h4><details><summary>如何安装？</summary><p>1. <a href="https://github.com/zhujingqi/download/releases/download/1.0.0/Jacky.Forum.Setup.1.0.0.exe">点击<b>下载EXE安装程序</b></a><br>2. 双击安装程序，安装<b>桌面版 Jacky 论坛</b><br>3. 更加便捷地使用 <b>Jacky 论坛</b> 吧！<h6>注：国内下载可能<del>较慢</del>非常慢！</h6></p></details><h4>iOS系统</h4><details><summary>如何安装？</summary>使用Safari浏览器访问 <b>Jacky 论坛</b><br><img src="1.jpg" style="width:100px;margin-top:10px;" class="zoomable" /><img src="2.jpg" style="width:100px;margin-top:10px;" class="zoomable" /><img src="3.jpg" style="width:100px;margin-top:10px;" class="zoomable" /></details>`);
+								`<h3>获取应用版 Jacky 论坛</h3><h4>Windows系统</h4><details><summary>如何安装？</summary><p>1. <a href="https://github.com/zhujingqi/download/releases/download/1.0.0/Jacky.Forum.Setup.1.0.0.exe">点击<b>下载EXE安装程序</b></a><br>2. 双击安装程序，安装<b>桌面版 Jacky 论坛</b><br>3. 更加便捷地使用 <b>Jacky 论坛</b> 吧！<h6>注：国内下载可能<del>较慢</del>非常慢！</h6></p></details><h4>iOS系统</h4><details><summary>如何安装？</summary>使用Safari浏览器访问 <b>Jacky 论坛</b><br><img src="1.jpg" style="width:100px;margin-top:10px;" class="zoomable" /><img src="2.jpg" style="width:100px;margin-top:10px;" class="zoomable" /><img src="3.jpg" style="width:100px;margin-top:10px;" class="zoomable" /></details>`
+								);
 						};
 						$("sysTheme2").onclick = () => document.body.classList.remove("dark");
 						$("lightTheme2").onclick = () => document.body.classList.remove("dark");
@@ -4675,7 +4988,9 @@
 				async function openShop() {
 					const shopDiv = document.createElement("div");
 					shopDiv.id = "shopModal";
-					const { data: userData } = await supabase.from("users")
+					const {
+						data: userData
+					} = await supabase.from("users")
 						.select("coins, role").eq("id", currentUser.id).single();
 					let coins = userData?.coins || 0;
 					let roleArr = userData?.role || [];
@@ -4695,23 +5010,25 @@
 						const itemsHtml = badges.map(item => {
 							const owned = roleArr.includes(item.id);
 							const isActive = active === item.id;
-							const canRemove = owned && !['owner','admin','official'].includes(item.id);
+							const canRemove = owned && !['owner', 'admin', 'official'].includes(item.id);
 							let btnHtml;
 							if (isActive && canRemove) {
-								btnHtml = `<button class="buyBtn equipped" data-remove="${item.id}">已装备</button>`;
+								btnHtml =
+									`<button class="buyBtn equipped" data-remove="${item.id}">已装备</button>`;
 							} else if (isActive) {
 								btnHtml = '<button class="buyBtn equipped">已装备</button>';
 							} else if (owned) {
 								btnHtml = `<button class="buyBtn owned" data-equip="${item.id}">装备</button>`;
 							} else if (coins >= item.price) {
-								btnHtml = `<button class="buyBtn buy" data-buy="${item.id}">${item.price}金币</button>`;
+								btnHtml =
+									`<button class="buyBtn buy" data-buy="${item.id}">${item.price}金币</button>`;
 							} else {
 								btnHtml = '<button class="buyBtn owned" style="opacity:.5;">金币不足</button>';
 							}
 							const cfg = ROLE_CONFIG[item.id];
-							const previewHtml = cfg
-								? `<div class="preview"><span class="shopPreviewBadge roleBadge ${item.id}"></span></div>`
-								: '';
+							const previewHtml = cfg ?
+								`<div class="preview"><span class="shopPreviewBadge roleBadge ${item.id}"></span></div>` :
+								'';
 							return `
 								<div class="shopItem">
 									${previewHtml}
@@ -4739,10 +5056,10 @@
 									<h3>徽章</h3>
 									${itemsHtml}
 								</div>
-								<div class="shopSection">
+								<!-- <div class="shopSection">
 									<h3>礼物</h3>
 									${giftsHtml}
-								</div>
+								</div> -->
 								<div class="shopSection">
 									<h3>抽奖</h3>
 									<div class="lotteryEntry" id="lotteryEntry">
@@ -4757,7 +5074,9 @@
 							</div>`;
 
 						shopDiv.querySelector("#shopCloseBtn").onclick = () => shopDiv.remove();
-						shopDiv.onclick = e => { if (e.target === shopDiv) shopDiv.remove(); };
+						shopDiv.onclick = e => {
+							if (e.target === shopDiv) shopDiv.remove();
+						};
 
 						shopDiv.querySelectorAll("[data-buy]").forEach(btn => {
 							btn.onclick = async () => {
@@ -4767,29 +5086,33 @@
 								await changeCoins(currentUser.id, -item.price);
 								coins -= item.price;
 								roleArr = [...roleArr, itemId];
-								await supabase.from("users").update({ role: roleArr }).eq("id", currentUser.id);
+								await supabase.from("users").update({
+									role: roleArr
+								}).eq("id", currentUser.id);
 								if (currentUser) currentUser.role = roleArr;
 								renderShop();
 							};
 						});
 
-						shopDiv.querySelectorAll("[data-buy-gift]").forEach(btn => {
-							btn.onclick = async () => {
-								const itemId = btn.dataset.buyGift;
-								const item = SHOP_ITEMS.find(i => i.id === itemId);
-								if (!item || coins < item.price) return;
-								await changeCoins(currentUser.id, -item.price);
-								coins -= item.price;
-								await openGiftPicker(item);
-								renderShop();
-							};
-						});
+						// shopDiv.querySelectorAll("[data-buy-gift]").forEach(btn => {
+						// 	btn.onclick = async () => {
+						// 		const itemId = btn.dataset.buyGift;
+						// 		const item = SHOP_ITEMS.find(i => i.id === itemId);
+						// 		if (!item || coins < item.price) return;
+						// 		await changeCoins(currentUser.id, -item.price);
+						// 		coins -= item.price;
+						// 		await openGiftPicker(item);
+						// 		renderShop();
+						// 	};
+						// });
 
 						shopDiv.querySelectorAll("[data-equip]").forEach(btn => {
 							btn.onclick = async () => {
 								const itemId = btn.dataset.equip;
 								roleArr = [itemId, ...roleArr.filter(r => r !== itemId)];
-								await supabase.from("users").update({ role: roleArr }).eq("id", currentUser.id);
+								await supabase.from("users").update({
+									role: roleArr
+								}).eq("id", currentUser.id);
 								if (currentUser) currentUser.role = roleArr;
 								renderShop();
 							};
@@ -4801,8 +5124,10 @@
 						shopDiv.querySelectorAll("[data-remove]").forEach(btn => {
 							btn.onclick = async () => {
 								const itemId = btn.dataset.remove;
-								roleArr = roleArr.filter(r => r !== itemId);
-								await supabase.from("users").update({ role: roleArr }).eq("id", currentUser.id);
+								roleArr = [...roleArr.filter(r => r !== itemId), itemId];
+								await supabase.from("users").update({
+									role: roleArr
+								}).eq("id", currentUser.id);
 								if (currentUser) currentUser.role = roleArr;
 								renderShop();
 							};
@@ -4813,107 +5138,197 @@
 					document.body.appendChild(shopDiv);
 				}
 
-				async function openGiftPicker(item) {
-					const users = await ensureAllUsersCache();
-					return new Promise(resolve => {
-						const modal = document.createElement("div");
-						modal.id = "giftPicker";
-						modal.innerHTML = `
-							<div class="giftBox">
-								<h3>选择收礼人 · ${item.name}</h3>
-								<input class="giftSearch" id="giftSearch" placeholder="搜索用户名..." autofocus>
-								<div class="giftUserList" id="giftUserList"></div>
-								<div class="giftActions">
-									<button class="giftCancel" id="giftCancel">取消</button>
-									<button class="giftConfirm" id="giftConfirm" disabled>确认赠送</button>
-								</div>
-							</div>`;
-						document.body.appendChild(modal);
+				// async function openGiftPicker(item) {
+				// 	const users = await ensureAllUsersCache();
+				// 	return new Promise(resolve => {
+				// 		const modal = document.createElement("div");
+				// 		modal.id = "giftPicker";
+				// 		modal.innerHTML = `
+				// 			<div class="giftBox">
+				// 				<h3>选择收礼人 · ${item.name}</h3>
+				// 				<input class="giftSearch" id="giftSearch" placeholder="搜索用户名..." autofocus>
+				// 				<div class="giftUserList" id="giftUserList"></div>
+				// 				<div class="giftActions">
+				// 					<button class="giftCancel" id="giftCancel">取消</button>
+				// 					<button class="giftConfirm" id="giftConfirm" disabled>确认赠送</button>
+				// 				</div>
+				// 			</div>`;
+				// 		document.body.appendChild(modal);
 
-						let selectedId = null;
-						const list = modal.querySelector("#giftUserList");
-						const input = modal.querySelector("#giftSearch");
-						const confirmBtn = modal.querySelector("#giftConfirm");
+				// 		let selectedId = null;
+				// 		const list = modal.querySelector("#giftUserList");
+				// 		const input = modal.querySelector("#giftSearch");
+				// 		const confirmBtn = modal.querySelector("#giftConfirm");
 
-						function renderList(q) {
-							const ql = q.toLowerCase().trim();
-							const matches = users.filter(u => u.id !== currentUser.id && u.name && u.name.toLowerCase().includes(ql));
-							if (!matches.length) {
-								list.innerHTML = '<div style="color:var(--sub);padding:12px;text-align:center;">无匹配用户</div>';
-								return;
-							}
-							list.innerHTML = matches.map(u => `
-								<div class="giftUserItem${u.id === selectedId ? ' selected' : ''}" data-uid="${u.id}">
-									<img class="avatar" src="${getAvatar(u)}" onerror="this.onerror=null;this.src='head.svg'">
-									<div class="name">${u.name}</div>
-								</div>
-							`).join("");
-							list.querySelectorAll(".giftUserItem").forEach(el => {
-								el.onclick = () => {
-									selectedId = Number(el.dataset.uid);
-									list.querySelectorAll(".giftUserItem").forEach(x => x.classList.toggle("selected", Number(x.dataset.uid) === selectedId));
-									confirmBtn.disabled = false;
-								};
-							});
-						}
+				// 		function renderList(q) {
+				// 			const ql = q.toLowerCase().trim();
+				// 			const matches = users.filter(u => u.id !== currentUser.id && u.name && u.name
+				// 				.toLowerCase().includes(ql));
+				// 			if (!matches.length) {
+				// 				list.innerHTML =
+				// 					'<div style="color:var(--sub);padding:12px;text-align:center;">无匹配用户</div>';
+				// 				return;
+				// 			}
+				// 			list.innerHTML = matches.map(u => `
+				// 				<div class="giftUserItem${u.id === selectedId ? ' selected' : ''}" data-uid="${u.id}">
+				// 					<img class="avatar" src="${getAvatar(u)}" onerror="this.onerror=null;this.src='head.svg'">
+				// 					<div class="name">${u.name}</div>
+				// 				</div>
+				// 			`).join("");
+				// 			list.querySelectorAll(".giftUserItem").forEach(el => {
+				// 				el.onclick = () => {
+				// 					selectedId = Number(el.dataset.uid);
+				// 					list.querySelectorAll(".giftUserItem").forEach(x => x
+				// 						.classList.toggle("selected", Number(x.dataset
+				// 							.uid) === selectedId));
+				// 					confirmBtn.disabled = false;
+				// 				};
+				// 			});
+				// 		}
 
-						input.oninput = () => renderList(input.value);
-						if (users) renderList("");
+				// 		input.oninput = () => renderList(input.value);
+				// 		if (users) renderList("");
 
-						modal.querySelector("#giftCancel").onclick = () => { modal.remove(); resolve(false); };
-						modal.onclick = e => { if (e.target === modal) { modal.remove(); resolve(false); } };
+				// 		modal.querySelector("#giftCancel").onclick = () => {
+				// 			modal.remove();
+				// 			resolve(false);
+				// 		};
+				// 		modal.onclick = e => {
+				// 			if (e.target === modal) {
+				// 				modal.remove();
+				// 				resolve(false);
+				// 			}
+				// 		};
 
-						confirmBtn.onclick = async () => {
-							if (!selectedId) return;
-							const recipient = users.find(u => u.id === selectedId);
-							if (!recipient) return;
-							try {
-								confirmBtn.disabled = true;
-								confirmBtn.textContent = "发送中...";
-								const { data: cur } = await supabase.from("users").select("coins").eq("id", selectedId).single();
-								const curCoins = (cur?.coins || 0) + item.gift;
-								const { error: updErr } = await supabase.from("users").update({ coins: curCoins }).eq("id", selectedId);
-								if (updErr) { showCoinMsg("赠送失败：" + updErr.message); modal.remove(); resolve(false); return; }
-								await createNotification({
-									targetId: selectedId,
-									actorId: currentUser.id,
-									postId: null,
-									type: "gift"
-								});
-								await refreshNotificationBadge();
-								showCoinMsg(`送了 ${recipient.name} 一个${item.name}！`);
-								modal.remove(); resolve(true);
-							} catch (e) {
-								console.error("赠送失败:", e);
-								showCoinMsg("赠送失败：" + e.message);
-								modal.remove(); resolve(false);
-							}
-						};
-					});
-				}
+				// 		confirmBtn.onclick = async () => {
+				// 			if (!selectedId) return;
+				// 			const recipient = users.find(u => u.id === selectedId);
+				// 			if (!recipient) return;
+				// 			try {
+				// 				confirmBtn.disabled = true;
+				// 				confirmBtn.textContent = "发送中...";
+				// 				const {
+				// 					data: cur
+				// 				} = await supabase.from("users").select("coins").eq("id", selectedId)
+				// 					.single();
+				// 				const curCoins = (cur?.coins || 0) + item.gift;
+				// 				const {
+				// 					error: updErr
+				// 				} = await supabase.from("users").update({
+				// 					coins: curCoins
+				// 				}).eq("id", selectedId);
+				// 				if (updErr) {
+				// 					showCoinMsg("赠送失败：" + updErr.message);
+				// 					modal.remove();
+				// 					resolve(false);
+				// 					return;
+				// 				}
+				// 				await createNotification({
+				// 					targetId: selectedId,
+				// 					actorId: currentUser.id,
+				// 					postId: null,
+				// 					type: "gift"
+				// 				});
+				// 				await refreshNotificationBadge();
+				// 				showCoinMsg(`送了 ${recipient.name} 一个${item.name}！`);
+				// 				modal.remove();
+				// 				resolve(true);
+				// 			} catch (e) {
+				// 				console.error("赠送失败:", e);
+				// 				showCoinMsg("赠送失败：" + e.message);
+				// 				modal.remove();
+				// 				resolve(false);
+				// 			}
+				// 		};
+				// 	});
+				// }
 
 				async function openLottery() {
-					const sm = document.getElementById("shopModal"); if (sm) sm.remove();
-					const { data: coinData } = await supabase.from("users").select("coins").eq("id", currentUser.id).single();
+					const sm = document.getElementById("shopModal");
+					if (sm) sm.remove();
+					const {
+						data: coinData
+					} = await supabase.from("users").select("coins").eq("id", currentUser.id).single();
 					if (coinData && currentUser) currentUser.coins = coinData.coins;
 
 					const modal = document.createElement("div");
 					modal.id = "lotteryModal";
 
-					const prizes = [
-						{ id:"lose5", label:"吞5", color:"#e53935", v:-5, w:10 },
-						{ id:"lose2", label:"吞2", color:"#ef9a9a", v:-2, w:14 },
-						{ id:"win5", label:"返5", color:"#81c784", v:5, w:18 },
-						{ id:"win8", label:"返8", color:"#66bb6a", v:8, w:20 },
-						{ id:"win12", label:"返12", color:"#4caf50", v:12, w:18 },
-						{ id:"win20", label:"返20", color:"#388e3c", v:20, w:11 },
-						{ id:"win50", label:"返50", color:"#1b5e20", v:50, w:6 },
-						{ id:"green_v", label:"绿V", color:"#d4a017", v:"green_v", w:1 },
-						{ id:"purple_star", label:"紫星", color:"#9c27b0", v:"purple_star", w:1 },
-						{ id:"blue_diamond", label:"蓝钻", color:"#2196f3", v:"blue_diamond", w:1 },
+					const prizes = [{
+							id: "lose5",
+							label: "吞5",
+							color: "#e53935",
+							v: -5,
+							w: 10
+						},
+						{
+							id: "lose2",
+							label: "吞2",
+							color: "#ef9a9a",
+							v: -2,
+							w: 14
+						},
+						{
+							id: "win5",
+							label: "返5",
+							color: "#81c784",
+							v: 5,
+							w: 18
+						},
+						{
+							id: "win8",
+							label: "返8",
+							color: "#66bb6a",
+							v: 8,
+							w: 20
+						},
+						{
+							id: "win12",
+							label: "返12",
+							color: "#4caf50",
+							v: 12,
+							w: 18
+						},
+						{
+							id: "win20",
+							label: "返20",
+							color: "#388e3c",
+							v: 20,
+							w: 11
+						},
+						{
+							id: "win50",
+							label: "返50",
+							color: "#1b5e20",
+							v: 50,
+							w: 6
+						},
+						{
+							id: "green_v",
+							label: "绿V",
+							color: "#d4a017",
+							v: "green_v",
+							w: 1
+						},
+						{
+							id: "purple_star",
+							label: "紫星",
+							color: "#9c27b0",
+							v: "purple_star",
+							w: 1
+						},
+						{
+							id: "blue_diamond",
+							label: "蓝钻",
+							color: "#2196f3",
+							v: "blue_diamond",
+							w: 1
+						},
 					];
 					const pool = [];
-					prizes.forEach((p,i) => { for (let j=0; j<p.w; j++) pool.push(i); });
+					prizes.forEach((p, i) => {
+						for (let j = 0; j < p.w; j++) pool.push(i);
+					});
 					const n = prizes.length;
 					const sa = (2 * Math.PI) / n;
 
@@ -4938,7 +5353,8 @@
 
 					const cv = document.getElementById("wc");
 					const cx = cv.getContext("2d");
-					let ang = 0, sp = false;
+					let ang = 0,
+						sp = false;
 
 					function setupCanvas() {
 						const wa = cv.parentElement;
@@ -4949,68 +5365,115 @@
 						cv.style.width = w + "px";
 						cv.style.height = w + "px";
 						cx.setTransform(dpr, 0, 0, dpr, 0, 0);
-						return { D: w, md: w/2, R: w/2 - 20, dpr };
+						return {
+							D: w,
+							md: w / 2,
+							R: w / 2 - 20,
+							dpr
+						};
 					}
 
 					function dr(a) {
-						const { D, md, R } = setupCanvas();
+						const {
+							D,
+							md,
+							R
+						} = setupCanvas();
 						cx.clearRect(0, 0, D, D);
-						cx.save(); cx.translate(md, md); cx.rotate(a);
+						cx.save();
+						cx.translate(md, md);
+						cx.rotate(a);
 						const fs = Math.round(R * 0.1);
-						for (let i=0;i<n;i++) {
-							const s = i*sa, e = s+sa;
-							cx.beginPath(); cx.moveTo(0,0); cx.arc(0,0,R,s,e); cx.closePath();
-							cx.fillStyle = prizes[i].color; cx.fill();
-							cx.strokeStyle = "rgba(255,255,255,.25)"; cx.lineWidth = 2; cx.stroke();
-							cx.save(); cx.rotate(s+sa/2);
-							cx.textAlign = "center"; cx.textBaseline = "middle";
+						for (let i = 0; i < n; i++) {
+							const s = i * sa,
+								e = s + sa;
+							cx.beginPath();
+							cx.moveTo(0, 0);
+							cx.arc(0, 0, R, s, e);
+							cx.closePath();
+							cx.fillStyle = prizes[i].color;
+							cx.fill();
+							cx.strokeStyle = "rgba(255,255,255,.25)";
+							cx.lineWidth = 2;
+							cx.stroke();
+							cx.save();
+							cx.rotate(s + sa / 2);
+							cx.textAlign = "center";
+							cx.textBaseline = "middle";
 							cx.font = `bold ${fs}px 'Microsoft YaHei',sans-serif`;
-							cx.strokeStyle = "rgba(0,0,0,.6)"; cx.lineWidth = Math.max(2, fs/5);
-							cx.strokeText(prizes[i].label, R-fs*1.4, 0);
+							cx.strokeStyle = "rgba(0,0,0,.6)";
+							cx.lineWidth = Math.max(2, fs / 5);
+							cx.strokeText(prizes[i].label, R - fs * 1.4, 0);
 							cx.fillStyle = "#fff";
-							cx.shadowColor = "rgba(0,0,0,.5)"; cx.shadowBlur = fs/4;
-							cx.fillText(prizes[i].label, R-fs*1.4, 0);
+							cx.shadowColor = "rgba(0,0,0,.5)";
+							cx.shadowBlur = fs / 4;
+							cx.fillText(prizes[i].label, R - fs * 1.4, 0);
 							cx.shadowBlur = 0;
 							cx.restore();
 						}
 						const cr = Math.max(12, R * 0.12);
-						cx.beginPath(); cx.arc(0,0,cr,0,2*Math.PI);
-						cx.fillStyle = document.body.classList.contains("dark") ? "#333" : "#fff"; cx.fill();
-						cx.strokeStyle = "#bbb"; cx.lineWidth = 2; cx.stroke();
+						cx.beginPath();
+						cx.arc(0, 0, cr, 0, 2 * Math.PI);
+						cx.fillStyle = document.body.classList.contains("dark") ? "#333" : "#fff";
+						cx.fill();
+						cx.strokeStyle = "#bbb";
+						cx.lineWidth = 2;
+						cx.stroke();
 						cx.restore();
 					}
+
 					function pick() {
-						let idx, tries = 0, owned = currentUser?.role;
+						let idx, tries = 0,
+							owned = currentUser?.role;
 						do {
-							idx = pool[Math.random()*pool.length|0];
+							idx = pool[Math.random() * pool.length | 0];
 							const v = prizes[idx].v;
-							if (typeof v === "string" && owned?.includes(v) && tries < 20) { tries++; continue; }
+							if (typeof v === "string" && owned?.includes(v) && tries < 20) {
+								tries++;
+								continue;
+							}
 							break;
 						} while (true);
 						return idx;
 					}
+
 					function prizeAtAngle(a) {
-						let t = (-a - Math.PI/2) % (2*Math.PI);
-						if (t<0) t += 2*Math.PI;
-						return (t/sa|0) % n;
+						let t = (-a - Math.PI / 2) % (2 * Math.PI);
+						if (t < 0) t += 2 * Math.PI;
+						return (t / sa | 0) % n;
 					}
+
 					function spinTo(ti, cb) {
-						if (sp) return; sp = true;
-						const s1 = document.getElementById("s1"), s10 = document.getElementById("s10");
-						s1.disabled = true; s10.disabled = true;
-						const off = (Math.random()-.5)*sa*.5;
-						const landing = -Math.PI/2 - ti*sa - sa/2 + off;
+						if (sp) return;
+						sp = true;
+						const s1 = document.getElementById("s1"),
+							s10 = document.getElementById("s10");
+						s1.disabled = true;
+						s10.disabled = true;
+						const off = (Math.random() - .5) * sa * .5;
+						const landing = -Math.PI / 2 - ti * sa - sa / 2 + off;
 						const minRot = 3;
-						const extra = Math.ceil((ang - landing) / (2*Math.PI) + minRot + Math.random()*2);
-						const ta = landing + extra * 2*Math.PI;
-						const st = ang, td = ta - st;
-						const dur = 3000 + Math.random()*1000, t0 = performance.now();
+						const extra = Math.ceil((ang - landing) / (2 * Math.PI) + minRot + Math.random() * 2);
+						const ta = landing + extra * 2 * Math.PI;
+						const st = ang,
+							td = ta - st;
+						const dur = 3000 + Math.random() * 1000,
+							t0 = performance.now();
+
 						function step(now) {
-							const p = Math.min((now-t0)/dur, 1);
-							const e = 1 - Math.pow(1-p, 3);
-							ang = st + td*e; dr(ang);
-							if (p<1) { requestAnimationFrame(step); }
-							else { cb(prizeAtAngle(ang), () => { sp = false; s1.disabled = false; s10.disabled = false; }); }
+							const p = Math.min((now - t0) / dur, 1);
+							const e = 1 - Math.pow(1 - p, 3);
+							ang = st + td * e;
+							dr(ang);
+							if (p < 1) {
+								requestAnimationFrame(step);
+							} else {
+								cb(prizeAtAngle(ang), () => {
+									sp = false;
+									s1.disabled = false;
+									s10.disabled = false;
+								});
+							}
 						}
 						requestAnimationFrame(step);
 					}
@@ -5020,7 +5483,10 @@
 
 					document.getElementById("s1").onclick = async () => {
 						if (sp) return;
-						if ((currentUser?.coins||0) < 10) { showCoinMsg("金币不足！"); return; }
+						if ((currentUser?.coins || 0) < 10) {
+							showCoinMsg("金币不足！");
+							return;
+						}
 						await changeCoins(currentUser.id, -10);
 						const idx = pick();
 						spinTo(idx, async (ri, done) => {
@@ -5028,75 +5494,119 @@
 								const p = prizes[ri];
 								if (typeof p.v === "number") {
 									await changeCoins(currentUser.id, p.v);
-									lr.innerHTML = `<div class="singleResult">${p.label} 金币</div>`;
+									lr.innerHTML =
+										`<div class="singleResult">${p.label} 金币</div>`;
 								} else {
 									await addBadge(p.v);
-									lr.innerHTML = `<div class="singleResult">获得称号：${p.label}！</div>`;
+									lr.innerHTML =
+										`<div class="singleResult">获得称号：${p.label}！</div>`;
 								}
 								updCoins();
-							} finally { done(); }
+							} finally {
+								done();
+							}
 						});
 						updCoins();
 					};
 
 					document.getElementById("s10").onclick = async () => {
-						if (sp) return; sp = true;
-						const s10b = document.getElementById("s10"), s1b = document.getElementById("s1");
-						s10b.disabled = true; s1b.disabled = true;
+						if (sp) return;
+						sp = true;
+						const s10b = document.getElementById("s10"),
+							s1b = document.getElementById("s1");
+						s10b.disabled = true;
+						s1b.disabled = true;
 						try {
-							if ((currentUser?.coins||0) < 99) { showCoinMsg("金币不足！"); return; }
+							if ((currentUser?.coins || 0) < 99) {
+								showCoinMsg("金币不足！");
+								return;
+							}
 							await changeCoins(currentUser.id, -99);
-							const ids = Array.from({length:10}, () => pick());
-						let tc = 0, newBadges = [];
-						const items = ids.map(idx => {
-							const p = prizes[idx];
-							if (typeof p.v === "number") { tc += p.v; return { ...p, isBadge: false }; }
-							else { newBadges.push(p.v); return { ...p, isBadge: true }; }
-						});
-						lr.innerHTML = '<div class="tenResult"><div class="tenTitle">十连抽结果</div><div class="tenGrid"></div></div>';
-						const grid = lr.querySelector(".tenGrid");
-						for (let i = 0; i < items.length; i++) {
-							const it = items[i];
-							const el = document.createElement("div");
-							el.className = "tenItem";
-							el.style.background = it.color;
-							if (it.isBadge) el.style.outline = "2px solid #fff";
-							el.textContent = it.label;
-							el.style.opacity = "0";
-							el.style.transform = "scale(.5)";
-							el.style.transition = "opacity .3s, transform .3s";
-							grid.appendChild(el);
-							requestAnimationFrame(() => { el.style.opacity = "1"; el.style.transform = "scale(1)"; });
-							await new Promise(r => setTimeout(r, 120));
+							const ids = Array.from({
+								length: 10
+							}, () => pick());
+							let tc = 0,
+								newBadges = [];
+							const items = ids.map(idx => {
+								const p = prizes[idx];
+								if (typeof p.v === "number") {
+									tc += p.v;
+									return {
+										...p,
+										isBadge: false
+									};
+								} else {
+									newBadges.push(p.v);
+									return {
+										...p,
+										isBadge: true
+									};
+								}
+							});
+							lr.innerHTML =
+								'<div class="tenResult"><div class="tenTitle">十连抽结果</div><div class="tenGrid"></div></div>';
+							const grid = lr.querySelector(".tenGrid");
+							for (let i = 0; i < items.length; i++) {
+								const it = items[i];
+								const el = document.createElement("div");
+								el.className = "tenItem";
+								el.style.background = it.color;
+								if (it.isBadge) el.style.outline = "2px solid #fff";
+								el.textContent = it.label;
+								el.style.opacity = "0";
+								el.style.transform = "scale(.5)";
+								el.style.transition = "opacity .3s, transform .3s";
+								grid.appendChild(el);
+								requestAnimationFrame(() => {
+									el.style.opacity = "1";
+									el.style.transform = "scale(1)";
+								});
+								await new Promise(r => setTimeout(r, 120));
+							}
+							if (tc !== 0) {
+								await changeCoins(currentUser.id, tc);
+							}
+							for (const b of newBadges) await addBadge(b);
+							const totalEl = document.createElement("div");
+							totalEl.className = "tenTotal";
+							totalEl.textContent = `${tc>0?'+':''}${tc} 金币`;
+							totalEl.style.opacity = "0";
+							totalEl.style.transition = "opacity .4s";
+							lr.querySelector(".tenResult").appendChild(totalEl);
+							requestAnimationFrame(() => totalEl.style.opacity = "1");
+							updCoins();
+						} finally {
+							sp = false;
+							s10b.disabled = false;
+							s1b.disabled = false;
 						}
-						if (tc !== 0) { await changeCoins(currentUser.id, tc); }
-						for (const b of newBadges) await addBadge(b);
-						const totalEl = document.createElement("div");
-						totalEl.className = "tenTotal";
-						totalEl.textContent = `${tc>0?'+':''}${tc} 金币`;
-						totalEl.style.opacity = "0";
-						totalEl.style.transition = "opacity .4s";
-						lr.querySelector(".tenResult").appendChild(totalEl);
-						requestAnimationFrame(() => totalEl.style.opacity = "1");
-						updCoins();
-						} finally { sp = false; s10b.disabled = false; s1b.disabled = false; }
 					};
 
 					async function addBadge(bid) {
 						let r = currentUser?.role || [];
 						if (Array.isArray(r) && !r.includes(bid)) {
 							r = [...r, bid];
-							await supabase.from("users").update({role:r}).eq("id", currentUser.id);
+							await supabase.from("users").update({
+								role: r
+							}).eq("id", currentUser.id);
 							if (currentUser) currentUser.role = r;
 						}
 					}
+
 					function updCoins() {
 						const el = document.querySelector("#lotteryModal .lotteryCoins b");
 						if (el) el.textContent = currentUser?.coins || 0;
 					}
-					function closeLottery() { modal.remove(); const sm = document.getElementById("shopModal"); if (sm) sm.remove(); }
+
+					function closeLottery() {
+						modal.remove();
+						const sm = document.getElementById("shopModal");
+						if (sm) sm.remove();
+					}
 					document.getElementById("lotteryCloseBtn").onclick = closeLottery;
-					modal.onclick = e => { if (e.target === modal) closeLottery(); };
+					modal.onclick = e => {
+						if (e.target === modal) closeLottery();
+					};
 				}
 
 				function openAvatarEditor() {
@@ -5185,20 +5695,73 @@
 				const autoId = localStorage.getItem("loginUser");
 
 				function getLevelInfo(coins) {
-					const levels = [
-						{ min: 0, name: "LV0", color: "#888" },
-						{ min: 1, name: "LV1", color: "#77bb00" },
-						{ min: 21, name: "LV2", color: "#00aaff" },
-						{ min: 41, name: "LV3", color: "#ffcc00" },
-						{ min: 81, name: "LV4", color: "#ff9900" },
-						{ min: 161, name: "LV5", color: "#ff5500" },
-						{ min: 321, name: "LV6", color: "#d93131" },
-						{ min: 641, name: "LV7", color: "#ff55ff" },
-						{ min: 1281, name: "LV8", color: "#9900ff" },
-						{ min: 2561, name: "LV9", color: "#55007f" },
-						{ min: 5121, name: "LV10", color: "#d4a017", cssClass: "lv10" },
-						{ min: 10241, name: "LV11", color: "#ff4500", cssClass: "lv11" },
-						{ min: 20481, name: "MAX", color: "#000000" }
+					const levels = [{
+							min: 0,
+							name: "LV0",
+							color: "#888"
+						},
+						{
+							min: 1,
+							name: "LV1",
+							color: "#77bb00"
+						},
+						{
+							min: 21,
+							name: "LV2",
+							color: "#00aaff"
+						},
+						{
+							min: 41,
+							name: "LV3",
+							color: "#ffcc00"
+						},
+						{
+							min: 81,
+							name: "LV4",
+							color: "#ff9900"
+						},
+						{
+							min: 161,
+							name: "LV5",
+							color: "#ff5500"
+						},
+						{
+							min: 321,
+							name: "LV6",
+							color: "#d93131"
+						},
+						{
+							min: 641,
+							name: "LV7",
+							color: "#ff55ff"
+						},
+						{
+							min: 1281,
+							name: "LV8",
+							color: "#9900ff"
+						},
+						{
+							min: 2561,
+							name: "LV9",
+							color: "#55007f"
+						},
+						{
+							min: 5121,
+							name: "LV10",
+							color: "#d4a017",
+							cssClass: "lv10"
+						},
+						{
+							min: 10241,
+							name: "LV11",
+							color: "#ff4500",
+							cssClass: "lv11"
+						},
+						{
+							min: 20481,
+							name: "MAX",
+							color: "#000000"
+						}
 					];
 					let current = levels[0];
 					let next = null;
@@ -5209,14 +5772,21 @@
 							break;
 						}
 					}
-					return { current, next, coins };
+					return {
+						current,
+						next,
+						coins
+					};
 				}
 
 				function renderLevelProgress(coins) {
 					const container = $("levelProgress");
 					if (!container) return;
 					const info = getLevelInfo(coins);
-					const { current, next } = info;
+					const {
+						current,
+						next
+					} = info;
 					if (!next) {
 						container.innerHTML = `
 							<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
@@ -5333,10 +5903,20 @@
 					};
 				}
 				$("randomPostBtn").onclick = async () => {
-					const { count } = await supabase.from("posts").select("id", { count: "exact", head: true });
-					if (!count) { modal("暂无帖子"); return; }
+					const {
+						count
+					} = await supabase.from("posts").select("id", {
+						count: "exact",
+						head: true
+					});
+					if (!count) {
+						modal("暂无帖子");
+						return;
+					}
 					const offset = Math.floor(Math.random() * count);
-					const { data } = await supabase.from("posts").select("id").order("id").range(offset, offset);
+					const {
+						data
+					} = await supabase.from("posts").select("id").order("id").range(offset, offset);
 					if (data && data[0]) {
 						history.replaceState(null, "", "?pid=" + data[0].id);
 						openSinglePost(data[0].id);
@@ -5471,7 +6051,9 @@
 						if (autoId) {
 							const {
 								data
-							} = await supabase.from("users").select("id, name, pass, coins, coin_ban, avatar, description, time, role, last_seen").eq("id", autoId).single();
+							} = await supabase.from("users").select(
+								"id, name, pass, coins, coin_ban, avatar, description, time, role, last_seen"
+								).eq("id", autoId).single();
 							if (data) {
 								currentUser = data;
 								$("nav").classList.remove("hidden");
