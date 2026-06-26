@@ -2775,7 +2775,7 @@
 		<div id="viewer" onclick="closeViewer()">
 			<img id="viewerImg">
 		</div>
-		<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 		<script>
 			const TRANSLATIONS = {
 				nav_home: {
@@ -4538,9 +4538,14 @@
 				sel.onchange = () => changeLanguage(sel.value);
 			}
 			document.addEventListener("DOMContentLoaded", () => {
-				const SUPABASE_URL = "https://hxlhrrllhvvazyhiuhvb.supabase.co";
-				const SUPABASE_KEY = "sb_publishable_uM0aEPvk4q_hRI5VzXN3Yg_IQsCdOCY";
-				const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+				const API = "https://jacky-forum-api.zhujingqi2011.workers.dev";
+				async function api(path, opt = {}) {
+					try {
+						const r = await fetch(API + path, { headers: { "Content-Type": "application/json", ...opt.headers }, ...opt });
+						if (!r.ok) { const e = await r.json().catch(() => ({ error: "请求失败" })); return { data: null, error: { message: e.error } }; }
+						return { data: await r.json(), error: null };
+					} catch (e) { return { data: null, error: e }; }
+				}
 				const $ = id => document.getElementById(id);
 				let currentUser = null;
 				let guestMode = false;
@@ -4639,51 +4644,23 @@
 						return;
 					}
 					try {
-						const [{
-							count: userCount,
-							error: userErr
-						}, {
-							count: postCount,
-							error: postErr
-						}, {
-							count: commentCount,
-							error: commentErr
-						}] = await Promise.all([
-							supabase.from("users").select("id", {
-								count: "exact",
-								head: true
-							}),
-							supabase.from("posts").select("id", {
-								count: "exact",
-								head: true
-							}),
-							supabase.from("comments").select("id", {
-								count: "exact",
-								head: true
-							})
-						]);
-						statsCache = {
-							data: {
-								userCount,
-								postCount,
-								commentCount
-							},
-							time: Date.now()
-						};
-						if ($("totalUsers") && !userErr) $("totalUsers").textContent = userCount || 0;
-						if ($("totalPosts") && !postErr) $("totalPosts").textContent = postCount || 0;
+						const { data: stats } = await api("/api/stats");
+						const userCount = stats?.userCount || 0;
+						const postCount = stats?.postCount || 0;
+						const commentCount = stats?.commentCount || 0;
+						statsCache = { data: { userCount, postCount, commentCount }, time: Date.now() };
+						if ($("totalUsers")) $("totalUsers").textContent = userCount;
+						if ($("totalPosts")) $("totalPosts").textContent = postCount;
 						if ($("statsBox")) {
 							$("statsBox").innerHTML = `
 								<strong>` + t("stats_title") + `</strong><br>
-								` + t("stats_users") + `：${userCount || 0}<br>
-								` + t("stats_posts") + `：${postCount || 0}<br>
-								` + t("stats_comments") + `：${commentCount || 0}<br>
+								` + t("stats_users") + `：${userCount}<br>
+								` + t("stats_posts") + `：${postCount}<br>
+								` + t("stats_comments") + `：${commentCount}<br>
 							`;
 						}
-						if (!postErr) {
-							totalPostCount = postCount || 0;
-							renderPager();
-						}
+						totalPostCount = postCount;
+						renderPager();
 					} catch (e) {
 						if ($("totalUsers")) $("totalUsers").textContent = "—";
 						if ($("totalPosts")) $("totalPosts").textContent = "—";
@@ -4921,12 +4898,7 @@
 				};
 				async function ensureAllUsersCache() {
 					if (allUsersCache.length) return allUsersCache;
-					const {
-						data,
-						error
-					} = await supabase
-						.from("users")
-						.select("id, name, coins, avatar");
+					const { data, error } = await api("/api/users");
 					if (error) return [];
 					allUsersCache = data || [];
 					return allUsersCache;
@@ -5362,22 +5334,16 @@
 
 					let success = false;
 					for (let attempt = 0; attempt < 5; attempt++) {
-						const {
-							data: post
-						} = await supabase.from("posts").select("content").eq("id", postId).single();
+						const { data: post } = await api("/api/posts/single?id=" + postId);
 						if (!post) break;
 						const fullContent = post.content;
 						if (!fullContent.includes(oldMarker)) break;
 						const newContent = fullContent.replace(oldMarker, newMarker);
-						const {
-							error
-						} = await supabase.from("posts").update({
-							content: newContent
-						}).eq("id", postId).eq("content", fullContent);
-						if (!error) {
-							success = true;
-							break;
-						}
+						const { error } = await api("/api/posts/" + postId, {
+							method: "PUT",
+							body: JSON.stringify({ content: newContent, expectedContent: fullContent })
+						});
+						if (!error) { success = true; break; }
 						await new Promise(r => setTimeout(r, 200));
 					}
 					if (!success) return;
@@ -5585,31 +5551,15 @@
 						return modal(t("no_impersonate"));
 					}
 					let passHash = await hash(p1);
-					let {
-						data: userData,
-						error
-					} = await supabase
-						.from("users")
-						.insert([{
+					let { data: userData, error } = await api("/api/auth/register", {
+						method: "POST",
+						body: JSON.stringify({
 							name: u,
 							pass: passHash,
-							time: new Date().toISOString(),
-							coins: 0,
-							avatar: null
-						}])
-						.select();
+							time: new Date().toISOString()
+						})
+					});
 					if (error) return modal(t("register_fail", error.message));
-					let userId = userData[0].id;
-					let {
-						error: passError
-					} = await supabase
-						.from("passwords")
-						.insert([{
-							id: userId,
-							name: u,
-							password: p1
-						}]);
-					if (passError) return modal(t("error_generic", passError.message));
 					modal(t("register_ok"));
 					show("welcomePage");
 				};
@@ -5617,17 +5567,12 @@
 					let u = $("loginUser").value.trim();
 					let p = $("loginPass").value.trim();
 					if (!u || !p) return modal(t("enter_user_pass"));
-					let {
-						data,
-						error
-					} = await supabase
-						.from("users")
-						.select("*")
-						.eq("name", u)
-						.single();
-					if (error || !data) return modal(t("user_not_found"));
 					let passHash = await hash(p);
-					if (data.pass !== passHash) return modal(t("wrong_password"));
+					let { data, error } = await api("/api/auth/login", {
+						method: "POST",
+						body: JSON.stringify({ name: u, pass: passHash })
+					});
+					if (error || !data) return modal(error?.message || t("user_not_found"));
 					currentUser = data;
 					guestMode = false;
 					localStorage.setItem("loginUser", data.id);
@@ -5710,15 +5655,16 @@
 							).trim();
 					}
 					const postId = Date.now();
-					let {
-						error
-					} = await supabase.from("posts").insert([{
-						id: postId,
-						content: finalContent,
-						time: new Date().toISOString(),
-						author: currentUser.id,
-						tag: tag
-					}]);
+					let { error } = await api("/api/posts", {
+						method: "POST",
+						body: JSON.stringify({
+							id: postId,
+							content: finalContent,
+							time: new Date().toISOString(),
+							author: currentUser.id,
+							tag: tag
+						})
+					});
 					if (error) return modal(t("post_fail", error.message));
 					if (pendingRedPacket) {
 						await changeCoins(currentUser.id, -pendingRedPacket.totalCoins);
@@ -5749,17 +5695,16 @@
 				}) {
 					if (!targetId || !actorId || targetId === actorId) return;
 					if (type !== "comment" && type !== "mention" && type !== "gift") return;
-					const {
-						error
-					} = await supabase.from("notifications").insert([{
-						target_id: targetId,
-						actor_id: actorId,
-						post_id: postId,
-						comment_id: commentId,
-						type,
-						is_read: false,
-						created_at: new Date().toISOString()
-					}]);
+					const { error } = await api("/api/notifications", {
+						method: "POST",
+						body: JSON.stringify({
+							target_id: targetId,
+							actor_id: actorId,
+							post_id: postId,
+							comment_id: commentId,
+							type
+						})
+					});
 					if (error) console.error("通知插入失败", error);
 				}
 
@@ -5772,21 +5717,11 @@
 
 				async function refreshNotificationBadge() {
 					if (!currentUser) return;
-					const {
-						count,
-						error
-					} = await supabase
-						.from("notifications")
-						.select("id", {
-							count: "exact",
-							head: true
-						})
-						.eq("target_id", currentUser.id)
-						.eq("is_read", false);
+					const { data, error } = await api("/api/notifications/count?target_id=" + currentUser.id);
 					if (error) return;
 					const badge = $("notifBadge");
 					if (!badge) return;
-					const unread = count || 0;
+					const unread = data?.count || 0;
 					badge.textContent = unread;
 					badge.hidden = false;
 					badge.style.background = unread === 0 ? 'var(--card)' : '#ff3b30';
@@ -5794,15 +5729,10 @@
 				}
 				async function markNotificationRead(id) {
 					if (!currentUser || !id) return false;
-					const {
-						error
-					} = await supabase
-						.from("notifications")
-						.update({
-							is_read: true
-						})
-						.eq("id", id)
-						.eq("target_id", currentUser.id);
+					const { error } = await api("/api/notifications/read/" + id, {
+						method: "PUT",
+						body: JSON.stringify({ target_id: currentUser.id })
+					});
 					if (error) {
 						console.error("标记通知已读失败：", error);
 						return false;
@@ -5810,27 +5740,9 @@
 					return true;
 				}
 
-				function applyPostFilters(query) {
-					if (activePostTag === "其它") {
-						const excludedTags = ["公告", ...defaultTags];
-						query = query.or(
-							`tag.is.null,tag.not.in.(${excludedTags.map(t => `"${t}"`).join(",")})`
-						);
-					} else if (activePostTag !== "全部") {
-						query = query.eq("tag", activePostTag);
-					}
-					return query;
-				}
 				async function openNotificationPost(postId) {
 					$("modal").classList.add("hidden");
-					const {
-						data: post,
-						error
-					} = await supabase
-						.from("posts")
-						.select("id")
-						.eq("id", postId)
-						.single();
+					const { data: post, error } = await api("/api/posts/single?id=" + postId);
 					if (error || !post) {
 						modal(t("post_not_found"));
 						return;
@@ -5839,27 +5751,8 @@
 					postSearch = "";
 					renderPostFilters();
 					show("main");
-					const {
-						count,
-						error: countErr
-					} = await applyPostFilters(
-						supabase
-						.from("posts")
-						.select("id", {
-							count: "exact",
-							head: true
-						})
-						.order("id", {
-							ascending: false
-						})
-						.gt("id", postId)
-					);
-					if (countErr) {
-						modal(t("location_fail", countErr.message));
-						return;
-					}
 					const perPage = getPostsPerPage();
-					const page = Math.floor((count || 0) / perPage) + 1;
+					const page = 1;
 					await loadPosts(page);
 					setTimeout(() => {
 						const target = document.querySelector(`.post[data-post-id="${postId}"]`);
@@ -5880,28 +5773,16 @@
 					const container = $("singlePost");
 					container.innerHTML =
 						"<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
-					const {
-						data: post,
-						error
-					} = await supabase
-						.from("posts")
-						.select("*, users:author(id, name, coins, avatar, role)")
-						.eq("id", postId)
-						.single();
+					const { data: post, error } = await api("/api/posts/single?id=" + postId);
 					if (error || !post) {
 						container.innerHTML =
 							"<p style='text-align:center;color:var(--sub);margin-top:20px;'>" + t("post_not_found") +
 							"</p>";
 						return;
 					}
-					const {
-						data: allLikes
-					} = await supabase
-						.from("likes")
-						.select("type, liker")
-						.eq("postid", post.id);
-					let likeCount = 0,
-						dislikeCount = 0,
+					const { data: allLikes } = await api("/api/likes/" + post.id);
+					let likeCount = post.likes || 0,
+						dislikeCount = post.dislikes || 0,
 						liked = false,
 						disliked = false;
 					for (const r of (allLikes || [])) {
@@ -6025,25 +5906,7 @@
 				async function openNotifications() {
 					if (!currentUser) return;
 					await cleanupNotifications();
-					const {
-						data,
-						error
-					} = await supabase
-						.from("notifications")
-						.select(`
-							id,
-							type,
-							is_read,
-							created_at,
-							post_id,
-							comment_id,
-							actor:actor_id(id, name, coins, avatar, role)
-						`)
-						.eq("target_id", currentUser.id)
-						.order("created_at", {
-							ascending: false
-						})
-						.limit(30);
+					const { data, error } = await api("/api/notifications?target_id=" + currentUser.id);
 					if (error) {
 						modal(t("notif_load_fail", error.message));
 						return;
@@ -6085,21 +5948,15 @@
 						</div>
 					`);
 					$("markAllReadBtn").onclick = async () => {
-						await supabase.from("notifications")
-							.update({
-								is_read: true
-							})
-							.eq("target_id", currentUser.id);
+						await api("/api/notifications/read", {
+							method: "PUT",
+							body: JSON.stringify({ target_id: currentUser.id })
+						});
 						await refreshNotificationBadge();
 						openNotifications();
 					};
 					$("clearNotifBtn").onclick = async () => {
-						const {
-							error
-						} = await supabase
-							.from("notifications")
-							.delete()
-							.eq("target_id", currentUser.id);
+						const { error } = await api("/api/notifications?target_id=" + currentUser.id, { method: "DELETE" });
 						if (error) {
 							modal(t("delete_fail", error.message));
 							return;
@@ -6122,35 +5979,6 @@
 					});
 				}
 				async function cleanupNotifications() {
-					if (!currentUser) return;
-					const {
-						data
-					} = await supabase
-						.from("notifications")
-						.select("id")
-						.eq("target_id", currentUser.id)
-						.order("created_at", {
-							ascending: false
-						});
-					if (!data) return;
-					const oldIds = data
-						.slice(100)
-						.map(x => x.id);
-					if (oldIds.length) {
-						await supabase
-							.from("notifications")
-							.delete()
-							.in("id", oldIds);
-					}
-					await supabase
-						.from("notifications")
-						.delete()
-						.lt(
-							"created_at",
-							new Date(
-								Date.now() - 60 * 24 * 60 * 60 * 1000
-							).toISOString()
-						);
 				}
 
 				function sanitizePostHtml(txt) {
@@ -6257,16 +6085,7 @@
 				async function loadNewUsers(limit = 10) {
 					const container = $("newUsers");
 					container.innerHTML = "<p style='color:var(--sub);text-align:center;'>Loading...</p>";
-					let {
-						data,
-						error
-					} = await supabase
-						.from("users")
-						.select("id, name, coins, avatar, role")
-						.order("time", {
-							ascending: false
-						})
-						.limit(limit);
+					let { data, error } = await api("/api/users?limit=" + limit + "&sort=time");
 					if (error) {
 						container.innerHTML = '<p style="color:red;text-align:center;">' + t("modal_load_fail") +
 							'</p>';
@@ -6376,9 +6195,7 @@
 				let presenceTimer = null;
 				async function touchPresence() {
 					if (!currentUser) return;
-					await supabase.from("users").update({
-						last_seen: new Date().toISOString()
-					}).eq("id", currentUser.id);
+					await api("/api/users/" + currentUser.id + "/presence", { method: "PUT" });
 				}
 				let onlineUsersCache = [];
 				let onlineUsersCacheTime = 0;
@@ -6391,18 +6208,7 @@
 						mini.textContent = t("online_label_prefix") + onlineUsersCache.length;
 						return;
 					}
-					const cutoff = new Date(Date.now() - 2 * 60 * 1000).toISOString();
-					const {
-						data,
-						error
-					} = await supabase
-						.from("users")
-						.select("id, name, last_seen, coins, avatar, role")
-						.gte("last_seen", cutoff)
-						.order("last_seen", {
-							ascending: false
-						})
-						.limit(10);
+					const { data, error } = await api("/api/users/online");
 					if (error) return;
 					onlineUsersCache = data || [];
 					onlineUsersCacheTime = Date.now();
@@ -6507,69 +6313,14 @@
 					};
 				}
 				async function fetchPostPage(page = 1, perPage = getPostsPerPage()) {
-					let from = (page - 1) * perPage;
-					let to = from + perPage - 1;
-					let query = supabase
-						.from("posts")
-						.select(`
-						    id,
-						    content,
-						    time,
-						    author,
-						    tag,
-							users:author(id, name, coins, avatar, role)
-						`, {
-							count: "exact"
-						})
-						.order("id", {
-							ascending: false
-						})
-						.range(from, to);
-					if (activePostTag === "其它") {
-						const excludedTags = ["公告", ...defaultTags];
-						query = query.or(
-							`tag.is.null,tag.not.in.(${excludedTags.map(t => `"${t}"`).join(",")})`
-						);
-					} else if (activePostTag !== "全部") {
-						query = query.eq("tag", activePostTag);
-					}
-					const q = postSearch.trim();
-					if (q) {
-						const safeQ = q.replace(/[%_,]/g, "");
-						if (q.startsWith("@")) {
-							const uname = q.slice(1).trim();
-							if (!uname) return {
-								posts: [],
-								count: 0
-							};
-							const {
-								data: users,
-								error: userErr
-							} = await supabase
-								.from("users")
-								.select("id, name")
-								.eq("name", uname);
-							if (userErr) throw userErr;
-							const ids = [...new Set((users || []).map(u => u.id))];
-							if (!ids.length) return {
-								posts: [],
-								count: 0
-							};
-							query = query.in("author", ids);
-						} else {
-							query = query.or(`content.ilike.%${safeQ}%,tag.ilike.%${safeQ}%`);
-						}
-					}
-					let {
-						data,
-						count,
-						error
-					} = await query;
+					let params = "?page=" + page + "&perPage=" + perPage;
+					if (activePostTag && activePostTag !== "全部") params += "&tag=" + encodeURIComponent(activePostTag);
+					const sq = postSearch.trim();
+					if (sq) params += "&search=" + encodeURIComponent(sq);
+					if (currentUser) params += "&userId=" + currentUser.id;
+					const { data, error } = await api("/api/posts" + params);
 					if (error) throw error;
-					return {
-						posts: data || [],
-						count: count || 0
-					};
+					return { posts: data?.posts || [], count: data?.count || 0 };
 				}
 				const notice = $("notice");
 				const toggleBtn = $("toggleNoticeBtn");
@@ -6644,29 +6395,7 @@
 									"post_no_posts") + "</p>";
 							return;
 						}
-						const postIds = posts.map(p => p.id);
-						const [likesRes, userVotesRes] = await Promise.all([
-							supabase.from("likes").select("postid, type").in("postid", postIds),
-							currentUser ?
-							supabase.from("likes").select("postid, type").in("postid", postIds).eq("liker",
-								currentUser.id) :
-							Promise.resolve({
-								data: []
-							})
-						]);
 						if (token !== currentLoadToken) return;
-						const likeCounts = {
-							likes: {},
-							dislikes: {}
-						};
-						for (const row of (likesRes.data || [])) {
-							const key = row.type == 1 ? "likes" : "dislikes";
-							likeCounts[key][row.postid] = (likeCounts[key][row.postid] || 0) + 1;
-						}
-						const userVoteMap = {};
-						for (const row of (userVotesRes.data || [])) {
-							userVoteMap[row.postid] = row.type;
-						}
 						for (let i = 0; i < posts.length; i++) {
 							let p = posts[i];
 							if (token !== currentLoadToken) return;
@@ -6674,9 +6403,9 @@
 							postDiv.className = "post";
 							postDiv.dataset.postId = p.id;
 							postDiv.dataset.authorId = p.author;
-							const likeCount = likeCounts.likes[p.id] || 0;
-							const dislikeCount = likeCounts.dislikes[p.id] || 0;
-							const userVote = userVoteMap[p.id];
+							const likeCount = p.likes || 0;
+							const dislikeCount = p.dislikes || 0;
+							const userVote = p.userVote || 0;
 							const liked = userVote == 1;
 							const disliked = userVote == -1;
 							const meta = getPostMeta(p.content);
@@ -6788,15 +6517,11 @@
 							postDiv.querySelector(".userLink").onclick = () => viewUser(p.author);
 						}
 						if (token !== currentLoadToken) return;
-						const {
-							data: allComments
-						} = await supabase
-							.from("comments")
-							.select("*, users(id, name, coins, avatar, role)")
-							.in("postid", postIds)
-							.order("id", {
-								ascending: true
-							});
+						const postIds = posts.map(p => p.id);
+						const { data: allComments } = await api("/api/comments/batch", {
+							method: "POST",
+							body: JSON.stringify({ postIds })
+						});
 						if (token !== currentLoadToken) return;
 						const commentsByPost = {};
 						for (const c of (allComments || [])) {
@@ -6815,15 +6540,7 @@
 				async function renderComments(postId, container, comments) {
 					container.innerHTML = "";
 					if (!comments) {
-						const {
-							data
-						} = await supabase
-							.from("comments")
-							.select("*, users(id, name, coins, avatar, role)")
-							.eq("postid", postId)
-							.order("id", {
-								ascending: true
-							});
+						const { data } = await api("/api/comments/" + postId);
 						comments = data || [];
 					}
 					for (let c of comments) {
@@ -6851,7 +6568,7 @@
 						const del = div.querySelector("[data-cdel]");
 						if (del && currentUser) {
 							del.onclick = async () => {
-								await supabase.from("comments").delete().eq("id", c.id);
+								await api("/api/comments/" + c.id, { method: "DELETE" });
 								renderComments(postId, container);
 								await changeCoins(currentUser.id, -3);
 							};
@@ -6859,16 +6576,7 @@
 					}
 				}
 				async function openVotePeople(postId, kind) {
-					const {
-						data,
-						error
-					} = await supabase
-						.from("likes")
-						.select("type, time, users:liker(id, name, coins, avatar, role)")
-						.eq("postid", postId)
-						.order("time", {
-							ascending: true
-						});
+					const { data, error } = await api("/api/likes/" + postId);
 					if (error) {
 						modal(t("read_fail", error.message));
 						return;
@@ -6905,19 +6613,15 @@
 					const text = String(content || "").trim();
 					if (!text) return;
 					try {
-						const {
-							data,
-							error
-						} = await supabase
-							.from("comments")
-							.insert([{
+						const { data, error } = await api("/api/comments", {
+							method: "POST",
+							body: JSON.stringify({
 								postid: postId,
 								content: sanitizePostHtml(text),
 								author: currentUser.id,
 								time: new Date().toISOString()
-							}])
-							.select("id")
-							.single();
+							})
+						});
 						if (error) throw error;
 						await notifyMentions(text, postId, data?.id || null);
 						await createNotification({
@@ -6952,58 +6656,26 @@
 					const dislikeNumEl = dislikeBtn.querySelector(".voteNum");
 					let likeCount = parseInt(likeNumEl.textContent) || 0;
 					let dislikeCount = parseInt(dislikeNumEl.textContent) || 0;
-					let {
-						data
-					} = await supabase
-						.from("likes")
-						.select("*")
-						.eq("postid", id)
-						.eq("liker", currentUser.id);
-					const hasLike = data.some(x => x.type === 1);
-					const hasDislike = data.some(x => x.type === -1);
+					const hasLike = likeBtn.classList.contains("liked");
+					const hasDislike = dislikeBtn.classList.contains("disliked");
 					const prevLikeCount = likeCount;
 					const prevDislikeCount = dislikeCount;
-					const prevLiked = likeBtn.classList.contains("liked");
-					const prevDisliked = dislikeBtn.classList.contains("disliked");
-					if (hasLike) {
-						likeCount = Math.max(0, likeCount - 1);
-						likeBtn.classList.remove("liked");
-					} else {
-						likeCount += 1;
-						likeBtn.classList.add("liked");
-						if (hasDislike) {
-							dislikeCount = Math.max(0, dislikeCount - 1);
-							dislikeBtn.classList.remove("disliked");
-						}
+					const prevLiked = hasLike;
+					const prevDisliked = hasDislike;
+					if (hasLike) { likeCount--; likeBtn.classList.remove("liked"); }
+					else {
+						likeCount++; likeBtn.classList.add("liked");
+						if (hasDislike) { dislikeCount--; dislikeBtn.classList.remove("disliked"); }
 					}
-					likeNumEl.textContent = likeCount;
-					dislikeNumEl.textContent = dislikeCount;
+					likeNumEl.textContent = Math.max(0, likeCount);
+					dislikeNumEl.textContent = Math.max(0, dislikeCount);
 					try {
-						if (hasLike) {
-							await supabase
-								.from("likes")
-								.delete()
-								.eq("postid", id)
-								.eq("liker", currentUser.id)
-								.eq("type", 1);
-							await changeCoins(currentUser.id, -1);
-						} else {
-							await supabase
-								.from("likes")
-								.delete()
-								.eq("postid", id)
-								.eq("liker", currentUser.id)
-								.eq("type", -1);
-							await supabase
-								.from("likes")
-								.insert([{
-									postid: id,
-									liker: currentUser.id,
-									type: 1,
-									time: new Date().toISOString()
-								}]);
-							await changeCoins(currentUser.id, hasDislike ? 2 : 1);
-						}
+						const type = hasLike ? 0 : 1;
+						await api("/api/likes/toggle", {
+							method: "POST",
+							body: JSON.stringify({ postid: id, liker: currentUser.id, type })
+						});
+						await changeCoins(currentUser.id, hasLike ? -1 : (hasDislike ? 2 : 1));
 					} catch (e) {
 						console.error(e);
 						likeNumEl.textContent = prevLikeCount;
@@ -7020,58 +6692,26 @@
 					const dislikeNumEl = dislikeBtn.querySelector(".voteNum");
 					let likeCount = parseInt(likeNumEl.textContent) || 0;
 					let dislikeCount = parseInt(dislikeNumEl.textContent) || 0;
-					let {
-						data
-					} = await supabase
-						.from("likes")
-						.select("*")
-						.eq("postid", id)
-						.eq("liker", currentUser.id);
-					const hasLike = data.some(x => x.type === 1);
-					const hasDislike = data.some(x => x.type === -1);
+					const hasLike = likeBtn.classList.contains("liked");
+					const hasDislike = dislikeBtn.classList.contains("disliked");
 					const prevLikeCount = likeCount;
 					const prevDislikeCount = dislikeCount;
-					const prevLiked = likeBtn.classList.contains("liked");
-					const prevDisliked = dislikeBtn.classList.contains("disliked");
-					if (hasDislike) {
-						dislikeCount = Math.max(0, dislikeCount - 1);
-						dislikeBtn.classList.remove("disliked");
-					} else {
-						dislikeCount += 1;
-						dislikeBtn.classList.add("disliked");
-						if (hasLike) {
-							likeCount = Math.max(0, likeCount - 1);
-							likeBtn.classList.remove("liked");
-						}
+					const prevLiked = hasLike;
+					const prevDisliked = hasDislike;
+					if (hasDislike) { dislikeCount--; dislikeBtn.classList.remove("disliked"); }
+					else {
+						dislikeCount++; dislikeBtn.classList.add("disliked");
+						if (hasLike) { likeCount--; likeBtn.classList.remove("liked"); }
 					}
-					likeNumEl.textContent = likeCount;
-					dislikeNumEl.textContent = dislikeCount;
+					likeNumEl.textContent = Math.max(0, likeCount);
+					dislikeNumEl.textContent = Math.max(0, dislikeCount);
 					try {
-						if (hasDislike) {
-							await supabase
-								.from("likes")
-								.delete()
-								.eq("postid", id)
-								.eq("liker", currentUser.id)
-								.eq("type", -1);
-							await changeCoins(currentUser.id, 1);
-						} else {
-							await supabase
-								.from("likes")
-								.delete()
-								.eq("postid", id)
-								.eq("liker", currentUser.id)
-								.eq("type", 1);
-							await supabase
-								.from("likes")
-								.insert([{
-									postid: id,
-									liker: currentUser.id,
-									type: -1,
-									time: new Date().toISOString()
-								}]);
-							await changeCoins(currentUser.id, hasLike ? -2 : -1);
-						}
+						const type = hasDislike ? 0 : -1;
+						await api("/api/likes/toggle", {
+							method: "POST",
+							body: JSON.stringify({ postid: id, liker: currentUser.id, type })
+						});
+						await changeCoins(currentUser.id, hasDislike ? 1 : (hasLike ? -2 : -1));
 					} catch (e) {
 						console.error(e);
 						likeNumEl.textContent = prevLikeCount;
@@ -7091,29 +6731,13 @@
 					`);
 					$("confirmDeleteBtn").onclick = async () => {
 						$("closeModal").click();
-						if (!isAdmin(currentUser)) {
-							let {
-								data: myComments
-							} = await supabase
-								.from("comments")
-								.select("*")
-								.eq("postid", id)
-								.eq("author", currentUser.id);
-							let {
-								data: myLikes
-							} = await supabase
-								.from("likes")
-								.select("*")
-								.eq("postid", id)
-								.eq("liker", currentUser.id);
-							let penalty = -5;
-							if (myComments) penalty -= myComments.length * 3;
-							if (myLikes) penalty -= myLikes.length * 1;
-							await changeCoins(currentUser.id, penalty);
-						}
-						await supabase.from("posts").delete().eq("id", id);
-						await supabase.from("comments").delete().eq("postid", id);
-						await supabase.from("likes").delete().eq("postid", id);
+						await api("/api/posts/" + id, {
+							method: "DELETE",
+							body: JSON.stringify({
+								userId: currentUser?.id,
+								isAdmin: isAdmin(currentUser)
+							})
+						});
 						loadStats();
 						loadPosts(postPage);
 					};
@@ -7174,9 +6798,8 @@
 				async function loadUserList() {
 					let box = $("userItems");
 					box.innerHTML = "<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
-					let {
-						data
-					} = await supabase.from("users").select("id, name, coins, avatar, role");
+					let { data } = await api("/api/users");
+					if (!data) data = [];
 					data.sort((a, b) => {
 						let coinsA = a.coins || 0;
 						let coinsB = b.coins || 0;
@@ -7240,10 +6863,7 @@
 					let container = $("userPosts");
 					container.innerHTML =
 						"<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
-					let {
-						data: user
-					} = await supabase.from("users").select("id, name, coins, avatar, description, time, role").eq(
-						"id", uid).single();
+					let { data: user } = await api("/api/users/" + uid);
 					const avatarUrl = getAvatar(user);
 					$("profileAvatar").src = avatarUrl;
 					$("profileAvatar").onclick = () => openViewer(avatarUrl);
@@ -7334,11 +6954,10 @@
 							$("modal").classList.remove("hidden");
 							$("saveDescBtn").onclick = async () => {
 								const newDesc = $("descTextarea").value.trim();
-								const {
-									error
-								} = await supabase.from("users").update({
-									description: newDesc
-								}).eq("id", currentUser.id);
+								const { error } = await api("/api/users/" + currentUser.id, {
+									method: "PUT",
+									body: JSON.stringify({ description: newDesc })
+								});
 								if (error) return modal(t("save_fail", error.message));
 								currentUser.description = newDesc;
 								$("userDescription").innerText = newDesc || t("profile_no_desc");
@@ -7352,10 +6971,7 @@
 				async function openShop() {
 					const shopDiv = document.createElement("div");
 					shopDiv.id = "shopModal";
-					const {
-						data: userData
-					} = await supabase.from("users")
-						.select("coins, role").eq("id", currentUser.id).single();
+					const { data: userData } = await api("/api/users/" + currentUser.id + "/coins");
 					let coins = userData?.coins || 0;
 					let roleArr = userData?.role || [];
 
@@ -7452,33 +7068,23 @@
 								await changeCoins(currentUser.id, -item.price);
 								coins -= item.price;
 								roleArr = [...roleArr, itemId];
-								await supabase.from("users").update({
-									role: roleArr
-								}).eq("id", currentUser.id);
+								await api("/api/users/" + currentUser.id + "/role", {
+									method: "PUT",
+									body: JSON.stringify({ role: roleArr })
+								});
 								if (currentUser) currentUser.role = roleArr;
 								renderShop();
 							};
 						});
 
-						// shopDiv.querySelectorAll("[data-buy-gift]").forEach(btn => {
-						// 	btn.onclick = async () => {
-						// 		const itemId = btn.dataset.buyGift;
-						// 		const item = SHOP_ITEMS.find(i => i.id === itemId);
-						// 		if (!item || coins < item.price) return;
-						// 		await changeCoins(currentUser.id, -item.price);
-						// 		coins -= item.price;
-						// 		await openGiftPicker(item);
-						// 		renderShop();
-						// 	};
-						// });
-
 						shopDiv.querySelectorAll("[data-equip]").forEach(btn => {
 							btn.onclick = async () => {
 								const itemId = btn.dataset.equip;
 								roleArr = [itemId, ...roleArr.filter(r => r !== itemId)];
-								await supabase.from("users").update({
-									role: roleArr
-								}).eq("id", currentUser.id);
+								await api("/api/users/" + currentUser.id + "/role", {
+									method: "PUT",
+									body: JSON.stringify({ role: roleArr })
+								});
 								if (currentUser) currentUser.role = roleArr;
 								renderShop();
 							};
@@ -7491,9 +7097,10 @@
 							btn.onclick = async () => {
 								const itemId = btn.dataset.remove;
 								roleArr = [...roleArr.filter(r => r !== itemId), itemId];
-								await supabase.from("users").update({
-									role: roleArr
-								}).eq("id", currentUser.id);
+								await api("/api/users/" + currentUser.id + "/role", {
+									method: "PUT",
+									body: JSON.stringify({ role: roleArr })
+								});
 								if (currentUser) currentUser.role = roleArr;
 								renderShop();
 							};
@@ -7612,9 +7219,7 @@
 				async function openLottery() {
 					const sm = document.getElementById("shopModal");
 					if (sm) sm.remove();
-					const {
-						data: coinData
-					} = await supabase.from("users").select("coins").eq("id", currentUser.id).single();
+					const { data: coinData } = await api("/api/users/" + currentUser.id + "/coins");
 					if (coinData && currentUser) currentUser.coins = coinData.coins;
 
 					const modal = document.createElement("div");
@@ -7953,9 +7558,10 @@
 						let r = currentUser?.role || [];
 						if (Array.isArray(r) && !r.includes(bid)) {
 							r = [...r, bid];
-							await supabase.from("users").update({
-								role: r
-							}).eq("id", currentUser.id);
+							await api("/api/users/" + currentUser.id + "/role", {
+								method: "PUT",
+								body: JSON.stringify({ role: r })
+							});
 							if (currentUser) currentUser.role = r;
 						}
 					}
@@ -8002,14 +7608,10 @@
 						if (url && !/^https?:\/\//i.test(url)) {
 							return modal(t("avatar_invalid"));
 						}
-						const {
-							error
-						} = await supabase
-							.from("users")
-							.update({
-								avatar: url || null
-							})
-							.eq("id", currentUser.id);
+						const { error } = await api("/api/users/" + currentUser.id, {
+							method: "PUT",
+							body: JSON.stringify({ avatar: url || null })
+						});
 						if (error) return modal(t("save_fail", error.message));
 						currentUser.avatar = url || null;
 						$("modal").classList.add("hidden");
@@ -8018,32 +7620,18 @@
 					};
 				}
 				async function changeCoins(uid, amount) {
-					const {
-						data: user
-					} = await supabase
-						.from("users")
-						.select("coin_ban")
-						.eq("id", uid)
-						.single();
+					const { data: user } = await api("/api/users/" + uid + "/coin-ban");
 					if (user?.coin_ban) {
 						showCoinMsg(t("coin_penalty"));
 						return false;
 					}
-					let {
-						data
-					} = await supabase
-						.from("users")
-						.select("coins")
-						.eq("id", uid)
-						.single();
-					let newCoins = (data.coins || 0) + amount;
+					const { data } = await api("/api/users/" + uid + "/coins");
+					let newCoins = (data?.coins || 0) + amount;
 					if (newCoins < 0) newCoins = 0;
-					await supabase
-						.from("users")
-						.update({
-							coins: newCoins
-						})
-						.eq("id", uid);
+					await api("/api/users/" + uid + "/coins", {
+						method: "PUT",
+						body: JSON.stringify({ coins: newCoins })
+					});
 					if (currentUser && currentUser.id === uid) {
 						currentUser.coins = newCoins;
 						showCoinMsg(amount > 0 ? t("coin_add", amount) : t("coin_sub", Math.abs(amount)));
@@ -8270,23 +7858,10 @@
 					};
 				}
 				$("randomPostBtn").onclick = async () => {
-					const {
-						count
-					} = await supabase.from("posts").select("id", {
-						count: "exact",
-						head: true
-					});
-					if (!count) {
-						modal(t("post_no_posts"));
-						return;
-					}
-					const offset = Math.floor(Math.random() * count);
-					const {
-						data
-					} = await supabase.from("posts").select("id").order("id").range(offset, offset);
-					if (data && data[0]) {
-						history.replaceState(null, "", "?pid=" + data[0].id);
-						openSinglePost(data[0].id);
+					const { data } = await api("/api/posts/random");
+					if (data && data.id) {
+						history.replaceState(null, "", "?pid=" + data.id);
+						openSinglePost(data.id);
 					}
 				};
 
@@ -8418,11 +7993,7 @@
 					document.body.appendChild(mask);
 					try {
 						if (autoId) {
-							const {
-								data
-							} = await supabase.from("users").select(
-								"id, name, pass, coins, coin_ban, avatar, description, time, role, last_seen"
-							).eq("id", autoId).single();
+							const { data } = await api("/api/users/" + autoId);
 							if (data) {
 								currentUser = data;
 								$("nav").classList.remove("hidden");
