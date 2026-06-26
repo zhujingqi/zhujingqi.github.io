@@ -782,6 +782,7 @@
 			.roleBadge.green_v {
 				background-color: #4caf50;
 				color: #fff;
+				opacity: .7;
 			}
 
 			.roleBadge.green_v::before {
@@ -792,6 +793,7 @@
 			.roleBadge.purple_star {
 				background-color: #9c27b0;
 				color: #fff;
+				opacity: .7;
 			}
 
 			.roleBadge.purple_star::before {
@@ -802,6 +804,7 @@
 			.roleBadge.blue_diamond {
 				background-color: #2196f3;
 				color: #fff;
+				opacity: .7;
 			}
 
 			.roleBadge.blue_diamond::before {
@@ -2005,6 +2008,174 @@
 				animation: postFadeIn .32s ease both;
 			}
 
+			/* Red envelope - simple red button */
+			.rpBtn {
+				display: inline-block;
+				padding: 4px 14px;
+				border-radius: 20px;
+				background: #e57373;
+				color: #fff;
+				font-size: 12px;
+				border: none;
+				cursor: pointer;
+				margin: 4px 0;
+				height: auto;
+				transition: opacity .15s
+			}
+
+			.rpBtn:hover {
+				opacity: .8
+			}
+
+			.rpBtn.rpDone {
+				background: #9e9e9e;
+				cursor: default;
+				opacity: 1
+			}
+
+			/* Claim overlay */
+			.toast {
+				position: fixed;
+				top: 40%;
+				left: 50%;
+				transform: translate(-50%, -50%);
+				background: #333;
+				color: #fff;
+				padding: 12px 28px;
+				border-radius: 20px;
+				font-size: 18px;
+				font-weight: 700;
+				z-index: 9999;
+				pointer-events: none;
+				animation: toastFade 1.2s ease forwards
+			}
+
+			@keyframes toastFade {
+				0% {
+					opacity: 0;
+					transform: translate(-50%, -50%)scale(.7)
+				}
+
+				15% {
+					opacity: 1;
+					transform: translate(-50%, -50%)scale(1)
+				}
+
+				70% {
+					opacity: 1
+				}
+
+				100% {
+					opacity: 0
+				}
+			}
+
+			/* Editor badge */
+			.rpBadge {
+				display: inline-flex;
+				align-items: center;
+				gap: 6px;
+				background: #ef5350;
+				color: #fff;
+				padding: 4px 12px;
+				border-radius: 4px;
+				font-size: 12px
+			}
+
+			.rpBadge button {
+				background: none;
+				border: none;
+				color: rgba(255, 255, 255, .7);
+				cursor: pointer;
+				font-size: 14px;
+				padding: 0 2px
+			}
+
+			.rpBadge button:hover {
+				color: #fff
+			}
+
+			.rpForm {
+				text-align: left;
+				padding: 4px 0
+			}
+
+			.rpForm label {
+				display: block;
+				font-size: 14px;
+				color: var(--sub);
+				margin-bottom: 4px;
+				margin-top: 12px
+			}
+
+			.rpForm label:first-child {
+				margin-top: 0
+			}
+
+			.rpForm input {
+				width: 100%;
+				padding: 10px 14px;
+				border-radius: 20px;
+				border: 1px solid var(--border, #ccc);
+				font-size: 15px;
+				background: var(--card);
+				color: var(--text);
+				outline: none;
+				transition: border .2s;
+				box-sizing: border-box
+			}
+
+			.rpForm input:focus {
+				border-color: var(--green)
+			}
+
+			.rpForm .modeRow {
+				display: flex;
+				gap: 14px;
+				margin-top: 8px
+			}
+
+			.rpForm .modeRow label {
+				display: flex;
+				align-items: center;
+				gap: 6px;
+				margin: 0;
+				font-size: 14px;
+				cursor: pointer;
+				color: var(--text);
+				font-weight: 400
+			}
+
+			.rpForm .modeRow input[type=radio] {
+				width: 16px;
+				height: 16px;
+				margin: 0;
+				cursor: pointer;
+				accent-color: var(--green)
+			}
+
+			.rpForm .rpErr {
+				color: var(--red, #f44336);
+				font-size: 13px;
+				margin: 6px 0 0;
+				text-align: center
+			}
+
+			@media(max-width:800px) {
+				.rpBtn {
+					padding: 3px 12px;
+					font-size: 11px
+				}
+
+				.claimBox {
+					padding: 22px 28px
+				}
+
+				.claimCoins {
+					font-size: 28px
+				}
+			}
+
 			@keyframes loadingDot {
 
 				0%,
@@ -2435,10 +2606,9 @@
 					<details>
 						<summary><b id="noticeUpdates">近期更新</b></summary>
 						<span id="noticeUpdatesContent">
+							· 红包<br>
 							· 多语言<br>
 							· 访客模式<br>
-							· 优化排行<br>
-							· 金币抽奖<br>
 						</span>
 					</details>
 				</div>
@@ -2485,10 +2655,12 @@
 			<div class="card" style="width:95%;max-width:600px;">
 				<textarea id="text" data-mention-input="1" placeholder="发布新鲜事（最多5000字符）" style="width:100%;"
 					maxlength="5000"></textarea>
-				<div style="display:flex;gap:6px;margin-top:8px;">
+				<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
 					<button id="insertImgBtn" type="button">插图</button>
 					<button id="insertMusicBtn" type="button">插入音乐</button>
+					<button id="addRedPacketBtn" type="button">红包</button>
 				</div>
+				<div id="rpPendingBar" style="margin-top:8px;display:none;"></div>
 				<div class="tagBarContainer"
 					style="display:flex;align-items:center;gap:6px;flex-wrap:nowrap;margin-top:8px;">
 					<div class="tagBar" id="tagBar" style="display:flex;gap:6px;flex-shrink:1;overflow-x:auto;"></div>
@@ -4131,6 +4303,167 @@
 					es: "Pregunta",
 					de: "Frage",
 					"zh-TW": "提問"
+				},
+				red_envelope_title: {
+					zh: "红包",
+					en: "Red Packet",
+					es: "Sobre Rojo",
+					de: "Geldgeschenk",
+					"zh-TW": "紅包"
+				},
+				red_envelope_open: {
+					zh: "领取红包",
+					en: "Open",
+					es: "Abrir",
+					de: "Öffnen",
+					"zh-TW": "領取紅包"
+				},
+				red_envelope_empty: {
+					zh: "已领完",
+					en: "All Claimed",
+					es: "Todo Reclamado",
+					de: "Alle Beansprucht",
+					"zh-TW": "已領完"
+				},
+				red_envelope_claim_detail: {
+					zh: "领取详情",
+					en: "Claim Details",
+					es: "Detalles",
+					de: "Details",
+					"zh-TW": "領取詳情"
+				},
+				red_envelope_yours: {
+					zh: "你发的红包",
+					en: "Your Red Packet",
+					es: "Tu Sobre",
+					de: "Dein Geldgeschenk",
+					"zh-TW": "你發的紅包"
+				},
+				rp_btn: {
+					zh: "红包",
+					en: "Red Packet",
+					es: "Sobre Rojo",
+					de: "Geldgeschenk",
+					"zh-TW": "紅包"
+				},
+				rp_total: {
+					zh: "总金币（1-1000）",
+					en: "Total Coins (1-1000)",
+					es: "Monedas (1-1000)",
+					de: "Gesamtmünzen (1-1000)",
+					"zh-TW": "總金幣（1-1000）"
+				},
+				rp_count: {
+					zh: "红包个数",
+					en: "Count",
+					es: "Cantidad",
+					de: "Anzahl",
+					"zh-TW": "紅包個數"
+				},
+				rp_mode: {
+					zh: "模式",
+					en: "Mode",
+					es: "Modo",
+					de: "Modus",
+					"zh-TW": "模式"
+				},
+				rp_mode_random: {
+					zh: "拼手气（随机）",
+					en: "Random",
+					es: "Aleatorio",
+					de: "Zufällig",
+					"zh-TW": "拼手氣（隨機）"
+				},
+				rp_mode_average: {
+					zh: "平均分配",
+					en: "Average",
+					es: "Promedio",
+					de: "Gleichmäßig",
+					"zh-TW": "平均分配"
+				},
+				rp_confirm_send: {
+					zh: "确认发送",
+					en: "Confirm",
+					es: "Confirmar",
+					de: "Bestätigen",
+					"zh-TW": "確認發送"
+				},
+				rp_confirm_password: {
+					zh: "确认密码",
+					en: "Confirm Password",
+					es: "Confirmar Contraseña",
+					de: "Passwort bestätigen",
+					"zh-TW": "確認密碼"
+				},
+				rp_password_hint: {
+					zh: "输入密码以发送红包",
+					en: "Enter password to send red packet",
+					es: "Ingrese la contraseña",
+					de: "Passwort eingeben",
+					"zh-TW": "輸入密碼以發送紅包"
+				},
+				rp_password_ph: {
+					zh: "密码",
+					en: "Password",
+					es: "Contraseña",
+					de: "Passwort",
+					"zh-TW": "密碼"
+				},
+				rp_confirm: {
+					zh: "确认",
+					en: "OK",
+					es: "OK",
+					de: "OK",
+					"zh-TW": "確認"
+				},
+				rp_enter_password: {
+					zh: "请输入密码",
+					en: "Please enter password",
+					es: "Ingrese la contraseña",
+					de: "Bitte Passwort eingeben",
+					"zh-TW": "請輸入密碼"
+				},
+				rp_wrong_password: {
+					zh: "密码错误",
+					en: "Wrong password",
+					es: "Contraseña incorrecta",
+					de: "Falsches Passwort",
+					"zh-TW": "密碼錯誤"
+				},
+				rp_invalid_number: {
+					zh: "请输入有效数字",
+					en: "Enter valid numbers",
+					es: "Ingrese números válidos",
+					de: "Gültige Zahlen eingeben",
+					"zh-TW": "請輸入有效數字"
+				},
+				rp_count_exceeds: {
+					zh: "个数不能超过总金币",
+					en: "Count cannot exceed total coins",
+					es: "La cantidad no puede exceder las monedas",
+					de: "Anzahl darf Gesamtmünzen nicht überschreiten",
+					"zh-TW": "個數不能超過總金幣"
+				},
+				rp_not_divisible: {
+					zh: "平均分配下总金币必须能被个数整除",
+					en: "Total must be divisible by count in average mode",
+					es: "El total debe ser divisible en modo promedio",
+					de: "Gesamtsumme muss durch Anzahl teilbar sein",
+					"zh-TW": "平均分配下總金幣必須能被個數整除"
+				},
+				rp_insufficient: {
+					zh: "金币不足",
+					en: "Insufficient coins",
+					es: "Monedas insuficientes",
+					de: "Nicht genug Münzen",
+					"zh-TW": "金幣不足"
+				},
+				rp_claimed: {
+					zh: "已领取",
+					en: "Claimed",
+					es: "Reclamado",
+					de: "Beansprucht",
+					"zh-TW": "已領取"
 				}
 			};
 			const PAGE_TITLE_TRANS = {
@@ -4215,6 +4548,7 @@
 				const defaultTags = ["学习", "日常", "搞笑", "提问"];
 				let selectedTags = [];
 				let postLayout = localStorage.getItem("postLayout") || "list";
+				let pendingRedPacket = null;
 
 				function syncLayoutBtn() {
 					const btn = $("layoutBtn");
@@ -4413,6 +4747,7 @@
 					setPH("text", t("editor_ph"));
 					setT("insertImgBtn", t("editor_insert_img"));
 					setT("insertMusicBtn", t("editor_insert_music"));
+					setT("addRedPacketBtn", t("rp_btn"));
 					setPH("customTag", t("editor_custom_tag_ph"));
 					setT("sendBtn", t("editor_send"));
 					setT("logoutBtn", t("profile_logout"));
@@ -4476,8 +4811,9 @@
 					setT("discChatDesc", t("discover_chat_desc"));
 					setT("discWikiDesc", t("discover_wiki_desc"));
 					const om = document.getElementById("onlineMini");
-					if (om && onlineUsersCache && onlineUsersCache.length >= 0) om.textContent = t(
-						"online_label_prefix") + onlineUsersCache.length;
+					if (om && typeof onlineUsersCache !== "undefined" && onlineUsersCache.length >= 0) om.textContent =
+						t(
+							"online_label_prefix") + onlineUsersCache.length;
 				}
 				window.refreshUILanguage = refreshUILanguage;
 
@@ -4890,6 +5226,201 @@
 				}
 				$("insertMusicBtn").onclick = openMusicPicker;
 
+				$("addRedPacketBtn").onclick = () => {
+					if (pendingRedPacket) {
+						pendingRedPacket = null;
+						$("rpPendingBar").style.display = "none";
+						return;
+					}
+					if (!currentUser) return;
+					document.querySelector(".modalBox").style.width = "400px";
+					modal(`
+					<h3>` + t("red_envelope_title") + `</h3>
+					<div class="rpForm">
+						<label>` + t("rp_total") + `</label>
+						<input id="rpTotal" type="number" min="1" max="1000" value="100">
+						<label>` + t("rp_count") + `</label>
+						<input id="rpCount" type="number" min="1" value="5">
+						<label>` + t("rp_mode") + `</label>
+						<div class="modeRow">
+							<label><input type="radio" name="rpMode" value="r" checked> ` + t("rp_mode_random") + `</label>
+							<label><input type="radio" name="rpMode" value="a"> ` + t("rp_mode_average") + `</label>
+						</div>
+					</div>
+					<div style="margin-top:16px;">
+						<button id="rpConfirmBtn" style="background:var(--green);color:#fff;">` + t("rp_confirm_send") + `</button>
+					</div>
+				`);
+					$("rpConfirmBtn").onclick = async () => {
+						const total = parseInt($("rpTotal").value);
+						const count = parseInt($("rpCount").value);
+						const mode = document.querySelector('input[name="rpMode"]:checked').value;
+						if (!total || !count || total < 1 || total > 1000 || count < 1) return modal(t(
+							"rp_invalid_number"));
+						if (count > total) return modal(t("rp_count_exceeds"));
+						if (mode === "a" && total % count !== 0) return modal(t("rp_not_divisible"));
+						if ((currentUser?.coins || 0) < total) return modal(t("rp_insufficient"));
+						$("modal").classList.add("hidden");
+						document.querySelector(".modalBox").style.width = "360px";
+						modal(`
+						<h3>` + t("rp_confirm_password") + `</h3>
+						<p style="color:var(--sub);font-size:14px;margin:8px 0;">` + t("rp_password_hint") + `</p>
+						<input id="rpPassInput" type="password" placeholder="` + t("rp_password_ph") + `" style="width:100%;padding:12px;border-radius:20px;border:1px solid var(--border,#ccc);font-size:15px;background:var(--card);color:var(--text);outline:none;transition:border .2s;box-sizing:border-box;">
+						<div id="rpPassErr" class="rpForm" style="color:var(--red,#f44336);font-size:13px;margin-top:6px;text-align:center;"></div>
+						<div style="margin-top:12px;">
+							<button id="rpPassConfirm" style="background:var(--green);color:#fff;">` + t("rp_confirm") + `</button>
+						</div>
+					`);
+						setTimeout(() => {
+							const inp = $("rpPassInput");
+							if (inp) inp.focus();
+						}, 100);
+						const doVerify = async () => {
+							const pass = $("rpPassInput")?.value;
+							if (!pass) {
+								$("rpPassErr").textContent = t("rp_enter_password");
+								return;
+							}
+							if ((await hash(pass)) !== currentUser?.pass) {
+								$("rpPassErr").textContent = t("rp_wrong_password");
+								return;
+							}
+							pendingRedPacket = {
+								totalCoins: total,
+								count,
+								mode
+							};
+							$("modal").classList.add("hidden");
+							document.querySelector(".modalBox").style.width = "300px";
+							const bar = $("rpPendingBar");
+							bar.style.display = "block";
+							bar.innerHTML = `<span class="rpBadge">` + t("red_envelope_title") +
+								`: ${total} ×${count} <button id="rpCancelBadge">✕</button></span>`;
+							$("rpCancelBadge").onclick = () => {
+								pendingRedPacket = null;
+								bar.style.display = "none";
+							};
+						};
+						$("rpPassConfirm").onclick = doVerify;
+						$("rpPassInput").onkeydown = e => {
+							if (e.key === "Enter") doVerify();
+						};
+					};
+				};
+
+				async function handleRedPacketClick(el) {
+					const raw = el.dataset.rp;
+					const postId = parseInt(el.dataset.postid);
+					const authorId = parseInt(el.dataset.author);
+					const data = parseRpData(raw);
+					const claimed = Object.keys(data.claims).length;
+					const remaining = data.count - claimed;
+					const isAuthor = currentUser && authorId && currentUser.id === authorId;
+
+					if (remaining <= 0) {
+						await showRpDetail(el);
+						return;
+					}
+
+					const myClaim = currentUser && data.claims[currentUser.id];
+					if (myClaim !== undefined) {
+						await showRpDetail(el);
+						return;
+					}
+
+					if (!currentUser) return modal(t("guest_modal_title"));
+
+					if (remaining > 0) {
+						await claimRedPacket(el, postId, data);
+					}
+				}
+
+				async function claimRedPacket(el, postId, data) {
+					const raw = el.dataset.rp;
+					const oldMarker = `[redpacket:${raw}]`;
+					const claimed = Object.keys(data.claims).length;
+					const claimedCoins = Object.values(data.claims).reduce((a, b) => a + b, 0);
+					const remainCoins = data.totalCoins - claimedCoins;
+					const remainCount = data.count - claimed;
+					let myCoins;
+					if (data.mode === "a") {
+						myCoins = Math.floor(data.totalCoins / data.count);
+						if (data.count - claimed === 1) myCoins = remainCoins;
+					} else {
+						const max = Math.min(Math.floor(remainCoins * 2 / remainCount), remainCoins - (remainCount -
+							1));
+						myCoins = Math.floor(Math.random() * Math.max(1, max)) + 1;
+						if (remainCount === 1) myCoins = remainCoins;
+					}
+					const newClaims = {
+						...data.claims,
+						[currentUser.id]: myCoins
+					};
+					const newClaimsStr = Object.entries(newClaims).map(([u, c]) => `${u}:${c}`).join(";");
+					const newRaw = `${data.totalCoins},${data.count},${data.mode};${newClaimsStr}`;
+					const newMarker = `[redpacket:${newRaw}]`;
+
+					let success = false;
+					for (let attempt = 0; attempt < 5; attempt++) {
+						const {
+							data: post
+						} = await supabase.from("posts").select("content").eq("id", postId).single();
+						if (!post) break;
+						const fullContent = post.content;
+						if (!fullContent.includes(oldMarker)) break;
+						const newContent = fullContent.replace(oldMarker, newMarker);
+						const {
+							error
+						} = await supabase.from("posts").update({
+							content: newContent
+						}).eq("id", postId).eq("content", fullContent);
+						if (!error) {
+							success = true;
+							break;
+						}
+						await new Promise(r => setTimeout(r, 200));
+					}
+					if (!success) return;
+
+					el.dataset.rp = newRaw;
+					el.style.background = "#9e9e9e";
+					el.className = "rpBtn rpDone";
+					const newClaimed = Object.keys(newClaims).length;
+					el.textContent = newClaimed >= data.count ? t("red_envelope_empty") : t("rp_claimed");
+					await changeCoins(currentUser.id, myCoins);
+					showClaimAnimation(myCoins);
+				}
+
+				function showClaimAnimation(coins) {
+					const t = document.createElement("div");
+					t.className = "toast";
+					t.textContent = "+" + coins;
+					document.body.appendChild(t);
+					setTimeout(() => t.remove(), 1300);
+				}
+
+				async function showRpDetail(el) {
+					const raw = el.dataset.rp;
+					const data = parseRpData(raw);
+					const entries = Object.entries(data.claims);
+					if (!entries.length) return modal(t("red_envelope_empty"));
+					await ensureAllUsersCache();
+					const totalClaimed = entries.reduce((a, [_, c]) => a + c, 0);
+					const nameMap = Object.fromEntries(allUsersCache.map(u => [u.id, u.name]));
+					const list = entries.map(([uid, coins]) => {
+						const name = nameMap[uid] || "#" + uid;
+						return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;">
+						<span style="flex:1;font-size:14px;text-align:left;">${name}</span>
+						<span style="font-weight:600;color:var(--green);">+${coins}</span>
+					</div>`;
+					}).join("");
+					document.querySelector(".modalBox").style.width = "380px";
+					modal(`<h3>` + t("red_envelope_title") + ` · ` + t("red_envelope_claim_detail") + `</h3>
+					<div style="margin:8px 0;font-size:14px;color:var(--sub);">${data.totalCoins} · ${entries.length}/${data.count} · ${totalClaimed}</div>
+					<div style="max-height:300px;overflow-y:auto;text-align:left;">${list}</div>
+				`);
+				}
+
 				function getPostMeta(content) {
 					let text = String(content || "").trim();
 					let bg = null,
@@ -4925,17 +5456,24 @@
 						img = imgMatch[1];
 						text = text.replace(/\[img:.*?\]/g, "").trim();
 					}
+					let packetRaw = null;
+					const rpMatch = text.match(/\[redpacket:(.*?)\]/);
+					if (rpMatch) {
+						packetRaw = rpMatch[1];
+						text = text.replace(/\[redpacket:.*?\]/g, "").trim();
+					}
 					return {
 						bg,
 						warn,
 						warnText,
 						music,
 						img,
+						packetRaw,
 						content: text
 					};
 				}
 
-				async function renderPostBody(box, fullContent) {
+				async function renderPostBody(box, fullContent, postId, authorId) {
 					const meta = getPostMeta(fullContent);
 					const hasHtml = /<[^>]+>/.test(meta.content);
 					const plainText = meta.content.replace(/<[^>]*>/g, "");
@@ -4948,6 +5486,9 @@
 					if (meta.img) {
 						html +=
 							`<div style="margin:8px 0;"><button class="loadImgBtn" data-src="${escapeAttr(meta.img)}" style="width:100%;padding:12px;border-radius:20px;background:var(--card);color:var(--text);font-size:16px;cursor:pointer;border:1px solid #ccc;text-align:center;transition:.2s;" onmouseover="this.style.background='var(--grad)';this.style.color='#fff'" onmouseout="this.style.background='';this.style.color=''">${t("post_load_img")}</button></div>`;
+					}
+					if (meta.packetRaw) {
+						html += renderRedPacketHtml(meta.packetRaw, postId, authorId);
 					}
 					html += needFold ?
 						`<span class="longPostText">${foldedText}</span><button class="toggleLongPost inline">${t("post_expand")}</button>` :
@@ -4963,17 +5504,59 @@
 								`<img src="${src}" class="zoomable" style="max-width:60%;border-radius:12px;display:block;">`;
 						};
 					}
-					const t = box.querySelector(".toggleLongPost");
-					if (t) {
-						let e = false;
-						t.onclick = () => {
-							e = !e;
-							const l = box.querySelector(".longPostText");
-							if (l) l.innerHTML = e ? meta.content : foldedText;
+					const rpEl = box.querySelector(".rpBtn");
+					if (rpEl) {
+						rpEl.onclick = () => handleRedPacketClick(rpEl);
+					}
+					const toggleBtn = box.querySelector(".toggleLongPost");
+					if (toggleBtn) {
+						let expanded = false;
+						toggleBtn.onclick = () => {
+							expanded = !expanded;
+							const longTextEl = box.querySelector(".longPostText");
+							if (longTextEl) longTextEl.innerHTML = expanded ? meta.content : foldedText;
 							linkifyMentions(box);
-							t.textContent = e ? t("post_collapse") : t("post_expand");
+							toggleBtn.textContent = expanded ? t("post_collapse") : t("post_expand");
 						};
 					}
+				}
+
+				function renderRedPacketHtml(raw, postId, authorId) {
+					const data = parseRpData(raw);
+					const claimed = Object.keys(data.claims).length;
+					const remaining = data.count - claimed;
+					const isAuthor = currentUser && authorId && currentUser.id === authorId;
+					const isClaimed = currentUser && data.claims[currentUser.id] !== undefined;
+					const done = remaining <= 0 || isClaimed;
+					const bg = done ? "#9e9e9e" : "#e57373";
+					const cls = done ? "rpBtn rpDone" : "rpBtn";
+					let text;
+					if (remaining <= 0) {
+						text = t("red_envelope_empty");
+					} else if (isClaimed) {
+						text = t("rp_claimed");
+					} else if (isAuthor) {
+						text = t("red_envelope_title");
+					} else {
+						text = `${t("red_envelope_open")}（${data.totalCoins}·${remaining}）`;
+					}
+					return `<button class="${cls}" style="background:${bg};color:#fff;border-radius:20px;border:none;" data-rp="${escapeAttr(raw)}" data-postid="${postId}" data-author="${authorId||''}">${text}</button>`;
+				}
+
+				function parseRpData(raw) {
+					const parts = raw.split(";");
+					const cfg = parts[0].split(",");
+					const claims = {};
+					for (let i = 1; i < parts.length; i++) {
+						const m = parts[i].match(/^(\d+):(\d+)$/);
+						if (m) claims[parseInt(m[1])] = parseInt(m[2]);
+					}
+					return {
+						totalCoins: parseInt(cfg[0]),
+						count: parseInt(cfg[1]),
+						mode: cfg[2],
+						claims
+					};
 				}
 
 				function renderMusicCard(music) {
@@ -5075,12 +5658,15 @@
 				};
 				document.addEventListener("click", e => {
 					if (!guestMode) return;
-					const t = e.target;
-					if (t.closest(".userLink") || t.closest("a") || t.closest("#viewer") || t.closest(
-							".modal") || t.closest("#welcomePage") || t.closest("#registerPage") || t.closest(
-							"#backBtn") || t.closest("#postBackBtn")) return;
-					if (t.closest("button") || t.closest("input") || t.closest("textarea") || t.closest(
-							"select") || t.closest(".postTag") || t.closest(".shareBtnWrapper")) {
+					const target = e.target;
+					if (target.closest(".userLink") || target.closest("a") || target.closest("#viewer") || target
+						.closest(
+							".modal") || target.closest("#welcomePage") || target.closest("#registerPage") ||
+						target.closest(
+							"#backBtn") || target.closest("#postBackBtn")) return;
+					if (target.closest("button") || target.closest("input") || target.closest("textarea") ||
+						target.closest(
+							"select") || target.closest(".postTag") || target.closest(".shareBtnWrapper")) {
 						e.preventDefault();
 						e.stopPropagation();
 						modal(t("guest_modal_title"));
@@ -5089,7 +5675,7 @@
 							const row = document.createElement("div");
 							row.style.cssText = "margin-top:14px;text-align:center;";
 							row.innerHTML =
-								'<button id="guestLoginRedirect" style="background:var(--green);color:#fff;">${t("guest_go_login")}</button>';
+								`<button id="guestLoginRedirect" style="background:var(--green);color:#fff;">${t("guest_go_login")}</button>`;
 							box.appendChild(row);
 							$("guestLoginRedirect").onclick = () => {
 								$("modal").classList.add("hidden");
@@ -5104,7 +5690,7 @@
 				}, true);
 				$("sendBtn").onclick = async () => {
 					let txt = $("text").value.trim();
-					if (!txt) return;
+					if (!txt && !pendingRedPacket) return;
 					let custom = $("customTag").value.trim();
 					let tag = custom || selectedTags[0] || null;
 					txt = sanitizePostHtml(txt);
@@ -5115,6 +5701,13 @@
 					}
 					if (selectedPostBg) {
 						finalContent = `[[bg:${selectedPostBg}]]` + finalContent;
+					}
+					if (pendingRedPacket) {
+						if ((currentUser?.coins || 0) < pendingRedPacket.totalCoins) return modal(t(
+							"rp_insufficient"));
+						finalContent = (finalContent +
+							`\n[redpacket:${pendingRedPacket.totalCoins},${pendingRedPacket.count},${pendingRedPacket.mode}]`
+							).trim();
 					}
 					const postId = Date.now();
 					let {
@@ -5127,6 +5720,11 @@
 						tag: tag
 					}]);
 					if (error) return modal(t("post_fail", error.message));
+					if (pendingRedPacket) {
+						await changeCoins(currentUser.id, -pendingRedPacket.totalCoins);
+						pendingRedPacket = null;
+						$("rpPendingBar").style.display = "none";
+					}
 					await notifyMentions(finalContent, postId, null);
 					$("text").value = "";
 					$("customTag").value = "";
@@ -5382,10 +5980,10 @@
 						`;
 						bodyBox.querySelector(".warnMsg").textContent = meta.warnText || t("warn_default");
 						bodyBox.querySelector(".revealWarnBtn").onclick = () => {
-							renderPostBody(bodyBox, post.content);
+							renderPostBody(bodyBox, post.content, post.id, post.author);
 						};
 					} else {
-						renderPostBody(bodyBox, post.content);
+						renderPostBody(bodyBox, post.content, post.id, post.author);
 					}
 					if (!guestMode) {
 						postDiv.querySelectorAll("[data-vote-list]").forEach(el => {
@@ -5690,7 +6288,7 @@
 					if (!pager) return;
 					if (guestMode) {
 						pager.innerHTML =
-							'<button class="navBtn" id="guestMoreBtn" style="min-width:120px;">${t("guest_more")}</button>';
+							`<button class="navBtn" id="guestMoreBtn" style="min-width:120px;">${t("guest_more")}</button>`;
 						$("guestMoreBtn").onclick = () => {
 							modal(t("guest_modal_title"));
 							const box = $("modalText");
@@ -5698,7 +6296,7 @@
 								const row = document.createElement("div");
 								row.style.cssText = "margin-top:14px;text-align:center;";
 								row.innerHTML =
-									'<button id="guestLoginRedirect" style="background:var(--green);color:#fff;">${t("guest_go_login")}</button>';
+									`<button id="guestLoginRedirect" style="background:var(--green);color:#fff;">${t("guest_go_login")}</button>`;
 								box.appendChild(row);
 								$("guestLoginRedirect").onclick = () => {
 									$("modal").classList.add("hidden");
@@ -6150,10 +6748,10 @@
 									'</div>';
 								bodyBox.querySelector(".warnMsg").textContent = meta.warnText || t("warn_default");
 								bodyBox.querySelector(".revealWarnBtn").onclick = () => {
-									renderPostBody(bodyBox, p.content);
+									renderPostBody(bodyBox, p.content, p.id, p.author);
 								};
 							} else {
-								renderPostBody(bodyBox, p.content);
+								renderPostBody(bodyBox, p.content, p.id, p.author);
 							}
 							if (!guestMode) {
 								postDiv.querySelectorAll("[data-vote-list]").forEach(el => {
@@ -7802,6 +8400,8 @@
 						document.querySelectorAll(".sharePopover.show").forEach(p => p.classList.remove("show"));
 					}
 				});
+
+				refreshUILanguage();
 
 				(async () => {
 					const mask = document.createElement("div");
