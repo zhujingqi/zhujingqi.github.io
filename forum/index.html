@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 	<head>
@@ -2350,6 +2349,80 @@
 					display: none;
 				}
 			}
+
+			.emojiBtn {
+				width: 36px;
+				height: 36px;
+				padding: 0;
+				border-radius: 50%;
+				background: var(--card);
+				border: 1px solid #ccc;
+				cursor: pointer;
+				font-size: 18px;
+				line-height: 1;
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				transition: .2s;
+				flex-shrink: 0;
+				user-select: none;
+			}
+
+			.emojiBtn:hover {
+				background: var(--grad);
+				color: #fff;
+			}
+
+			.emojiPickerPopup {
+				position: fixed;
+				z-index: 99999;
+				background: var(--card);
+				border: 1px solid #ccc;
+				border-radius: 16px;
+				padding: 10px;
+				box-shadow: 0 8px 30px rgba(0, 0, 0, .15);
+				display: none;
+				grid-template-columns: repeat(6, 1fr);
+				gap: 4px;
+				max-width: 280px;
+				max-height: 220px;
+				overflow-y: auto;
+			}
+
+			.emojiPickerPopup.show {
+				display: grid;
+			}
+
+			.emojiPickerPopup img {
+				width: 32px;
+				height: 32px;
+				cursor: pointer;
+				border-radius: 6px;
+				padding: 4px;
+				transition: .12s;
+				box-sizing: border-box;
+			}
+
+			.emojiPickerPopup img:hover {
+				background: var(--bg);
+				transform: scale(1.2);
+			}
+
+			.emojiInPost {
+				display: inline;
+				vertical-align: middle;
+				width: 24px;
+				height: 24px;
+				margin: 0 2px;
+			}
+
+			.commentRow .emojiBtn {
+				width: 30px;
+				height: 30px;
+				font-size: 16px;
+				margin: 0 4px;
+				flex-shrink: 0;
+			}
 		</style>
 	</head>
 	<body>
@@ -2436,10 +2509,9 @@
 					<details>
 						<summary><b id="noticeUpdates">近期更新</b></summary>
 						<span id="noticeUpdatesContent">
+							· Emojis<br>
 							· 多语言<br>
 							· 访客模式<br>
-							· 优化排行<br>
-							· 金币抽奖<br>
 						</span>
 					</details>
 				</div>
@@ -2489,6 +2561,8 @@
 				<div style="display:flex;gap:6px;margin-top:8px;">
 					<button id="insertImgBtn" type="button">插图</button>
 					<button id="insertMusicBtn" type="button">插入音乐</button>
+					<button id="editorEmojiBtn" class="emojiBtn" type="button" title="表情"><img src="emojis/happy.svg"
+							style="width:22px;height:22px;display:block;pointer-events:none;"></button>
 				</div>
 				<div class="tagBarContainer"
 					style="display:flex;align-items:center;gap:6px;flex-wrap:nowrap;margin-top:8px;">
@@ -2600,6 +2674,7 @@
 		</div>
 		<div id="coinMsg">
 		</div>
+		<div id="emojiPicker" class="emojiPickerPopup"></div>
 		<div id="mentionBox" class="mentionBox hidden"></div>
 		<div id="viewer" onclick="closeViewer()">
 			<img id="viewerImg">
@@ -2608,24 +2683,50 @@
 			const API_BASE = "https://hxlhrrllhvvazyhiuhvb.supabase.co/functions/v1";
 
 			async function api(path, options = {}) {
-				const headers = { "Content-Type": "application/json", ...options.headers };
-				const res = await fetch(API_BASE + path, { ...options, headers });
+				const headers = {
+					"Content-Type": "application/json",
+					...options.headers
+				};
+				const res = await fetch(API_BASE + path, {
+					...options,
+					headers
+				});
 				const text = await res.text();
 				if (!res.ok) {
 					let msg = text;
-					try { const j = JSON.parse(text); if (j.error) msg = j.error; } catch {}
+					try {
+						const j = JSON.parse(text);
+						if (j.error) msg = j.error;
+					} catch {}
 					throw new Error(msg);
 				}
 				return text ? JSON.parse(text) : null;
 			}
 
-			async function apiGet(path) { return api(path); }
+			async function apiGet(path) {
+				return api(path);
+			}
 
-			async function apiPost(path, body) { return api(path, { method: "POST", body: JSON.stringify(body) }); }
+			async function apiPost(path, body) {
+				return api(path, {
+					method: "POST",
+					body: JSON.stringify(body)
+				});
+			}
 
-			async function apiPut(path, body) { return api(path, { method: "PUT", body: JSON.stringify(body) }); }
+			async function apiPut(path, body) {
+				return api(path, {
+					method: "PUT",
+					body: JSON.stringify(body)
+				});
+			}
 
-			async function apiDelete(path, body) { return api(path, { method: "DELETE", body: JSON.stringify(body) }); }
+			async function apiDelete(path, body) {
+				return api(path, {
+					method: "DELETE",
+					body: JSON.stringify(body)
+				});
+			}
 		</script>
 		<script>
 			const TRANSLATIONS = {
@@ -4326,8 +4427,15 @@
 					}
 					try {
 						const stats = await apiGet("/api/stats");
-						statsCache = { data: stats, time: Date.now() };
-						const { userCount, postCount, commentCount } = stats;
+						statsCache = {
+							data: stats,
+							time: Date.now()
+						};
+						const {
+							userCount,
+							postCount,
+							commentCount
+						} = stats;
 						if ($("totalUsers")) $("totalUsers").textContent = userCount || 0;
 						if ($("totalPosts")) $("totalPosts").textContent = postCount || 0;
 						if ($("statsBox")) {
@@ -4578,7 +4686,9 @@
 					try {
 						const data = await apiGet("/api/users");
 						allUsersCache = data || [];
-					} catch { allUsersCache = []; }
+					} catch {
+						allUsersCache = [];
+					}
 					return allUsersCache;
 				}
 
@@ -4697,6 +4807,62 @@
 								frag.appendChild(document.createTextNode(full));
 							}
 							last = m.index + full.length;
+						}
+						const tail = text.slice(last);
+						if (tail) frag.appendChild(document.createTextNode(tail));
+						node.parentNode.replaceChild(frag, node);
+					}
+				}
+				const EMOJI_MAP = [
+					"happy",
+					"haha",
+					"sad",
+					"cry",
+					"scared",
+					"love",
+					"hmm",
+					"sweat",
+					"updown",
+					"strange",
+					"ask",
+					"blank",
+					"dead",
+					"alien",
+					"bot",
+					"right",
+					"wrong",
+					"jesus",
+					"maga"
+				];
+
+				function renderEmojis(root) {
+					if (!root) return;
+					const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+					const nodes = [];
+					while (walker.nextNode()) nodes.push(walker.currentNode);
+					for (const node of nodes) {
+						if (!node.parentElement) continue;
+						if (node.parentElement.closest(".mentionLink,script,style,.emojiInPost")) continue;
+						const text = node.nodeValue;
+						if (!text || !text.includes(":")) continue;
+						const frag = document.createDocumentFragment();
+						let last = 0;
+						const reg = /:([a-zA-Z0-9_-]+):/g;
+						let m;
+						while ((m = reg.exec(text))) {
+							const before = text.slice(last, m.index);
+							if (before) frag.appendChild(document.createTextNode(before));
+							const name = m[1].toLowerCase();
+							if (EMOJI_MAP.includes(name)) {
+								const img = document.createElement("img");
+								img.src = "emojis/" + name + ".svg";
+								img.className = "emojiInPost";
+								img.alt = ":" + name + ":";
+								frag.appendChild(img);
+							} else {
+								frag.appendChild(document.createTextNode(m[0]));
+							}
+							last = m.index + m[0].length;
 						}
 						const tail = text.slice(last);
 						if (tail) frag.appendChild(document.createTextNode(tail));
@@ -4941,6 +5107,7 @@
 					box.innerHTML = html;
 					await ensureAllUsersCache();
 					linkifyMentions(box);
+					renderEmojis(box);
 					const loadBtn = box.querySelector(".loadImgBtn");
 					if (loadBtn) {
 						loadBtn.onclick = () => {
@@ -4949,14 +5116,15 @@
 								`<img src="${src}" class="zoomable" style="max-width:60%;border-radius:12px;display:block;">`;
 						};
 					}
-				const toggleBtn = box.querySelector(".toggleLongPost");
-				if (toggleBtn) {
-					let e = false;
-					toggleBtn.onclick = () => {
+					const toggleBtn = box.querySelector(".toggleLongPost");
+					if (toggleBtn) {
+						let e = false;
+						toggleBtn.onclick = () => {
 							e = !e;
 							const l = box.querySelector(".longPostText");
 							if (l) l.innerHTML = e ? meta.content : foldedText;
 							linkifyMentions(box);
+							renderEmojis(box);
 							toggleBtn.textContent = e ? t("post_collapse") : t("post_expand");
 						};
 					}
@@ -4989,7 +5157,11 @@
 					}
 					const passHash = await hash(p1);
 					try {
-						await apiPost("/api/auth/register", { name: u, pass: passHash, time: new Date().toISOString() });
+						await apiPost("/api/auth/register", {
+							name: u,
+							pass: passHash,
+							time: new Date().toISOString()
+						});
 						modal(t("register_ok"));
 						show("welcomePage");
 					} catch (e) {
@@ -5002,7 +5174,10 @@
 					if (!u || !p) return modal(t("enter_user_pass"));
 					const passHash = await hash(p);
 					try {
-						const data = await apiPost("/api/auth/login", { name: u, pass: passHash });
+						const data = await apiPost("/api/auth/login", {
+							name: u,
+							pass: passHash
+						});
 						currentUser = data;
 						guestMode = false;
 						localStorage.setItem("loginUser", data.id);
@@ -5041,10 +5216,13 @@
 				document.addEventListener("click", e => {
 					if (!guestMode) return;
 					const target = e.target;
-					if (target.closest(".userLink") || target.closest("a") || target.closest("#viewer") || target.closest(
-							".modal") || target.closest("#welcomePage") || target.closest("#registerPage") || target.closest(
+					if (target.closest(".userLink") || target.closest("a") || target.closest("#viewer") || target
+						.closest(
+							".modal") || target.closest("#welcomePage") || target.closest("#registerPage") ||
+						target.closest(
 							"#backBtn") || target.closest("#postBackBtn")) return;
-					if (target.closest("button") || target.closest("input") || target.closest("textarea") || target.closest(
+					if (target.closest("button") || target.closest("input") || target.closest("textarea") ||
+						target.closest(
 							"select") || target.closest(".postTag") || target.closest(".shareBtnWrapper")) {
 						e.preventDefault();
 						e.stopPropagation();
@@ -5054,7 +5232,8 @@
 							const row = document.createElement("div");
 							row.style.cssText = "margin-top:14px;text-align:center;";
 							row.innerHTML =
-								'<button id="guestLoginRedirect" style="background:var(--green);color:#fff;">' + t("guest_go_login") + '</button>';
+								'<button id="guestLoginRedirect" style="background:var(--green);color:#fff;">' +
+								t("guest_go_login") + '</button>';
 							box.appendChild(row);
 							$("guestLoginRedirect").onclick = () => {
 								$("modal").classList.add("hidden");
@@ -5090,7 +5269,9 @@
 							author: currentUser.id,
 							tag: tag
 						});
-					} catch (e) { return modal(t("post_fail", e.message)); }
+					} catch (e) {
+						return modal(t("post_fail", e.message));
+					}
 					await notifyMentions(finalContent, postId, null);
 					$("text").value = "";
 					$("customTag").value = "";
@@ -5125,7 +5306,9 @@
 							is_read: false,
 							created_at: new Date().toISOString()
 						});
-					} catch (e) { console.error("通知插入失败", e); }
+					} catch (e) {
+						console.error("通知插入失败", e);
+					}
 				}
 
 				function notifLabel(n) {
@@ -5138,7 +5321,9 @@
 				async function refreshNotificationBadge() {
 					if (!currentUser) return;
 					try {
-						const { count } = await apiGet("/api/notifications/count?target_id=" + currentUser.id);
+						const {
+							count
+						} = await apiGet("/api/notifications/count?target_id=" + currentUser.id);
 						const badge = $("notifBadge");
 						if (!badge) return;
 						const unread = count || 0;
@@ -5146,12 +5331,16 @@
 						badge.hidden = false;
 						badge.style.background = unread === 0 ? 'var(--card)' : '#ff3b30';
 						badge.style.color = unread === 0 ? 'var(--sub)' : '#fff';
-					} catch (e) { console.error(e); }
+					} catch (e) {
+						console.error(e);
+					}
 				}
 				async function markNotificationRead(id) {
 					if (!currentUser || !id) return false;
 					try {
-						await apiPut("/api/notifications/read/" + id, { target_id: currentUser.id });
+						await apiPut("/api/notifications/read/" + id, {
+							target_id: currentUser.id
+						});
 						return true;
 					} catch (e) {
 						console.error("标记通知已读失败：", e);
@@ -5208,7 +5397,8 @@
 					const container = $("singlePost");
 					container.innerHTML =
 						"<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
-					const post = await apiGet("/api/posts/single?id=" + postId + (currentUser ? "&userId=" + currentUser.id : ""));
+					const post = await apiGet("/api/posts/single?id=" + postId + (currentUser ? "&userId=" +
+						currentUser.id : ""));
 					if (!post || post.error) throw new Error(t("post_not_found"));
 					let likeCount = post.likes || 0;
 					let dislikeCount = post.dislikes || 0;
@@ -5268,6 +5458,8 @@
 							'</div>') +
 						(guestMode ? '' : '<div class="commentRow"><input data-input="' + post.id +
 							'" data-mention-input="1" placeholder="' + t("post_comment_ph") + '">' +
+							'<button class="emojiBtn commentEmojiBtn" data-emoji-target="' + post.id +
+							'" type="button" title="表情"><img src="emojis/happy.svg" style="width:18px;height:18px;display:block;pointer-events:none;"></button>' +
 							'<button data-comment="' + post.id + '">' + t("post_send") + '</button></div>') +
 						'<div class="commentList"></div>';
 					container.innerHTML = "";
@@ -5372,14 +5564,20 @@
 					`);
 					$("markAllReadBtn").onclick = async () => {
 						try {
-							await apiPut("/api/notifications/read", { target_id: currentUser.id });
-						} catch (e) { console.error(e); }
+							await apiPut("/api/notifications/read", {
+								target_id: currentUser.id
+							});
+						} catch (e) {
+							console.error(e);
+						}
 						await refreshNotificationBadge();
 						openNotifications();
 					};
 					$("clearNotifBtn").onclick = async () => {
 						try {
-							await apiDelete("/api/notifications", { target_id: currentUser.id });
+							await apiDelete("/api/notifications", {
+								target_id: currentUser.id
+							});
 						} catch (e) {
 							modal(t("delete_fail", e.message));
 							return;
@@ -5404,11 +5602,19 @@
 				async function cleanupNotifications() {
 					if (!currentUser) return;
 					let data;
-					try { data = await apiGet("/api/notifications?target_id=" + currentUser.id); } catch { return; }
+					try {
+						data = await apiGet("/api/notifications?target_id=" + currentUser.id);
+					} catch {
+						return;
+					}
 					if (!data) return;
 					const oldIds = data.slice(100).map(x => x.id);
 					if (oldIds.length) {
-						try { await apiDelete("/api/notifications", { target_id: currentUser.id }); } catch {}
+						try {
+							await apiDelete("/api/notifications", {
+								target_id: currentUser.id
+							});
+						} catch {}
 					}
 				}
 
@@ -5517,8 +5723,11 @@
 					const container = $("newUsers");
 					container.innerHTML = "<p style='color:var(--sub);text-align:center;'>Loading...</p>";
 					let data;
-					try { data = await apiGet("/api/users?limit=" + limit + "&sort=time"); } catch {
-						container.innerHTML = '<p style="color:red;text-align:center;">' + t("modal_load_fail") + '</p>';
+					try {
+						data = await apiGet("/api/users?limit=" + limit + "&sort=time");
+					} catch {
+						container.innerHTML = '<p style="color:red;text-align:center;">' + t("modal_load_fail") +
+							'</p>';
 						return;
 					}
 					container.innerHTML = '<h3>' + t("new_users_title") + '</h3>';
@@ -5625,7 +5834,9 @@
 				let presenceTimer = null;
 				async function touchPresence() {
 					if (!currentUser) return;
-					try { await apiPut("/api/users/" + currentUser.id + "/presence"); } catch {}
+					try {
+						await apiPut("/api/users/" + currentUser.id + "/presence");
+					} catch {}
 				}
 				let onlineUsersCache = [];
 				let onlineUsersCacheTime = 0;
@@ -5639,7 +5850,11 @@
 						return;
 					}
 					let data;
-					try { data = await apiGet("/api/users/online"); } catch { return; }
+					try {
+						data = await apiGet("/api/users/online");
+					} catch {
+						return;
+					}
 					onlineUsersCache = data || [];
 					onlineUsersCacheTime = Date.now();
 					mini.textContent = t("online_label_prefix") + onlineUsersCache.length;
@@ -5747,14 +5962,27 @@
 					let result;
 					if (postSearch && postSearch.startsWith("@")) {
 						const uname = postSearch.slice(1).trim();
-						if (!uname) return { posts: [], count: 0 };
+						if (!uname) return {
+							posts: [],
+							count: 0
+						};
 						try {
-							result = await apiGet("/api/posts?search=" + encodeURIComponent(postSearch) + "&page=" + page + "&perPage=" + perPage + (activePostTag && activePostTag !== "全部" ? "&tag=" + encodeURIComponent(activePostTag) : ""));
-						} catch { return { posts: [], count: 0 }; }
+							result = await apiGet("/api/posts?search=" + encodeURIComponent(postSearch) + "&page=" +
+								page + "&perPage=" + perPage + (activePostTag && activePostTag !== "全部" ?
+									"&tag=" + encodeURIComponent(activePostTag) : ""));
+						} catch {
+							return {
+								posts: [],
+								count: 0
+							};
+						}
 					} else {
 						result = await apiGet("/api/posts" + q);
 					}
-					return { posts: result.posts || [], count: result.count || 0 };
+					return {
+						posts: result.posts || [],
+						count: result.count || 0
+					};
 				}
 				const notice = $("notice");
 				const toggleBtn = $("toggleNoticeBtn");
@@ -5831,7 +6059,10 @@
 						}
 						const postIds = posts.map(p => p.id);
 						if (token !== currentLoadToken) return;
-						const likeCounts = { likes: {}, dislikes: {} };
+						const likeCounts = {
+							likes: {},
+							dislikes: {}
+						};
 						const userVoteMap = {};
 						for (const p of posts) {
 							likeCounts.likes[p.id] = p.likes || 0;
@@ -5901,6 +6132,8 @@
 									'</div>') +
 								(guestMode ? '' : '<div class="commentRow"><input data-input="' + p.id +
 									'" data-mention-input="1" placeholder="' + t("post_comment_ph") + '">' +
+									'<button class="emojiBtn commentEmojiBtn" data-emoji-target="' + p.id +
+									'" type="button" title="表情"><img src="emojis/happy.svg" style="width:18px;height:18px;display:block;pointer-events:none;"></button>' +
 									'<button data-comment="' + p.id + '">' + t("post_send") + '</button></div>') +
 								'<div class="commentList"></div>';
 							container.appendChild(postDiv);
@@ -5961,8 +6194,12 @@
 						if (token !== currentLoadToken) return;
 						let allComments = [];
 						try {
-							allComments = await apiPost("/api/comments/batch", { postIds }) || [];
-						} catch { allComments = []; }
+							allComments = await apiPost("/api/comments/batch", {
+								postIds
+							}) || [];
+						} catch {
+							allComments = [];
+						}
 						if (token !== currentLoadToken) return;
 						const commentsByPost = {};
 						for (const c of (allComments || [])) {
@@ -5983,7 +6220,9 @@
 					if (!comments) {
 						try {
 							comments = await apiGet("/api/comments/" + postId);
-						} catch { comments = []; }
+						} catch {
+							comments = [];
+						}
 					}
 					for (let c of comments) {
 						let div = document.createElement("div");
@@ -6002,6 +6241,7 @@
 						div.querySelector(".commentContent").textContent = c.content || "";
 						await ensureAllUsersCache();
 						linkifyMentions(div);
+						renderEmojis(div);
 						container.appendChild(div);
 						const userLink = div.querySelector(".userLink");
 						if (userLink) {
@@ -6010,7 +6250,11 @@
 						const del = div.querySelector("[data-cdel]");
 						if (del && currentUser) {
 							del.onclick = async () => {
-								try { await apiDelete("/api/comments/" + c.id); } catch (e) { console.error(e); }
+								try {
+									await apiDelete("/api/comments/" + c.id);
+								} catch (e) {
+									console.error(e);
+								}
 								renderComments(postId, container);
 								await changeCoins(currentUser.id, -3);
 							};
@@ -6118,7 +6362,11 @@
 					dislikeNumEl.textContent = dislikeCount;
 					const targetType = hasLike ? 0 : 1;
 					try {
-						await apiPost("/api/likes/toggle", { postid: id, liker: currentUser.id, type: targetType });
+						await apiPost("/api/likes/toggle", {
+							postid: id,
+							liker: currentUser.id,
+							type: targetType
+						});
 						await changeCoins(currentUser.id, hasLike ? -1 : (hasDislike ? 2 : 1));
 					} catch (e) {
 						console.error(e);
@@ -6157,7 +6405,11 @@
 					dislikeNumEl.textContent = dislikeCount;
 					const targetType = hasDislike ? 0 : -1;
 					try {
-						await apiPost("/api/likes/toggle", { postid: id, liker: currentUser.id, type: targetType });
+						await apiPost("/api/likes/toggle", {
+							postid: id,
+							liker: currentUser.id,
+							type: targetType
+						});
 						await changeCoins(currentUser.id, hasDislike ? 1 : (hasLike ? -2 : -1));
 					} catch (e) {
 						console.error(e);
@@ -6179,8 +6431,13 @@
 					$("confirmDeleteBtn").onclick = async () => {
 						$("closeModal").click();
 						try {
-							await apiDelete("/api/posts/" + id, { userId: currentUser.id, isAdmin: isAdmin(currentUser) });
-						} catch (e) { console.error(e); }
+							await apiDelete("/api/posts/" + id, {
+								userId: currentUser.id,
+								isAdmin: isAdmin(currentUser)
+							});
+						} catch (e) {
+							console.error(e);
+						}
 						loadStats();
 						loadPosts(postPage);
 					};
@@ -6242,7 +6499,11 @@
 					let box = $("userItems");
 					box.innerHTML = "<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
 					let data = [];
-					try { data = await apiGet("/api/users"); } catch { data = []; }
+					try {
+						data = await apiGet("/api/users");
+					} catch {
+						data = [];
+					}
 					data.sort((a, b) => {
 						let coinsA = a.coins || 0;
 						let coinsB = b.coins || 0;
@@ -6307,7 +6568,19 @@
 					container.innerHTML =
 						"<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
 					let user;
-					try { user = await apiGet("/api/users/" + uid); } catch { user = { id: uid, name: "?", coins: 0, avatar: null, description: "", time: "", role: [] }; }
+					try {
+						user = await apiGet("/api/users/" + uid);
+					} catch {
+						user = {
+							id: uid,
+							name: "?",
+							coins: 0,
+							avatar: null,
+							description: "",
+							time: "",
+							role: []
+						};
+					}
 					const avatarUrl = getAvatar(user);
 					$("profileAvatar").src = avatarUrl;
 					$("profileAvatar").onclick = () => openViewer(avatarUrl);
@@ -6399,8 +6672,12 @@
 							$("saveDescBtn").onclick = async () => {
 								const newDesc = $("descTextarea").value.trim();
 								try {
-									await apiPut("/api/users/" + currentUser.id, { description: newDesc });
-								} catch (e) { return modal(t("save_fail", e.message)); }
+									await apiPut("/api/users/" + currentUser.id, {
+										description: newDesc
+									});
+								} catch (e) {
+									return modal(t("save_fail", e.message));
+								}
 								currentUser.description = newDesc;
 								$("userDescription").innerText = newDesc || t("profile_no_desc");
 								$("modal").classList.add("hidden");
@@ -6414,7 +6691,14 @@
 					const shopDiv = document.createElement("div");
 					shopDiv.id = "shopModal";
 					let userData;
-					try { userData = await apiGet("/api/users/" + currentUser.id); } catch { userData = { coins: 0, role: [] }; }
+					try {
+						userData = await apiGet("/api/users/" + currentUser.id);
+					} catch {
+						userData = {
+							coins: 0,
+							role: []
+						};
+					}
 					let coins = userData?.coins || 0;
 					let roleArr = userData?.role || [];
 
@@ -6511,7 +6795,13 @@
 								await changeCoins(currentUser.id, -item.price);
 								coins -= item.price;
 								roleArr = [...roleArr, itemId];
-								try { await apiPut("/api/users/" + currentUser.id, { role: roleArr }); } catch (e) { console.error(e); }
+								try {
+									await apiPut("/api/users/" + currentUser.id, {
+										role: roleArr
+									});
+								} catch (e) {
+									console.error(e);
+								}
 								if (currentUser) currentUser.role = roleArr;
 								renderShop();
 							};
@@ -6521,7 +6811,13 @@
 							btn.onclick = async () => {
 								const itemId = btn.dataset.equip;
 								roleArr = [itemId, ...roleArr.filter(r => r !== itemId)];
-								try { await apiPut("/api/users/" + currentUser.id, { role: roleArr }); } catch (e) { console.error(e); }
+								try {
+									await apiPut("/api/users/" + currentUser.id, {
+										role: roleArr
+									});
+								} catch (e) {
+									console.error(e);
+								}
 								if (currentUser) currentUser.role = roleArr;
 								renderShop();
 							};
@@ -6534,7 +6830,13 @@
 							btn.onclick = async () => {
 								const itemId = btn.dataset.remove;
 								roleArr = [...roleArr.filter(r => r !== itemId), itemId];
-								try { await apiPut("/api/users/" + currentUser.id, { role: roleArr }); } catch (e) { console.error(e); }
+								try {
+									await apiPut("/api/users/" + currentUser.id, {
+										role: roleArr
+									});
+								} catch (e) {
+									console.error(e);
+								}
 								if (currentUser) currentUser.role = roleArr;
 								renderShop();
 							};
@@ -6994,7 +7296,11 @@
 						let r = currentUser?.role || [];
 						if (Array.isArray(r) && !r.includes(bid)) {
 							r = [...r, bid];
-							try { await apiPut("/api/users/" + currentUser.id, { role: r }); } catch {}
+							try {
+								await apiPut("/api/users/" + currentUser.id, {
+									role: r
+								});
+							} catch {}
 							if (currentUser) currentUser.role = r;
 						}
 					}
@@ -7042,8 +7348,12 @@
 							return modal(t("avatar_invalid"));
 						}
 						try {
-							await apiPut("/api/users/" + currentUser.id, { avatar: url || null });
-						} catch (e) { return modal(t("save_fail", e.message)); }
+							await apiPut("/api/users/" + currentUser.id, {
+								avatar: url || null
+							});
+						} catch (e) {
+							return modal(t("save_fail", e.message));
+						}
 						currentUser.avatar = url || null;
 						$("modal").classList.add("hidden");
 						loadPosts(postPage);
@@ -7052,7 +7362,9 @@
 				}
 				async function changeCoins(uid, amount) {
 					try {
-						const result = await apiPut("/api/users/" + uid + "/coins", { amount });
+						const result = await apiPut("/api/users/" + uid + "/coins", {
+							amount
+						});
 						if (result && result.coins !== undefined) {
 							if (currentUser && currentUser.id === uid) {
 								currentUser.coins = result.coins;
@@ -7290,7 +7602,9 @@
 							history.replaceState(null, "", "?pid=" + randomPost.id);
 							openSinglePost(randomPost.id);
 						}
-					} catch { modal(t("post_no_posts")); }
+					} catch {
+						modal(t("post_no_posts"));
+					}
 				};
 
 				document.getElementById("fortuneBtn").onclick = function() {
@@ -7404,6 +7718,68 @@
 					}
 				});
 
+				const emojiPicker = $("emojiPicker");
+				emojiPicker.innerHTML = EMOJI_MAP.map(name =>
+					`<img src="emojis/${name}.svg" data-emoji="${name}" alt=":${name}:" title=":${name}:">`
+				).join("");
+				let emojiTargetInput = null;
+
+				function positionEmojiPicker(btn) {
+					const rect = btn.getBoundingClientRect();
+					let top = rect.bottom + 4;
+					let left = rect.left;
+					if (top + 230 > window.innerHeight) {
+						top = rect.top - 230;
+					}
+					emojiPicker.style.left = Math.min(left, window.innerWidth - 290) + "px";
+					emojiPicker.style.top = top + "px";
+				}
+				document.addEventListener("click", e => {
+					const btn = e.target.closest(".emojiBtn, #editorEmojiBtn");
+					if (btn) {
+						e.preventDefault();
+						e.stopPropagation();
+						if (btn.id === "editorEmojiBtn") {
+							emojiTargetInput = $("text");
+						} else {
+							const pid = btn.dataset.emojiTarget;
+							emojiTargetInput = document.querySelector(`[data-input="${pid}"]`);
+						}
+						if (!emojiTargetInput) return;
+						const showing = emojiPicker.classList.contains("show") && emojiPicker._targetBtn === btn;
+						emojiPicker.classList.remove("show");
+						if (!showing) {
+							positionEmojiPicker(btn);
+							emojiPicker.classList.add("show");
+							emojiPicker._targetBtn = btn;
+						}
+						return;
+					}
+					if (!e.target.closest("#emojiPicker")) {
+						emojiPicker.classList.remove("show");
+					}
+				});
+				emojiPicker.addEventListener("click", e => {
+					const img = e.target.closest("img");
+					if (!img || !emojiTargetInput) return;
+					const name = img.dataset.emoji;
+					if (!name) return;
+					const text = `:${name}:`;
+					const input = emojiTargetInput;
+					const start = input.selectionStart;
+					const end = input.selectionEnd;
+					const before = input.value.substring(0, start);
+					const after = input.value.substring(end);
+					input.value = before + text + after;
+					const pos = start + text.length;
+					input.selectionStart = input.selectionEnd = pos;
+					input.focus();
+					input.dispatchEvent(new Event("input", {
+						bubbles: true
+					}));
+					emojiPicker.classList.remove("show");
+				});
+
 				(async () => {
 					const mask = document.createElement("div");
 					mask.className = "loadingMask";
@@ -7420,7 +7796,11 @@
 					try {
 						if (autoId) {
 							let data;
-							try { data = await apiGet("/api/users/" + autoId); } catch { data = null; }
+							try {
+								data = await apiGet("/api/users/" + autoId);
+							} catch {
+								data = null;
+							}
 							if (data) {
 								currentUser = data;
 								$("nav").classList.remove("hidden");
