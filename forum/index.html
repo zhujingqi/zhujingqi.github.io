@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html>
 	<head>
@@ -782,7 +783,6 @@
 			.roleBadge.green_v {
 				background-color: #4caf50;
 				color: #fff;
-				opacity: .7;
 			}
 
 			.roleBadge.green_v::before {
@@ -793,7 +793,6 @@
 			.roleBadge.purple_star {
 				background-color: #9c27b0;
 				color: #fff;
-				opacity: .7;
 			}
 
 			.roleBadge.purple_star::before {
@@ -804,7 +803,6 @@
 			.roleBadge.blue_diamond {
 				background-color: #2196f3;
 				color: #fff;
-				opacity: .7;
 			}
 
 			.roleBadge.blue_diamond::before {
@@ -2008,174 +2006,6 @@
 				animation: postFadeIn .32s ease both;
 			}
 
-			/* Red envelope - simple red button */
-			.rpBtn {
-				display: inline-block;
-				padding: 4px 14px;
-				border-radius: 20px;
-				background: #e57373;
-				color: #fff;
-				font-size: 12px;
-				border: none;
-				cursor: pointer;
-				margin: 4px 0;
-				height: auto;
-				transition: opacity .15s
-			}
-
-			.rpBtn:hover {
-				opacity: .8
-			}
-
-			.rpBtn.rpDone {
-				background: #9e9e9e;
-				cursor: default;
-				opacity: 1
-			}
-
-			/* Claim overlay */
-			.toast {
-				position: fixed;
-				top: 40%;
-				left: 50%;
-				transform: translate(-50%, -50%);
-				background: #333;
-				color: #fff;
-				padding: 12px 28px;
-				border-radius: 20px;
-				font-size: 18px;
-				font-weight: 700;
-				z-index: 9999;
-				pointer-events: none;
-				animation: toastFade 1.2s ease forwards
-			}
-
-			@keyframes toastFade {
-				0% {
-					opacity: 0;
-					transform: translate(-50%, -50%)scale(.7)
-				}
-
-				15% {
-					opacity: 1;
-					transform: translate(-50%, -50%)scale(1)
-				}
-
-				70% {
-					opacity: 1
-				}
-
-				100% {
-					opacity: 0
-				}
-			}
-
-			/* Editor badge */
-			.rpBadge {
-				display: inline-flex;
-				align-items: center;
-				gap: 6px;
-				background: #ef5350;
-				color: #fff;
-				padding: 4px 12px;
-				border-radius: 4px;
-				font-size: 12px
-			}
-
-			.rpBadge button {
-				background: none;
-				border: none;
-				color: rgba(255, 255, 255, .7);
-				cursor: pointer;
-				font-size: 14px;
-				padding: 0 2px
-			}
-
-			.rpBadge button:hover {
-				color: #fff
-			}
-
-			.rpForm {
-				text-align: left;
-				padding: 4px 0
-			}
-
-			.rpForm label {
-				display: block;
-				font-size: 14px;
-				color: var(--sub);
-				margin-bottom: 4px;
-				margin-top: 12px
-			}
-
-			.rpForm label:first-child {
-				margin-top: 0
-			}
-
-			.rpForm input {
-				width: 100%;
-				padding: 10px 14px;
-				border-radius: 20px;
-				border: 1px solid var(--border, #ccc);
-				font-size: 15px;
-				background: var(--card);
-				color: var(--text);
-				outline: none;
-				transition: border .2s;
-				box-sizing: border-box
-			}
-
-			.rpForm input:focus {
-				border-color: var(--green)
-			}
-
-			.rpForm .modeRow {
-				display: flex;
-				gap: 14px;
-				margin-top: 8px
-			}
-
-			.rpForm .modeRow label {
-				display: flex;
-				align-items: center;
-				gap: 6px;
-				margin: 0;
-				font-size: 14px;
-				cursor: pointer;
-				color: var(--text);
-				font-weight: 400
-			}
-
-			.rpForm .modeRow input[type=radio] {
-				width: 16px;
-				height: 16px;
-				margin: 0;
-				cursor: pointer;
-				accent-color: var(--green)
-			}
-
-			.rpForm .rpErr {
-				color: var(--red, #f44336);
-				font-size: 13px;
-				margin: 6px 0 0;
-				text-align: center
-			}
-
-			@media(max-width:800px) {
-				.rpBtn {
-					padding: 3px 12px;
-					font-size: 11px
-				}
-
-				.claimBox {
-					padding: 22px 28px
-				}
-
-				.claimCoins {
-					font-size: 28px
-				}
-			}
-
 			@keyframes loadingDot {
 
 				0%,
@@ -2606,9 +2436,10 @@
 					<details>
 						<summary><b id="noticeUpdates">近期更新</b></summary>
 						<span id="noticeUpdatesContent">
-							· 红包<br>
 							· 多语言<br>
 							· 访客模式<br>
+							· 优化排行<br>
+							· 金币抽奖<br>
 						</span>
 					</details>
 				</div>
@@ -2655,12 +2486,10 @@
 			<div class="card" style="width:95%;max-width:600px;">
 				<textarea id="text" data-mention-input="1" placeholder="发布新鲜事（最多5000字符）" style="width:100%;"
 					maxlength="5000"></textarea>
-				<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;">
+				<div style="display:flex;gap:6px;margin-top:8px;">
 					<button id="insertImgBtn" type="button">插图</button>
 					<button id="insertMusicBtn" type="button">插入音乐</button>
-					<button id="addRedPacketBtn" type="button">红包</button>
 				</div>
-				<div id="rpPendingBar" style="margin-top:8px;display:none;"></div>
 				<div class="tagBarContainer"
 					style="display:flex;align-items:center;gap:6px;flex-wrap:nowrap;margin-top:8px;">
 					<div class="tagBar" id="tagBar" style="display:flex;gap:6px;flex-shrink:1;overflow-x:auto;"></div>
@@ -2775,7 +2604,29 @@
 		<div id="viewer" onclick="closeViewer()">
 			<img id="viewerImg">
 		</div>
-		<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+		<script>
+			const API_BASE = "https://hxlhrrllhvvazyhiuhvb.supabase.co/functions/v1";
+
+			async function api(path, options = {}) {
+				const headers = { "Content-Type": "application/json", ...options.headers };
+				const res = await fetch(API_BASE + path, { ...options, headers });
+				const text = await res.text();
+				if (!res.ok) {
+					let msg = text;
+					try { const j = JSON.parse(text); if (j.error) msg = j.error; } catch {}
+					throw new Error(msg);
+				}
+				return text ? JSON.parse(text) : null;
+			}
+
+			async function apiGet(path) { return api(path); }
+
+			async function apiPost(path, body) { return api(path, { method: "POST", body: JSON.stringify(body) }); }
+
+			async function apiPut(path, body) { return api(path, { method: "PUT", body: JSON.stringify(body) }); }
+
+			async function apiDelete(path, body) { return api(path, { method: "DELETE", body: JSON.stringify(body) }); }
+		</script>
 		<script>
 			const TRANSLATIONS = {
 				nav_home: {
@@ -4303,167 +4154,6 @@
 					es: "Pregunta",
 					de: "Frage",
 					"zh-TW": "提問"
-				},
-				red_envelope_title: {
-					zh: "红包",
-					en: "Red Packet",
-					es: "Sobre Rojo",
-					de: "Geldgeschenk",
-					"zh-TW": "紅包"
-				},
-				red_envelope_open: {
-					zh: "领取红包",
-					en: "Open",
-					es: "Abrir",
-					de: "Öffnen",
-					"zh-TW": "領取紅包"
-				},
-				red_envelope_empty: {
-					zh: "已领完",
-					en: "All Claimed",
-					es: "Todo Reclamado",
-					de: "Alle Beansprucht",
-					"zh-TW": "已領完"
-				},
-				red_envelope_claim_detail: {
-					zh: "领取详情",
-					en: "Claim Details",
-					es: "Detalles",
-					de: "Details",
-					"zh-TW": "領取詳情"
-				},
-				red_envelope_yours: {
-					zh: "你发的红包",
-					en: "Your Red Packet",
-					es: "Tu Sobre",
-					de: "Dein Geldgeschenk",
-					"zh-TW": "你發的紅包"
-				},
-				rp_btn: {
-					zh: "红包",
-					en: "Red Packet",
-					es: "Sobre Rojo",
-					de: "Geldgeschenk",
-					"zh-TW": "紅包"
-				},
-				rp_total: {
-					zh: "总金币（1-1000）",
-					en: "Total Coins (1-1000)",
-					es: "Monedas (1-1000)",
-					de: "Gesamtmünzen (1-1000)",
-					"zh-TW": "總金幣（1-1000）"
-				},
-				rp_count: {
-					zh: "红包个数",
-					en: "Count",
-					es: "Cantidad",
-					de: "Anzahl",
-					"zh-TW": "紅包個數"
-				},
-				rp_mode: {
-					zh: "模式",
-					en: "Mode",
-					es: "Modo",
-					de: "Modus",
-					"zh-TW": "模式"
-				},
-				rp_mode_random: {
-					zh: "拼手气（随机）",
-					en: "Random",
-					es: "Aleatorio",
-					de: "Zufällig",
-					"zh-TW": "拼手氣（隨機）"
-				},
-				rp_mode_average: {
-					zh: "平均分配",
-					en: "Average",
-					es: "Promedio",
-					de: "Gleichmäßig",
-					"zh-TW": "平均分配"
-				},
-				rp_confirm_send: {
-					zh: "确认发送",
-					en: "Confirm",
-					es: "Confirmar",
-					de: "Bestätigen",
-					"zh-TW": "確認發送"
-				},
-				rp_confirm_password: {
-					zh: "确认密码",
-					en: "Confirm Password",
-					es: "Confirmar Contraseña",
-					de: "Passwort bestätigen",
-					"zh-TW": "確認密碼"
-				},
-				rp_password_hint: {
-					zh: "输入密码以发送红包",
-					en: "Enter password to send red packet",
-					es: "Ingrese la contraseña",
-					de: "Passwort eingeben",
-					"zh-TW": "輸入密碼以發送紅包"
-				},
-				rp_password_ph: {
-					zh: "密码",
-					en: "Password",
-					es: "Contraseña",
-					de: "Passwort",
-					"zh-TW": "密碼"
-				},
-				rp_confirm: {
-					zh: "确认",
-					en: "OK",
-					es: "OK",
-					de: "OK",
-					"zh-TW": "確認"
-				},
-				rp_enter_password: {
-					zh: "请输入密码",
-					en: "Please enter password",
-					es: "Ingrese la contraseña",
-					de: "Bitte Passwort eingeben",
-					"zh-TW": "請輸入密碼"
-				},
-				rp_wrong_password: {
-					zh: "密码错误",
-					en: "Wrong password",
-					es: "Contraseña incorrecta",
-					de: "Falsches Passwort",
-					"zh-TW": "密碼錯誤"
-				},
-				rp_invalid_number: {
-					zh: "请输入有效数字",
-					en: "Enter valid numbers",
-					es: "Ingrese números válidos",
-					de: "Gültige Zahlen eingeben",
-					"zh-TW": "請輸入有效數字"
-				},
-				rp_count_exceeds: {
-					zh: "个数不能超过总金币",
-					en: "Count cannot exceed total coins",
-					es: "La cantidad no puede exceder las monedas",
-					de: "Anzahl darf Gesamtmünzen nicht überschreiten",
-					"zh-TW": "個數不能超過總金幣"
-				},
-				rp_not_divisible: {
-					zh: "平均分配下总金币必须能被个数整除",
-					en: "Total must be divisible by count in average mode",
-					es: "El total debe ser divisible en modo promedio",
-					de: "Gesamtsumme muss durch Anzahl teilbar sein",
-					"zh-TW": "平均分配下總金幣必須能被個數整除"
-				},
-				rp_insufficient: {
-					zh: "金币不足",
-					en: "Insufficient coins",
-					es: "Monedas insuficientes",
-					de: "Nicht genug Münzen",
-					"zh-TW": "金幣不足"
-				},
-				rp_claimed: {
-					zh: "已领取",
-					en: "Claimed",
-					es: "Reclamado",
-					de: "Beansprucht",
-					"zh-TW": "已領取"
 				}
 			};
 			const PAGE_TITLE_TRANS = {
@@ -4538,9 +4228,6 @@
 				sel.onchange = () => changeLanguage(sel.value);
 			}
 			document.addEventListener("DOMContentLoaded", () => {
-				const SUPABASE_URL = "https://hxlhrrllhvvazyhiuhvb.supabase.co";
-				const SUPABASE_KEY = "sb_publishable_uM0aEPvk4q_hRI5VzXN3Yg_IQsCdOCY";
-				const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 				const $ = id => document.getElementById(id);
 				let currentUser = null;
 				let guestMode = false;
@@ -4548,7 +4235,6 @@
 				const defaultTags = ["学习", "日常", "搞笑", "提问"];
 				let selectedTags = [];
 				let postLayout = localStorage.getItem("postLayout") || "list";
-				let pendingRedPacket = null;
 
 				function syncLayoutBtn() {
 					const btn = $("layoutBtn");
@@ -4639,39 +4325,11 @@
 						return;
 					}
 					try {
-						const [{
-							count: userCount,
-							error: userErr
-						}, {
-							count: postCount,
-							error: postErr
-						}, {
-							count: commentCount,
-							error: commentErr
-						}] = await Promise.all([
-							supabase.from("users").select("id", {
-								count: "exact",
-								head: true
-							}),
-							supabase.from("posts").select("id", {
-								count: "exact",
-								head: true
-							}),
-							supabase.from("comments").select("id", {
-								count: "exact",
-								head: true
-							})
-						]);
-						statsCache = {
-							data: {
-								userCount,
-								postCount,
-								commentCount
-							},
-							time: Date.now()
-						};
-						if ($("totalUsers") && !userErr) $("totalUsers").textContent = userCount || 0;
-						if ($("totalPosts") && !postErr) $("totalPosts").textContent = postCount || 0;
+						const stats = await apiGet("/api/stats");
+						statsCache = { data: stats, time: Date.now() };
+						const { userCount, postCount, commentCount } = stats;
+						if ($("totalUsers")) $("totalUsers").textContent = userCount || 0;
+						if ($("totalPosts")) $("totalPosts").textContent = postCount || 0;
 						if ($("statsBox")) {
 							$("statsBox").innerHTML = `
 								<strong>` + t("stats_title") + `</strong><br>
@@ -4680,10 +4338,8 @@
 								` + t("stats_comments") + `：${commentCount || 0}<br>
 							`;
 						}
-						if (!postErr) {
-							totalPostCount = postCount || 0;
-							renderPager();
-						}
+						totalPostCount = postCount || 0;
+						renderPager();
 					} catch (e) {
 						if ($("totalUsers")) $("totalUsers").textContent = "—";
 						if ($("totalPosts")) $("totalPosts").textContent = "—";
@@ -4747,7 +4403,6 @@
 					setPH("text", t("editor_ph"));
 					setT("insertImgBtn", t("editor_insert_img"));
 					setT("insertMusicBtn", t("editor_insert_music"));
-					setT("addRedPacketBtn", t("rp_btn"));
 					setPH("customTag", t("editor_custom_tag_ph"));
 					setT("sendBtn", t("editor_send"));
 					setT("logoutBtn", t("profile_logout"));
@@ -4811,9 +4466,8 @@
 					setT("discChatDesc", t("discover_chat_desc"));
 					setT("discWikiDesc", t("discover_wiki_desc"));
 					const om = document.getElementById("onlineMini");
-					if (om && typeof onlineUsersCache !== "undefined" && onlineUsersCache.length >= 0) om.textContent =
-						t(
-							"online_label_prefix") + onlineUsersCache.length;
+					if (om && onlineUsersCache && onlineUsersCache.length >= 0) om.textContent = t(
+						"online_label_prefix") + onlineUsersCache.length;
 				}
 				window.refreshUILanguage = refreshUILanguage;
 
@@ -4825,11 +4479,6 @@
 					$("modal").classList.add("hidden");
 					document.querySelector(".modalBox").style.width = "300px";
 				}
-				async function hash(text) {
-					const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
-					return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
-				}
-
 				function isAdmin(user) {
 					return user?.role?.includes?.('owner') || user?.role?.includes?.('admin');
 				}
@@ -4921,14 +4570,10 @@
 				};
 				async function ensureAllUsersCache() {
 					if (allUsersCache.length) return allUsersCache;
-					const {
-						data,
-						error
-					} = await supabase
-						.from("users")
-						.select("id, name, coins, avatar");
-					if (error) return [];
-					allUsersCache = data || [];
+					try {
+						const data = await apiGet("/api/users");
+						allUsersCache = data || [];
+					} catch { allUsersCache = []; }
 					return allUsersCache;
 				}
 
@@ -5226,201 +4871,6 @@
 				}
 				$("insertMusicBtn").onclick = openMusicPicker;
 
-				$("addRedPacketBtn").onclick = () => {
-					if (pendingRedPacket) {
-						pendingRedPacket = null;
-						$("rpPendingBar").style.display = "none";
-						return;
-					}
-					if (!currentUser) return;
-					document.querySelector(".modalBox").style.width = "400px";
-					modal(`
-					<h3>` + t("red_envelope_title") + `</h3>
-					<div class="rpForm">
-						<label>` + t("rp_total") + `</label>
-						<input id="rpTotal" type="number" min="1" max="1000" value="100">
-						<label>` + t("rp_count") + `</label>
-						<input id="rpCount" type="number" min="1" value="5">
-						<label>` + t("rp_mode") + `</label>
-						<div class="modeRow">
-							<label><input type="radio" name="rpMode" value="r" checked> ` + t("rp_mode_random") + `</label>
-							<label><input type="radio" name="rpMode" value="a"> ` + t("rp_mode_average") + `</label>
-						</div>
-					</div>
-					<div style="margin-top:16px;">
-						<button id="rpConfirmBtn" style="background:var(--green);color:#fff;">` + t("rp_confirm_send") + `</button>
-					</div>
-				`);
-					$("rpConfirmBtn").onclick = async () => {
-						const total = parseInt($("rpTotal").value);
-						const count = parseInt($("rpCount").value);
-						const mode = document.querySelector('input[name="rpMode"]:checked').value;
-						if (!total || !count || total < 1 || total > 1000 || count < 1) return modal(t(
-							"rp_invalid_number"));
-						if (count > total) return modal(t("rp_count_exceeds"));
-						if (mode === "a" && total % count !== 0) return modal(t("rp_not_divisible"));
-						if ((currentUser?.coins || 0) < total) return modal(t("rp_insufficient"));
-						$("modal").classList.add("hidden");
-						document.querySelector(".modalBox").style.width = "360px";
-						modal(`
-						<h3>` + t("rp_confirm_password") + `</h3>
-						<p style="color:var(--sub);font-size:14px;margin:8px 0;">` + t("rp_password_hint") + `</p>
-						<input id="rpPassInput" type="password" placeholder="` + t("rp_password_ph") + `" style="width:100%;padding:12px;border-radius:20px;border:1px solid var(--border,#ccc);font-size:15px;background:var(--card);color:var(--text);outline:none;transition:border .2s;box-sizing:border-box;">
-						<div id="rpPassErr" class="rpForm" style="color:var(--red,#f44336);font-size:13px;margin-top:6px;text-align:center;"></div>
-						<div style="margin-top:12px;">
-							<button id="rpPassConfirm" style="background:var(--green);color:#fff;">` + t("rp_confirm") + `</button>
-						</div>
-					`);
-						setTimeout(() => {
-							const inp = $("rpPassInput");
-							if (inp) inp.focus();
-						}, 100);
-						const doVerify = async () => {
-							const pass = $("rpPassInput")?.value;
-							if (!pass) {
-								$("rpPassErr").textContent = t("rp_enter_password");
-								return;
-							}
-							if ((await hash(pass)) !== currentUser?.pass) {
-								$("rpPassErr").textContent = t("rp_wrong_password");
-								return;
-							}
-							pendingRedPacket = {
-								totalCoins: total,
-								count,
-								mode
-							};
-							$("modal").classList.add("hidden");
-							document.querySelector(".modalBox").style.width = "300px";
-							const bar = $("rpPendingBar");
-							bar.style.display = "block";
-							bar.innerHTML = `<span class="rpBadge">` + t("red_envelope_title") +
-								`: ${total} ×${count} <button id="rpCancelBadge">✕</button></span>`;
-							$("rpCancelBadge").onclick = () => {
-								pendingRedPacket = null;
-								bar.style.display = "none";
-							};
-						};
-						$("rpPassConfirm").onclick = doVerify;
-						$("rpPassInput").onkeydown = e => {
-							if (e.key === "Enter") doVerify();
-						};
-					};
-				};
-
-				async function handleRedPacketClick(el) {
-					const raw = el.dataset.rp;
-					const postId = parseInt(el.dataset.postid);
-					const authorId = parseInt(el.dataset.author);
-					const data = parseRpData(raw);
-					const claimed = Object.keys(data.claims).length;
-					const remaining = data.count - claimed;
-					const isAuthor = currentUser && authorId && currentUser.id === authorId;
-
-					if (remaining <= 0) {
-						await showRpDetail(el);
-						return;
-					}
-
-					const myClaim = currentUser && data.claims[currentUser.id];
-					if (myClaim !== undefined) {
-						await showRpDetail(el);
-						return;
-					}
-
-					if (!currentUser) return modal(t("guest_modal_title"));
-
-					if (remaining > 0) {
-						await claimRedPacket(el, postId, data);
-					}
-				}
-
-				async function claimRedPacket(el, postId, data) {
-					const raw = el.dataset.rp;
-					const oldMarker = `[redpacket:${raw}]`;
-					const claimed = Object.keys(data.claims).length;
-					const claimedCoins = Object.values(data.claims).reduce((a, b) => a + b, 0);
-					const remainCoins = data.totalCoins - claimedCoins;
-					const remainCount = data.count - claimed;
-					let myCoins;
-					if (data.mode === "a") {
-						myCoins = Math.floor(data.totalCoins / data.count);
-						if (data.count - claimed === 1) myCoins = remainCoins;
-					} else {
-						const max = Math.min(Math.floor(remainCoins * 2 / remainCount), remainCoins - (remainCount -
-							1));
-						myCoins = Math.floor(Math.random() * Math.max(1, max)) + 1;
-						if (remainCount === 1) myCoins = remainCoins;
-					}
-					const newClaims = {
-						...data.claims,
-						[currentUser.id]: myCoins
-					};
-					const newClaimsStr = Object.entries(newClaims).map(([u, c]) => `${u}:${c}`).join(";");
-					const newRaw = `${data.totalCoins},${data.count},${data.mode};${newClaimsStr}`;
-					const newMarker = `[redpacket:${newRaw}]`;
-
-					let success = false;
-					for (let attempt = 0; attempt < 5; attempt++) {
-						const {
-							data: post
-						} = await supabase.from("posts").select("content").eq("id", postId).single();
-						if (!post) break;
-						const fullContent = post.content;
-						if (!fullContent.includes(oldMarker)) break;
-						const newContent = fullContent.replace(oldMarker, newMarker);
-						const {
-							error
-						} = await supabase.from("posts").update({
-							content: newContent
-						}).eq("id", postId).eq("content", fullContent);
-						if (!error) {
-							success = true;
-							break;
-						}
-						await new Promise(r => setTimeout(r, 200));
-					}
-					if (!success) return;
-
-					el.dataset.rp = newRaw;
-					el.style.background = "#9e9e9e";
-					el.className = "rpBtn rpDone";
-					const newClaimed = Object.keys(newClaims).length;
-					el.textContent = newClaimed >= data.count ? t("red_envelope_empty") : t("rp_claimed");
-					await changeCoins(currentUser.id, myCoins);
-					showClaimAnimation(myCoins);
-				}
-
-				function showClaimAnimation(coins) {
-					const t = document.createElement("div");
-					t.className = "toast";
-					t.textContent = "+" + coins;
-					document.body.appendChild(t);
-					setTimeout(() => t.remove(), 1300);
-				}
-
-				async function showRpDetail(el) {
-					const raw = el.dataset.rp;
-					const data = parseRpData(raw);
-					const entries = Object.entries(data.claims);
-					if (!entries.length) return modal(t("red_envelope_empty"));
-					await ensureAllUsersCache();
-					const totalClaimed = entries.reduce((a, [_, c]) => a + c, 0);
-					const nameMap = Object.fromEntries(allUsersCache.map(u => [u.id, u.name]));
-					const list = entries.map(([uid, coins]) => {
-						const name = nameMap[uid] || "#" + uid;
-						return `<div style="display:flex;align-items:center;gap:8px;padding:5px 0;">
-						<span style="flex:1;font-size:14px;text-align:left;">${name}</span>
-						<span style="font-weight:600;color:var(--green);">+${coins}</span>
-					</div>`;
-					}).join("");
-					document.querySelector(".modalBox").style.width = "380px";
-					modal(`<h3>` + t("red_envelope_title") + ` · ` + t("red_envelope_claim_detail") + `</h3>
-					<div style="margin:8px 0;font-size:14px;color:var(--sub);">${data.totalCoins} · ${entries.length}/${data.count} · ${totalClaimed}</div>
-					<div style="max-height:300px;overflow-y:auto;text-align:left;">${list}</div>
-				`);
-				}
-
 				function getPostMeta(content) {
 					let text = String(content || "").trim();
 					let bg = null,
@@ -5456,24 +4906,17 @@
 						img = imgMatch[1];
 						text = text.replace(/\[img:.*?\]/g, "").trim();
 					}
-					let packetRaw = null;
-					const rpMatch = text.match(/\[redpacket:(.*?)\]/);
-					if (rpMatch) {
-						packetRaw = rpMatch[1];
-						text = text.replace(/\[redpacket:.*?\]/g, "").trim();
-					}
 					return {
 						bg,
 						warn,
 						warnText,
 						music,
 						img,
-						packetRaw,
 						content: text
 					};
 				}
 
-				async function renderPostBody(box, fullContent, postId, authorId) {
+				async function renderPostBody(box, fullContent) {
 					const meta = getPostMeta(fullContent);
 					const hasHtml = /<[^>]+>/.test(meta.content);
 					const plainText = meta.content.replace(/<[^>]*>/g, "");
@@ -5486,9 +4929,6 @@
 					if (meta.img) {
 						html +=
 							`<div style="margin:8px 0;"><button class="loadImgBtn" data-src="${escapeAttr(meta.img)}" style="width:100%;padding:12px;border-radius:20px;background:var(--card);color:var(--text);font-size:16px;cursor:pointer;border:1px solid #ccc;text-align:center;transition:.2s;" onmouseover="this.style.background='var(--grad)';this.style.color='#fff'" onmouseout="this.style.background='';this.style.color=''">${t("post_load_img")}</button></div>`;
-					}
-					if (meta.packetRaw) {
-						html += renderRedPacketHtml(meta.packetRaw, postId, authorId);
 					}
 					html += needFold ?
 						`<span class="longPostText">${foldedText}</span><button class="toggleLongPost inline">${t("post_expand")}</button>` :
@@ -5504,59 +4944,17 @@
 								`<img src="${src}" class="zoomable" style="max-width:60%;border-radius:12px;display:block;">`;
 						};
 					}
-					const rpEl = box.querySelector(".rpBtn");
-					if (rpEl) {
-						rpEl.onclick = () => handleRedPacketClick(rpEl);
-					}
-					const toggleBtn = box.querySelector(".toggleLongPost");
-					if (toggleBtn) {
-						let expanded = false;
-						toggleBtn.onclick = () => {
-							expanded = !expanded;
-							const longTextEl = box.querySelector(".longPostText");
-							if (longTextEl) longTextEl.innerHTML = expanded ? meta.content : foldedText;
+					const t = box.querySelector(".toggleLongPost");
+					if (t) {
+						let e = false;
+						t.onclick = () => {
+							e = !e;
+							const l = box.querySelector(".longPostText");
+							if (l) l.innerHTML = e ? meta.content : foldedText;
 							linkifyMentions(box);
-							toggleBtn.textContent = expanded ? t("post_collapse") : t("post_expand");
+							t.textContent = e ? t("post_collapse") : t("post_expand");
 						};
 					}
-				}
-
-				function renderRedPacketHtml(raw, postId, authorId) {
-					const data = parseRpData(raw);
-					const claimed = Object.keys(data.claims).length;
-					const remaining = data.count - claimed;
-					const isAuthor = currentUser && authorId && currentUser.id === authorId;
-					const isClaimed = currentUser && data.claims[currentUser.id] !== undefined;
-					const done = remaining <= 0 || isClaimed;
-					const bg = done ? "#9e9e9e" : "#e57373";
-					const cls = done ? "rpBtn rpDone" : "rpBtn";
-					let text;
-					if (remaining <= 0) {
-						text = t("red_envelope_empty");
-					} else if (isClaimed) {
-						text = t("rp_claimed");
-					} else if (isAuthor) {
-						text = t("red_envelope_title");
-					} else {
-						text = `${t("red_envelope_open")}（${data.totalCoins}·${remaining}）`;
-					}
-					return `<button class="${cls}" style="background:${bg};color:#fff;border-radius:20px;border:none;" data-rp="${escapeAttr(raw)}" data-postid="${postId}" data-author="${authorId||''}">${text}</button>`;
-				}
-
-				function parseRpData(raw) {
-					const parts = raw.split(";");
-					const cfg = parts[0].split(",");
-					const claims = {};
-					for (let i = 1; i < parts.length; i++) {
-						const m = parts[i].match(/^(\d+):(\d+)$/);
-						if (m) claims[parseInt(m[1])] = parseInt(m[2]);
-					}
-					return {
-						totalCoins: parseInt(cfg[0]),
-						count: parseInt(cfg[1]),
-						mode: cfg[2],
-						claims
-					};
 				}
 
 				function renderMusicCard(music) {
@@ -5584,67 +4982,41 @@
 					if (/jacky|admin/i.test(u)) {
 						return modal(t("no_impersonate"));
 					}
-					let passHash = await hash(p1);
-					let {
-						data: userData,
-						error
-					} = await supabase
-						.from("users")
-						.insert([{
-							name: u,
-							pass: passHash,
-							time: new Date().toISOString(),
-							coins: 0,
-							avatar: null
-						}])
-						.select();
-					if (error) return modal(t("register_fail", error.message));
-					let userId = userData[0].id;
-					let {
-						error: passError
-					} = await supabase
-						.from("passwords")
-						.insert([{
-							id: userId,
-							name: u,
-							password: p1
-						}]);
-					if (passError) return modal(t("error_generic", passError.message));
-					modal(t("register_ok"));
-					show("welcomePage");
+					try {
+						await apiPost("/api/auth/register", { name: u, pass: p1, time: new Date().toISOString() });
+						modal(t("register_ok"));
+						show("welcomePage");
+					} catch (e) {
+						modal(t("register_fail", e.message));
+					}
 				};
 				$("loginBtn").onclick = async () => {
 					let u = $("loginUser").value.trim();
 					let p = $("loginPass").value.trim();
 					if (!u || !p) return modal(t("enter_user_pass"));
-					let {
-						data,
-						error
-					} = await supabase
-						.from("users")
-						.select("*")
-						.eq("name", u)
-						.single();
-					if (error || !data) return modal(t("user_not_found"));
-					let passHash = await hash(p);
-					if (data.pass !== passHash) return modal(t("wrong_password"));
-					currentUser = data;
-					guestMode = false;
-					localStorage.setItem("loginUser", data.id);
-					$("nav").classList.remove("hidden");
-					$("postFilterBar").style.display = "";
-					$("logoRow").querySelector("#onlineMini").style.display = "";
-					$("logoRow").querySelector("#notifBtn").style.display = "";
-					show("main");
-					renderPostFilters();
-					syncLayoutMode();
-					syncLayoutBtn();
-					loadStats();
-					loadPosts(1);
-					loadOnlineUsers();
-					startPresence();
-					refreshNotificationBadge();
-					modal(t("welcome_back", data.name));
+					try {
+						const data = await apiPost("/api/auth/login", { name: u, pass: p });
+						currentUser = data;
+						guestMode = false;
+						localStorage.setItem("loginUser", data.id);
+						if (data.token) localStorage.setItem("token", data.token);
+						$("nav").classList.remove("hidden");
+						$("postFilterBar").style.display = "";
+						$("logoRow").querySelector("#onlineMini").style.display = "";
+						$("logoRow").querySelector("#notifBtn").style.display = "";
+						show("main");
+						renderPostFilters();
+						syncLayoutMode();
+						syncLayoutBtn();
+						loadStats();
+						loadPosts(1);
+						loadOnlineUsers();
+						startPresence();
+						refreshNotificationBadge();
+						modal(t("welcome_back", data.name));
+					} catch (e) {
+						modal(t("user_not_found") + "：" + e.message);
+					}
 				};
 				$("guestBtn").onclick = () => {
 					guestMode = true;
@@ -5658,15 +5030,12 @@
 				};
 				document.addEventListener("click", e => {
 					if (!guestMode) return;
-					const target = e.target;
-					if (target.closest(".userLink") || target.closest("a") || target.closest("#viewer") || target
-						.closest(
-							".modal") || target.closest("#welcomePage") || target.closest("#registerPage") ||
-						target.closest(
-							"#backBtn") || target.closest("#postBackBtn")) return;
-					if (target.closest("button") || target.closest("input") || target.closest("textarea") ||
-						target.closest(
-							"select") || target.closest(".postTag") || target.closest(".shareBtnWrapper")) {
+					const t = e.target;
+					if (t.closest(".userLink") || t.closest("a") || t.closest("#viewer") || t.closest(
+							".modal") || t.closest("#welcomePage") || t.closest("#registerPage") || t.closest(
+							"#backBtn") || t.closest("#postBackBtn")) return;
+					if (t.closest("button") || t.closest("input") || t.closest("textarea") || t.closest(
+							"select") || t.closest(".postTag") || t.closest(".shareBtnWrapper")) {
 						e.preventDefault();
 						e.stopPropagation();
 						modal(t("guest_modal_title"));
@@ -5675,7 +5044,7 @@
 							const row = document.createElement("div");
 							row.style.cssText = "margin-top:14px;text-align:center;";
 							row.innerHTML =
-								`<button id="guestLoginRedirect" style="background:var(--green);color:#fff;">${t("guest_go_login")}</button>`;
+								'<button id="guestLoginRedirect" style="background:var(--green);color:#fff;">${t("guest_go_login")}</button>';
 							box.appendChild(row);
 							$("guestLoginRedirect").onclick = () => {
 								$("modal").classList.add("hidden");
@@ -5690,7 +5059,7 @@
 				}, true);
 				$("sendBtn").onclick = async () => {
 					let txt = $("text").value.trim();
-					if (!txt && !pendingRedPacket) return;
+					if (!txt) return;
 					let custom = $("customTag").value.trim();
 					let tag = custom || selectedTags[0] || null;
 					txt = sanitizePostHtml(txt);
@@ -5702,29 +5071,16 @@
 					if (selectedPostBg) {
 						finalContent = `[[bg:${selectedPostBg}]]` + finalContent;
 					}
-					if (pendingRedPacket) {
-						if ((currentUser?.coins || 0) < pendingRedPacket.totalCoins) return modal(t(
-							"rp_insufficient"));
-						finalContent = (finalContent +
-							`\n[redpacket:${pendingRedPacket.totalCoins},${pendingRedPacket.count},${pendingRedPacket.mode}]`
-							).trim();
-					}
 					const postId = Date.now();
-					let {
-						error
-					} = await supabase.from("posts").insert([{
-						id: postId,
-						content: finalContent,
-						time: new Date().toISOString(),
-						author: currentUser.id,
-						tag: tag
-					}]);
-					if (error) return modal(t("post_fail", error.message));
-					if (pendingRedPacket) {
-						await changeCoins(currentUser.id, -pendingRedPacket.totalCoins);
-						pendingRedPacket = null;
-						$("rpPendingBar").style.display = "none";
-					}
+					try {
+						await apiPost("/api/posts", {
+							id: postId,
+							content: finalContent,
+							time: new Date().toISOString(),
+							author: currentUser.id,
+							tag: tag
+						});
+					} catch (e) { return modal(t("post_fail", e.message)); }
 					await notifyMentions(finalContent, postId, null);
 					$("text").value = "";
 					$("customTag").value = "";
@@ -5749,18 +5105,17 @@
 				}) {
 					if (!targetId || !actorId || targetId === actorId) return;
 					if (type !== "comment" && type !== "mention" && type !== "gift") return;
-					const {
-						error
-					} = await supabase.from("notifications").insert([{
-						target_id: targetId,
-						actor_id: actorId,
-						post_id: postId,
-						comment_id: commentId,
-						type,
-						is_read: false,
-						created_at: new Date().toISOString()
-					}]);
-					if (error) console.error("通知插入失败", error);
+					try {
+						await apiPost("/api/notifications", {
+							target_id: targetId,
+							actor_id: actorId,
+							post_id: postId,
+							comment_id: commentId,
+							type,
+							is_read: false,
+							created_at: new Date().toISOString()
+						});
+					} catch (e) { console.error("通知插入失败", e); }
 				}
 
 				function notifLabel(n) {
@@ -5772,66 +5127,40 @@
 
 				async function refreshNotificationBadge() {
 					if (!currentUser) return;
-					const {
-						count,
-						error
-					} = await supabase
-						.from("notifications")
-						.select("id", {
-							count: "exact",
-							head: true
-						})
-						.eq("target_id", currentUser.id)
-						.eq("is_read", false);
-					if (error) return;
-					const badge = $("notifBadge");
-					if (!badge) return;
-					const unread = count || 0;
-					badge.textContent = unread;
-					badge.hidden = false;
-					badge.style.background = unread === 0 ? 'var(--card)' : '#ff3b30';
-					badge.style.color = unread === 0 ? 'var(--sub)' : '#fff';
+					try {
+						const { count } = await apiGet("/api/notifications/count?target_id=" + currentUser.id);
+						const badge = $("notifBadge");
+						if (!badge) return;
+						const unread = count || 0;
+						badge.textContent = unread;
+						badge.hidden = false;
+						badge.style.background = unread === 0 ? 'var(--card)' : '#ff3b30';
+						badge.style.color = unread === 0 ? 'var(--sub)' : '#fff';
+					} catch (e) { console.error(e); }
 				}
 				async function markNotificationRead(id) {
 					if (!currentUser || !id) return false;
-					const {
-						error
-					} = await supabase
-						.from("notifications")
-						.update({
-							is_read: true
-						})
-						.eq("id", id)
-						.eq("target_id", currentUser.id);
-					if (error) {
-						console.error("标记通知已读失败：", error);
+					try {
+						await apiPut("/api/notifications/read/" + id, { target_id: currentUser.id });
+						return true;
+					} catch (e) {
+						console.error("标记通知已读失败：", e);
 						return false;
 					}
-					return true;
 				}
 
-				function applyPostFilters(query) {
-					if (activePostTag === "其它") {
-						const excludedTags = ["公告", ...defaultTags];
-						query = query.or(
-							`tag.is.null,tag.not.in.(${excludedTags.map(t => `"${t}"`).join(",")})`
-						);
-					} else if (activePostTag !== "全部") {
-						query = query.eq("tag", activePostTag);
-					}
-					return query;
+				function buildPostQuery(page, perPage) {
+					let q = `?page=${page}&perPage=${perPage}`;
+					if (currentUser) q += "&userId=" + currentUser.id;
+					if (activePostTag && activePostTag !== "全部") q += "&tag=" + encodeURIComponent(activePostTag);
+					if (postSearch) q += "&search=" + encodeURIComponent(postSearch);
+					return q;
 				}
 				async function openNotificationPost(postId) {
 					$("modal").classList.add("hidden");
-					const {
-						data: post,
-						error
-					} = await supabase
-						.from("posts")
-						.select("id")
-						.eq("id", postId)
-						.single();
-					if (error || !post) {
+					try {
+						await apiGet("/api/posts/single?id=" + postId);
+					} catch {
 						modal(t("post_not_found"));
 						return;
 					}
@@ -5839,28 +5168,17 @@
 					postSearch = "";
 					renderPostFilters();
 					show("main");
-					const {
-						count,
-						error: countErr
-					} = await applyPostFilters(
-						supabase
-						.from("posts")
-						.select("id", {
-							count: "exact",
-							head: true
-						})
-						.order("id", {
-							ascending: false
-						})
-						.gt("id", postId)
-					);
-					if (countErr) {
-						modal(t("location_fail", countErr.message));
-						return;
+					try {
+						const pageRes = await apiGet("/api/posts?perPage=10000&tag=全部");
+						const posts = pageRes.posts || [];
+						const count = posts.length;
+						const higher = posts.filter(p => p.id > postId).length;
+						const perPage = getPostsPerPage();
+						const page = Math.floor(higher / perPage) + 1;
+						await loadPosts(page);
+					} catch {
+						await loadPosts(1);
 					}
-					const perPage = getPostsPerPage();
-					const page = Math.floor((count || 0) / perPage) + 1;
-					await loadPosts(page);
 					setTimeout(() => {
 						const target = document.querySelector(`.post[data-post-id="${postId}"]`);
 						if (!target) {
@@ -5880,38 +5198,12 @@
 					const container = $("singlePost");
 					container.innerHTML =
 						"<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
-					const {
-						data: post,
-						error
-					} = await supabase
-						.from("posts")
-						.select("*, users:author(id, name, coins, avatar, role)")
-						.eq("id", postId)
-						.single();
-					if (error || !post) {
-						container.innerHTML =
-							"<p style='text-align:center;color:var(--sub);margin-top:20px;'>" + t("post_not_found") +
-							"</p>";
-						return;
-					}
-					const {
-						data: allLikes
-					} = await supabase
-						.from("likes")
-						.select("type, liker")
-						.eq("postid", post.id);
-					let likeCount = 0,
-						dislikeCount = 0,
-						liked = false,
-						disliked = false;
-					for (const r of (allLikes || [])) {
-						if (r.type == 1) likeCount++;
-						else if (r.type == -1) dislikeCount++;
-						if (currentUser && r.liker === currentUser.id) {
-							if (r.type == 1) liked = true;
-							else if (r.type == -1) disliked = true;
-						}
-					}
+					const post = await apiGet("/api/posts/single?id=" + postId + (currentUser ? "&userId=" + currentUser.id : ""));
+					if (!post || post.error) throw new Error(t("post_not_found"));
+					let likeCount = post.likes || 0;
+					let dislikeCount = post.dislikes || 0;
+					let liked = post.userVote === 1;
+					let disliked = post.userVote === -1;
 					const meta = getPostMeta(post.content);
 					const avatar = getAvatar(post.users);
 					const postDiv = document.createElement("div");
@@ -5980,10 +5272,10 @@
 						`;
 						bodyBox.querySelector(".warnMsg").textContent = meta.warnText || t("warn_default");
 						bodyBox.querySelector(".revealWarnBtn").onclick = () => {
-							renderPostBody(bodyBox, post.content, post.id, post.author);
+							renderPostBody(bodyBox, post.content);
 						};
 					} else {
-						renderPostBody(bodyBox, post.content, post.id, post.author);
+						renderPostBody(bodyBox, post.content);
 					}
 					if (!guestMode) {
 						postDiv.querySelectorAll("[data-vote-list]").forEach(el => {
@@ -6025,30 +5317,14 @@
 				async function openNotifications() {
 					if (!currentUser) return;
 					await cleanupNotifications();
-					const {
-						data,
-						error
-					} = await supabase
-						.from("notifications")
-						.select(`
-							id,
-							type,
-							is_read,
-							created_at,
-							post_id,
-							comment_id,
-							actor:actor_id(id, name, coins, avatar, role)
-						`)
-						.eq("target_id", currentUser.id)
-						.order("created_at", {
-							ascending: false
-						})
-						.limit(30);
-					if (error) {
-						modal(t("notif_load_fail", error.message));
+					let rows;
+					try {
+						rows = await apiGet("/api/notifications?target_id=" + currentUser.id);
+					} catch (e) {
+						modal(t("notif_load_fail", e.message));
 						return;
 					}
-					const rows = data || [];
+					rows = rows || [];
 					const notifHtml = rows.length ?
 						rows.map(n => {
 							const a = n.actor || {};
@@ -6085,23 +5361,17 @@
 						</div>
 					`);
 					$("markAllReadBtn").onclick = async () => {
-						await supabase.from("notifications")
-							.update({
-								is_read: true
-							})
-							.eq("target_id", currentUser.id);
+						try {
+							await apiPut("/api/notifications/read", { target_id: currentUser.id });
+						} catch (e) { console.error(e); }
 						await refreshNotificationBadge();
 						openNotifications();
 					};
 					$("clearNotifBtn").onclick = async () => {
-						const {
-							error
-						} = await supabase
-							.from("notifications")
-							.delete()
-							.eq("target_id", currentUser.id);
-						if (error) {
-							modal(t("delete_fail", error.message));
+						try {
+							await apiDelete("/api/notifications", { target_id: currentUser.id });
+						} catch (e) {
+							modal(t("delete_fail", e.message));
 							return;
 						}
 						$("modal").classList.add("hidden");
@@ -6123,34 +5393,13 @@
 				}
 				async function cleanupNotifications() {
 					if (!currentUser) return;
-					const {
-						data
-					} = await supabase
-						.from("notifications")
-						.select("id")
-						.eq("target_id", currentUser.id)
-						.order("created_at", {
-							ascending: false
-						});
+					let data;
+					try { data = await apiGet("/api/notifications?target_id=" + currentUser.id); } catch { return; }
 					if (!data) return;
-					const oldIds = data
-						.slice(100)
-						.map(x => x.id);
+					const oldIds = data.slice(100).map(x => x.id);
 					if (oldIds.length) {
-						await supabase
-							.from("notifications")
-							.delete()
-							.in("id", oldIds);
+						try { await apiDelete("/api/notifications", { target_id: currentUser.id }); } catch {}
 					}
-					await supabase
-						.from("notifications")
-						.delete()
-						.lt(
-							"created_at",
-							new Date(
-								Date.now() - 60 * 24 * 60 * 60 * 1000
-							).toISOString()
-						);
 				}
 
 				function sanitizePostHtml(txt) {
@@ -6257,19 +5506,9 @@
 				async function loadNewUsers(limit = 10) {
 					const container = $("newUsers");
 					container.innerHTML = "<p style='color:var(--sub);text-align:center;'>Loading...</p>";
-					let {
-						data,
-						error
-					} = await supabase
-						.from("users")
-						.select("id, name, coins, avatar, role")
-						.order("time", {
-							ascending: false
-						})
-						.limit(limit);
-					if (error) {
-						container.innerHTML = '<p style="color:red;text-align:center;">' + t("modal_load_fail") +
-							'</p>';
+					let data;
+					try { data = await apiGet("/api/users?limit=" + limit + "&sort=time"); } catch {
+						container.innerHTML = '<p style="color:red;text-align:center;">' + t("modal_load_fail") + '</p>';
 						return;
 					}
 					container.innerHTML = '<h3>' + t("new_users_title") + '</h3>';
@@ -6288,7 +5527,7 @@
 					if (!pager) return;
 					if (guestMode) {
 						pager.innerHTML =
-							`<button class="navBtn" id="guestMoreBtn" style="min-width:120px;">${t("guest_more")}</button>`;
+							'<button class="navBtn" id="guestMoreBtn" style="min-width:120px;">${t("guest_more")}</button>';
 						$("guestMoreBtn").onclick = () => {
 							modal(t("guest_modal_title"));
 							const box = $("modalText");
@@ -6296,7 +5535,7 @@
 								const row = document.createElement("div");
 								row.style.cssText = "margin-top:14px;text-align:center;";
 								row.innerHTML =
-									`<button id="guestLoginRedirect" style="background:var(--green);color:#fff;">${t("guest_go_login")}</button>`;
+									'<button id="guestLoginRedirect" style="background:var(--green);color:#fff;">${t("guest_go_login")}</button>';
 								box.appendChild(row);
 								$("guestLoginRedirect").onclick = () => {
 									$("modal").classList.add("hidden");
@@ -6376,9 +5615,7 @@
 				let presenceTimer = null;
 				async function touchPresence() {
 					if (!currentUser) return;
-					await supabase.from("users").update({
-						last_seen: new Date().toISOString()
-					}).eq("id", currentUser.id);
+					try { await apiPut("/api/users/" + currentUser.id + "/presence"); } catch {}
 				}
 				let onlineUsersCache = [];
 				let onlineUsersCacheTime = 0;
@@ -6391,19 +5628,8 @@
 						mini.textContent = t("online_label_prefix") + onlineUsersCache.length;
 						return;
 					}
-					const cutoff = new Date(Date.now() - 2 * 60 * 1000).toISOString();
-					const {
-						data,
-						error
-					} = await supabase
-						.from("users")
-						.select("id, name, last_seen, coins, avatar, role")
-						.gte("last_seen", cutoff)
-						.order("last_seen", {
-							ascending: false
-						})
-						.limit(10);
-					if (error) return;
+					let data;
+					try { data = await apiGet("/api/users/online"); } catch { return; }
 					onlineUsersCache = data || [];
 					onlineUsersCacheTime = Date.now();
 					mini.textContent = t("online_label_prefix") + onlineUsersCache.length;
@@ -6507,69 +5733,18 @@
 					};
 				}
 				async function fetchPostPage(page = 1, perPage = getPostsPerPage()) {
-					let from = (page - 1) * perPage;
-					let to = from + perPage - 1;
-					let query = supabase
-						.from("posts")
-						.select(`
-						    id,
-						    content,
-						    time,
-						    author,
-						    tag,
-							users:author(id, name, coins, avatar, role)
-						`, {
-							count: "exact"
-						})
-						.order("id", {
-							ascending: false
-						})
-						.range(from, to);
-					if (activePostTag === "其它") {
-						const excludedTags = ["公告", ...defaultTags];
-						query = query.or(
-							`tag.is.null,tag.not.in.(${excludedTags.map(t => `"${t}"`).join(",")})`
-						);
-					} else if (activePostTag !== "全部") {
-						query = query.eq("tag", activePostTag);
+					const q = buildPostQuery(page, perPage);
+					let result;
+					if (postSearch && postSearch.startsWith("@")) {
+						const uname = postSearch.slice(1).trim();
+						if (!uname) return { posts: [], count: 0 };
+						try {
+							result = await apiGet("/api/posts?search=" + encodeURIComponent(postSearch) + "&page=" + page + "&perPage=" + perPage + (activePostTag && activePostTag !== "全部" ? "&tag=" + encodeURIComponent(activePostTag) : ""));
+						} catch { return { posts: [], count: 0 }; }
+					} else {
+						result = await apiGet("/api/posts" + q);
 					}
-					const q = postSearch.trim();
-					if (q) {
-						const safeQ = q.replace(/[%_,]/g, "");
-						if (q.startsWith("@")) {
-							const uname = q.slice(1).trim();
-							if (!uname) return {
-								posts: [],
-								count: 0
-							};
-							const {
-								data: users,
-								error: userErr
-							} = await supabase
-								.from("users")
-								.select("id, name")
-								.eq("name", uname);
-							if (userErr) throw userErr;
-							const ids = [...new Set((users || []).map(u => u.id))];
-							if (!ids.length) return {
-								posts: [],
-								count: 0
-							};
-							query = query.in("author", ids);
-						} else {
-							query = query.or(`content.ilike.%${safeQ}%,tag.ilike.%${safeQ}%`);
-						}
-					}
-					let {
-						data,
-						count,
-						error
-					} = await query;
-					if (error) throw error;
-					return {
-						posts: data || [],
-						count: count || 0
-					};
+					return { posts: result.posts || [], count: result.count || 0 };
 				}
 				const notice = $("notice");
 				const toggleBtn = $("toggleNoticeBtn");
@@ -6645,27 +5820,13 @@
 							return;
 						}
 						const postIds = posts.map(p => p.id);
-						const [likesRes, userVotesRes] = await Promise.all([
-							supabase.from("likes").select("postid, type").in("postid", postIds),
-							currentUser ?
-							supabase.from("likes").select("postid, type").in("postid", postIds).eq("liker",
-								currentUser.id) :
-							Promise.resolve({
-								data: []
-							})
-						]);
 						if (token !== currentLoadToken) return;
-						const likeCounts = {
-							likes: {},
-							dislikes: {}
-						};
-						for (const row of (likesRes.data || [])) {
-							const key = row.type == 1 ? "likes" : "dislikes";
-							likeCounts[key][row.postid] = (likeCounts[key][row.postid] || 0) + 1;
-						}
+						const likeCounts = { likes: {}, dislikes: {} };
 						const userVoteMap = {};
-						for (const row of (userVotesRes.data || [])) {
-							userVoteMap[row.postid] = row.type;
+						for (const p of posts) {
+							likeCounts.likes[p.id] = p.likes || 0;
+							likeCounts.dislikes[p.id] = p.dislikes || 0;
+							if (p.userVote) userVoteMap[p.id] = p.userVote;
 						}
 						for (let i = 0; i < posts.length; i++) {
 							let p = posts[i];
@@ -6748,10 +5909,10 @@
 									'</div>';
 								bodyBox.querySelector(".warnMsg").textContent = meta.warnText || t("warn_default");
 								bodyBox.querySelector(".revealWarnBtn").onclick = () => {
-									renderPostBody(bodyBox, p.content, p.id, p.author);
+									renderPostBody(bodyBox, p.content);
 								};
 							} else {
-								renderPostBody(bodyBox, p.content, p.id, p.author);
+								renderPostBody(bodyBox, p.content);
 							}
 							if (!guestMode) {
 								postDiv.querySelectorAll("[data-vote-list]").forEach(el => {
@@ -6788,15 +5949,10 @@
 							postDiv.querySelector(".userLink").onclick = () => viewUser(p.author);
 						}
 						if (token !== currentLoadToken) return;
-						const {
-							data: allComments
-						} = await supabase
-							.from("comments")
-							.select("*, users(id, name, coins, avatar, role)")
-							.in("postid", postIds)
-							.order("id", {
-								ascending: true
-							});
+						let allComments = [];
+						try {
+							allComments = await apiPost("/api/comments/batch", { postIds }) || [];
+						} catch { allComments = []; }
 						if (token !== currentLoadToken) return;
 						const commentsByPost = {};
 						for (const c of (allComments || [])) {
@@ -6815,16 +5971,9 @@
 				async function renderComments(postId, container, comments) {
 					container.innerHTML = "";
 					if (!comments) {
-						const {
-							data
-						} = await supabase
-							.from("comments")
-							.select("*, users(id, name, coins, avatar, role)")
-							.eq("postid", postId)
-							.order("id", {
-								ascending: true
-							});
-						comments = data || [];
+						try {
+							comments = await apiGet("/api/comments/" + postId);
+						} catch { comments = []; }
 					}
 					for (let c of comments) {
 						let div = document.createElement("div");
@@ -6851,7 +6000,7 @@
 						const del = div.querySelector("[data-cdel]");
 						if (del && currentUser) {
 							del.onclick = async () => {
-								await supabase.from("comments").delete().eq("id", c.id);
+								try { await apiDelete("/api/comments/" + c.id); } catch (e) { console.error(e); }
 								renderComments(postId, container);
 								await changeCoins(currentUser.id, -3);
 							};
@@ -6859,18 +6008,11 @@
 					}
 				}
 				async function openVotePeople(postId, kind) {
-					const {
-						data,
-						error
-					} = await supabase
-						.from("likes")
-						.select("type, time, users:liker(id, name, coins, avatar, role)")
-						.eq("postid", postId)
-						.order("time", {
-							ascending: true
-						});
-					if (error) {
-						modal(t("read_fail", error.message));
+					let data;
+					try {
+						data = await apiGet("/api/likes/" + postId);
+					} catch (e) {
+						modal(t("read_fail", e.message));
 						return;
 					}
 					const rows = (data || []).filter(x => x.type === (kind === "like" ? 1 : -1));
@@ -6905,26 +6047,19 @@
 					const text = String(content || "").trim();
 					if (!text) return;
 					try {
-						const {
-							data,
-							error
-						} = await supabase
-							.from("comments")
-							.insert([{
-								postid: postId,
-								content: sanitizePostHtml(text),
-								author: currentUser.id,
-								time: new Date().toISOString()
-							}])
-							.select("id")
-							.single();
-						if (error) throw error;
-						await notifyMentions(text, postId, data?.id || null);
+						const result = await apiPost("/api/comments", {
+							postid: postId,
+							content: sanitizePostHtml(text),
+							author: currentUser.id,
+							time: new Date().toISOString()
+						});
+						const commentId = result?.id || null;
+						await notifyMentions(text, postId, commentId);
 						await createNotification({
 							targetId: postAuthorId,
 							actorId: currentUser.id,
 							postId: postId,
-							commentId: data?.id || null,
+							commentId: commentId,
 							type: "comment"
 						});
 						const postDiv = document.querySelector(`.post[data-post-id="${postId}"]`);
@@ -6952,19 +6087,12 @@
 					const dislikeNumEl = dislikeBtn.querySelector(".voteNum");
 					let likeCount = parseInt(likeNumEl.textContent) || 0;
 					let dislikeCount = parseInt(dislikeNumEl.textContent) || 0;
-					let {
-						data
-					} = await supabase
-						.from("likes")
-						.select("*")
-						.eq("postid", id)
-						.eq("liker", currentUser.id);
-					const hasLike = data.some(x => x.type === 1);
-					const hasDislike = data.some(x => x.type === -1);
+					const hasLike = likeBtn.classList.contains("liked");
+					const hasDislike = dislikeBtn.classList.contains("disliked");
 					const prevLikeCount = likeCount;
 					const prevDislikeCount = dislikeCount;
-					const prevLiked = likeBtn.classList.contains("liked");
-					const prevDisliked = dislikeBtn.classList.contains("disliked");
+					const prevLiked = hasLike;
+					const prevDisliked = hasDislike;
 					if (hasLike) {
 						likeCount = Math.max(0, likeCount - 1);
 						likeBtn.classList.remove("liked");
@@ -6978,32 +6106,10 @@
 					}
 					likeNumEl.textContent = likeCount;
 					dislikeNumEl.textContent = dislikeCount;
+					const targetType = hasLike ? 0 : 1;
 					try {
-						if (hasLike) {
-							await supabase
-								.from("likes")
-								.delete()
-								.eq("postid", id)
-								.eq("liker", currentUser.id)
-								.eq("type", 1);
-							await changeCoins(currentUser.id, -1);
-						} else {
-							await supabase
-								.from("likes")
-								.delete()
-								.eq("postid", id)
-								.eq("liker", currentUser.id)
-								.eq("type", -1);
-							await supabase
-								.from("likes")
-								.insert([{
-									postid: id,
-									liker: currentUser.id,
-									type: 1,
-									time: new Date().toISOString()
-								}]);
-							await changeCoins(currentUser.id, hasDislike ? 2 : 1);
-						}
+						await apiPost("/api/likes/toggle", { postid: id, liker: currentUser.id, type: targetType });
+						await changeCoins(currentUser.id, hasLike ? -1 : (hasDislike ? 2 : 1));
 					} catch (e) {
 						console.error(e);
 						likeNumEl.textContent = prevLikeCount;
@@ -7020,19 +6126,12 @@
 					const dislikeNumEl = dislikeBtn.querySelector(".voteNum");
 					let likeCount = parseInt(likeNumEl.textContent) || 0;
 					let dislikeCount = parseInt(dislikeNumEl.textContent) || 0;
-					let {
-						data
-					} = await supabase
-						.from("likes")
-						.select("*")
-						.eq("postid", id)
-						.eq("liker", currentUser.id);
-					const hasLike = data.some(x => x.type === 1);
-					const hasDislike = data.some(x => x.type === -1);
+					const hasLike = likeBtn.classList.contains("liked");
+					const hasDislike = dislikeBtn.classList.contains("disliked");
 					const prevLikeCount = likeCount;
 					const prevDislikeCount = dislikeCount;
-					const prevLiked = likeBtn.classList.contains("liked");
-					const prevDisliked = dislikeBtn.classList.contains("disliked");
+					const prevLiked = hasLike;
+					const prevDisliked = hasDislike;
 					if (hasDislike) {
 						dislikeCount = Math.max(0, dislikeCount - 1);
 						dislikeBtn.classList.remove("disliked");
@@ -7046,32 +6145,10 @@
 					}
 					likeNumEl.textContent = likeCount;
 					dislikeNumEl.textContent = dislikeCount;
+					const targetType = hasDislike ? 0 : -1;
 					try {
-						if (hasDislike) {
-							await supabase
-								.from("likes")
-								.delete()
-								.eq("postid", id)
-								.eq("liker", currentUser.id)
-								.eq("type", -1);
-							await changeCoins(currentUser.id, 1);
-						} else {
-							await supabase
-								.from("likes")
-								.delete()
-								.eq("postid", id)
-								.eq("liker", currentUser.id)
-								.eq("type", 1);
-							await supabase
-								.from("likes")
-								.insert([{
-									postid: id,
-									liker: currentUser.id,
-									type: -1,
-									time: new Date().toISOString()
-								}]);
-							await changeCoins(currentUser.id, hasLike ? -2 : -1);
-						}
+						await apiPost("/api/likes/toggle", { postid: id, liker: currentUser.id, type: targetType });
+						await changeCoins(currentUser.id, hasDislike ? 1 : (hasLike ? -2 : -1));
 					} catch (e) {
 						console.error(e);
 						likeNumEl.textContent = prevLikeCount;
@@ -7091,29 +6168,9 @@
 					`);
 					$("confirmDeleteBtn").onclick = async () => {
 						$("closeModal").click();
-						if (!isAdmin(currentUser)) {
-							let {
-								data: myComments
-							} = await supabase
-								.from("comments")
-								.select("*")
-								.eq("postid", id)
-								.eq("author", currentUser.id);
-							let {
-								data: myLikes
-							} = await supabase
-								.from("likes")
-								.select("*")
-								.eq("postid", id)
-								.eq("liker", currentUser.id);
-							let penalty = -5;
-							if (myComments) penalty -= myComments.length * 3;
-							if (myLikes) penalty -= myLikes.length * 1;
-							await changeCoins(currentUser.id, penalty);
-						}
-						await supabase.from("posts").delete().eq("id", id);
-						await supabase.from("comments").delete().eq("postid", id);
-						await supabase.from("likes").delete().eq("postid", id);
+						try {
+							await apiDelete("/api/posts/" + id, { userId: currentUser.id, isAdmin: isAdmin(currentUser) });
+						} catch (e) { console.error(e); }
 						loadStats();
 						loadPosts(postPage);
 					};
@@ -7174,9 +6231,8 @@
 				async function loadUserList() {
 					let box = $("userItems");
 					box.innerHTML = "<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
-					let {
-						data
-					} = await supabase.from("users").select("id, name, coins, avatar, role");
+					let data = [];
+					try { data = await apiGet("/api/users"); } catch { data = []; }
 					data.sort((a, b) => {
 						let coinsA = a.coins || 0;
 						let coinsB = b.coins || 0;
@@ -7240,10 +6296,8 @@
 					let container = $("userPosts");
 					container.innerHTML =
 						"<p style='text-align:center;color:var(--sub);margin-top:20px;'>Loading...</p>";
-					let {
-						data: user
-					} = await supabase.from("users").select("id, name, coins, avatar, description, time, role").eq(
-						"id", uid).single();
+					let user;
+					try { user = await apiGet("/api/users/" + uid); } catch { user = { id: uid, name: "?", coins: 0, avatar: null, description: "", time: "", role: [] }; }
 					const avatarUrl = getAvatar(user);
 					$("profileAvatar").src = avatarUrl;
 					$("profileAvatar").onclick = () => openViewer(avatarUrl);
@@ -7334,12 +6388,9 @@
 							$("modal").classList.remove("hidden");
 							$("saveDescBtn").onclick = async () => {
 								const newDesc = $("descTextarea").value.trim();
-								const {
-									error
-								} = await supabase.from("users").update({
-									description: newDesc
-								}).eq("id", currentUser.id);
-								if (error) return modal(t("save_fail", error.message));
+								try {
+									await apiPut("/api/users/" + currentUser.id, { description: newDesc });
+								} catch (e) { return modal(t("save_fail", e.message)); }
 								currentUser.description = newDesc;
 								$("userDescription").innerText = newDesc || t("profile_no_desc");
 								$("modal").classList.add("hidden");
@@ -7352,10 +6403,8 @@
 				async function openShop() {
 					const shopDiv = document.createElement("div");
 					shopDiv.id = "shopModal";
-					const {
-						data: userData
-					} = await supabase.from("users")
-						.select("coins, role").eq("id", currentUser.id).single();
+					let userData;
+					try { userData = await apiGet("/api/users/" + currentUser.id); } catch { userData = { coins: 0, role: [] }; }
 					let coins = userData?.coins || 0;
 					let roleArr = userData?.role || [];
 
@@ -7452,33 +6501,17 @@
 								await changeCoins(currentUser.id, -item.price);
 								coins -= item.price;
 								roleArr = [...roleArr, itemId];
-								await supabase.from("users").update({
-									role: roleArr
-								}).eq("id", currentUser.id);
+								try { await apiPut("/api/users/" + currentUser.id, { role: roleArr }); } catch (e) { console.error(e); }
 								if (currentUser) currentUser.role = roleArr;
 								renderShop();
 							};
 						});
 
-						// shopDiv.querySelectorAll("[data-buy-gift]").forEach(btn => {
-						// 	btn.onclick = async () => {
-						// 		const itemId = btn.dataset.buyGift;
-						// 		const item = SHOP_ITEMS.find(i => i.id === itemId);
-						// 		if (!item || coins < item.price) return;
-						// 		await changeCoins(currentUser.id, -item.price);
-						// 		coins -= item.price;
-						// 		await openGiftPicker(item);
-						// 		renderShop();
-						// 	};
-						// });
-
 						shopDiv.querySelectorAll("[data-equip]").forEach(btn => {
 							btn.onclick = async () => {
 								const itemId = btn.dataset.equip;
 								roleArr = [itemId, ...roleArr.filter(r => r !== itemId)];
-								await supabase.from("users").update({
-									role: roleArr
-								}).eq("id", currentUser.id);
+								try { await apiPut("/api/users/" + currentUser.id, { role: roleArr }); } catch (e) { console.error(e); }
 								if (currentUser) currentUser.role = roleArr;
 								renderShop();
 							};
@@ -7491,9 +6524,7 @@
 							btn.onclick = async () => {
 								const itemId = btn.dataset.remove;
 								roleArr = [...roleArr.filter(r => r !== itemId), itemId];
-								await supabase.from("users").update({
-									role: roleArr
-								}).eq("id", currentUser.id);
+								try { await apiPut("/api/users/" + currentUser.id, { role: roleArr }); } catch (e) { console.error(e); }
 								if (currentUser) currentUser.role = roleArr;
 								renderShop();
 							};
@@ -7612,10 +6643,10 @@
 				async function openLottery() {
 					const sm = document.getElementById("shopModal");
 					if (sm) sm.remove();
-					const {
-						data: coinData
-					} = await supabase.from("users").select("coins").eq("id", currentUser.id).single();
-					if (coinData && currentUser) currentUser.coins = coinData.coins;
+					try {
+						const coinData = await apiGet("/api/users/" + currentUser.id);
+						if (coinData && currentUser) currentUser.coins = coinData.coins;
+					} catch {};
 
 					const modal = document.createElement("div");
 					modal.id = "lotteryModal";
@@ -7953,9 +6984,7 @@
 						let r = currentUser?.role || [];
 						if (Array.isArray(r) && !r.includes(bid)) {
 							r = [...r, bid];
-							await supabase.from("users").update({
-								role: r
-							}).eq("id", currentUser.id);
+							try { await apiPut("/api/users/" + currentUser.id, { role: r }); } catch {}
 							if (currentUser) currentUser.role = r;
 						}
 					}
@@ -8002,15 +7031,9 @@
 						if (url && !/^https?:\/\//i.test(url)) {
 							return modal(t("avatar_invalid"));
 						}
-						const {
-							error
-						} = await supabase
-							.from("users")
-							.update({
-								avatar: url || null
-							})
-							.eq("id", currentUser.id);
-						if (error) return modal(t("save_fail", error.message));
+						try {
+							await apiPut("/api/users/" + currentUser.id, { avatar: url || null });
+						} catch (e) { return modal(t("save_fail", e.message)); }
 						currentUser.avatar = url || null;
 						$("modal").classList.add("hidden");
 						loadPosts(postPage);
@@ -8018,35 +7041,16 @@
 					};
 				}
 				async function changeCoins(uid, amount) {
-					const {
-						data: user
-					} = await supabase
-						.from("users")
-						.select("coin_ban")
-						.eq("id", uid)
-						.single();
-					if (user?.coin_ban) {
+					try {
+						const result = await apiPut("/api/users/" + uid + "/coins", { amount });
+						if (result && result.coins !== undefined) {
+							if (currentUser && currentUser.id === uid) {
+								currentUser.coins = result.coins;
+								showCoinMsg(amount > 0 ? t("coin_add", amount) : t("coin_sub", Math.abs(amount)));
+							}
+						}
+					} catch (e) {
 						showCoinMsg(t("coin_penalty"));
-						return false;
-					}
-					let {
-						data
-					} = await supabase
-						.from("users")
-						.select("coins")
-						.eq("id", uid)
-						.single();
-					let newCoins = (data.coins || 0) + amount;
-					if (newCoins < 0) newCoins = 0;
-					await supabase
-						.from("users")
-						.update({
-							coins: newCoins
-						})
-						.eq("id", uid);
-					if (currentUser && currentUser.id === uid) {
-						currentUser.coins = newCoins;
-						showCoinMsg(amount > 0 ? t("coin_add", amount) : t("coin_sub", Math.abs(amount)));
 					}
 				}
 
@@ -8270,24 +7274,13 @@
 					};
 				}
 				$("randomPostBtn").onclick = async () => {
-					const {
-						count
-					} = await supabase.from("posts").select("id", {
-						count: "exact",
-						head: true
-					});
-					if (!count) {
-						modal(t("post_no_posts"));
-						return;
-					}
-					const offset = Math.floor(Math.random() * count);
-					const {
-						data
-					} = await supabase.from("posts").select("id").order("id").range(offset, offset);
-					if (data && data[0]) {
-						history.replaceState(null, "", "?pid=" + data[0].id);
-						openSinglePost(data[0].id);
-					}
+					try {
+						const randomPost = await apiGet("/api/posts/random");
+						if (randomPost && randomPost.id) {
+							history.replaceState(null, "", "?pid=" + randomPost.id);
+							openSinglePost(randomPost.id);
+						}
+					} catch { modal(t("post_no_posts")); }
 				};
 
 				document.getElementById("fortuneBtn").onclick = function() {
@@ -8401,8 +7394,6 @@
 					}
 				});
 
-				refreshUILanguage();
-
 				(async () => {
 					const mask = document.createElement("div");
 					mask.className = "loadingMask";
@@ -8418,11 +7409,8 @@
 					document.body.appendChild(mask);
 					try {
 						if (autoId) {
-							const {
-								data
-							} = await supabase.from("users").select(
-								"id, name, pass, coins, coin_ban, avatar, description, time, role, last_seen"
-							).eq("id", autoId).single();
+							let data;
+							try { data = await apiGet("/api/users/" + autoId); } catch { data = null; }
 							if (data) {
 								currentUser = data;
 								$("nav").classList.remove("hidden");
