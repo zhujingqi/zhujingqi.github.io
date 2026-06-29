@@ -2509,6 +2509,7 @@
 					<details>
 						<summary><b id="noticeUpdates">近期更新</b></summary>
 						<span id="noticeUpdatesContent">
+							· 重大BUG修复<br>
 							· Emojis<br>
 							· 多语言<br>
 							· 访客模式<br>
@@ -2687,6 +2688,8 @@
 					"Content-Type": "application/json",
 					...options.headers
 				};
+				const token = localStorage.getItem("token");
+				if (token) headers["Authorization"] = "Bearer " + token;
 				const res = await fetch(API_BASE + path, {
 					...options,
 					headers
@@ -5358,7 +5361,7 @@
 				function buildPostQuery(page, perPage) {
 					let q = `?page=${page}&perPage=${perPage}`;
 					if (currentUser) q += "&userId=" + currentUser.id;
-					if (activePostTag && activePostTag !== "全部") q += "&tag=" + encodeURIComponent(activePostTag);
+					if (activePostTag && activePostTag !== "全部" && activePostTag !== "其它") q += "&tag=" + encodeURIComponent(activePostTag);
 					if (postSearch) q += "&search=" + encodeURIComponent(postSearch);
 					return q;
 				}
@@ -5409,8 +5412,8 @@
 					if (!post || post.error) throw new Error(t("post_not_found"));
 					let likeCount = post.likes || 0;
 					let dislikeCount = post.dislikes || 0;
-					let liked = post.userVote === 1;
-					let disliked = post.userVote === -1;
+					let liked = post.userVote == 1;
+					let disliked = post.userVote == -1;
 					const meta = getPostMeta(post.content);
 					const avatar = getAvatar(post.users);
 					const postDiv = document.createElement("div");
@@ -5492,6 +5495,18 @@
 						});
 						postDiv.querySelector(".like").onclick = () => likePost(post.id, postDiv);
 						postDiv.querySelector(".dislike").onclick = () => dislikePost(post.id, postDiv);
+						const postTagEl = postDiv.querySelector(".postTag");
+						if (postTagEl) postTagEl.onclick = e => {
+							e.stopPropagation();
+							activePostTag = postTagEl.dataset.tag;
+							postSearch = "";
+							$("postSearch").value = "";
+							show("main");
+							setActive("homeBtn");
+							renderPostFilters();
+							loadStats();
+							loadPosts(1);
+						};
 						const delBtn = postDiv.querySelector("[data-del]");
 						if (delBtn) delBtn.onclick = () => deletePost(post.id);
 						const shareBtn = postDiv.querySelector("[data-share]");
@@ -5536,8 +5551,20 @@
 					rows = rows || [];
 					const notifHtml = rows.length ?
 						rows.map(n => {
-							const a = n.actor || {};
-							const avatar = getAvatar(a);
+							const a = n.actor;
+							let actorName, actorAvatar;
+							if (typeof a === 'object' && a) {
+								actorName = a.name || t("post_unknown");
+								actorAvatar = getAvatar(a);
+							} else if (a != null) {
+								const uid = Number(a);
+								const found = allUsersCache.find(u => u.id === uid);
+								actorName = found ? found.name : t("post_unknown");
+								actorAvatar = found ? getAvatar(found) : DEFAULT_AVATAR;
+							} else {
+								actorName = t("post_unknown");
+								actorAvatar = DEFAULT_AVATAR;
+							}
 							const unreadClass = n.is_read ? "" : "font-weight:700;background:rgba(0,0,0,.03);";
 							return `
 								<div class="notifItem"
@@ -5545,10 +5572,10 @@
 									data-post="${n.post_id}"
 									style="padding:8px 10px;border-bottom:1px solid var(--bg);cursor:pointer;border-radius:14px;${unreadClass}">
 									<div style="display:flex;align-items:center;gap:8px;">
-										<img class="avatar notifAvatar" src="${avatar}" onerror="this.onerror=null;this.src='head.svg'">
+										<img class="avatar notifAvatar" src="${actorAvatar}" onerror="this.onerror=null;this.src='head.svg'">
 										<div style="min-width:0;flex:1;">
 											<div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-												<b>${a.name || t("post_unknown")}</b>
+												<b>${actorName}</b>
 												<span>${notifLabel(n)}</span>
 											</div>
 											<div class="time">${new Date(n.created_at).toLocaleString()}</div>
@@ -5953,12 +5980,24 @@
 					}
 					$("searchBtn").onclick = () => {
 						postSearch = search.value.trim();
+						const matchedTag = [...defaultTags, "公告"].find(t => t === postSearch);
+						if (matchedTag) {
+							activePostTag = matchedTag;
+							postSearch = "";
+							search.value = "";
+						}
 						loadStats();
 						loadPosts(1);
 					};
 					search.onkeydown = e => {
 						if (e.key === "Enter") {
 							postSearch = search.value.trim();
+							const matchedTag = [...defaultTags, "公告"].find(t => t === postSearch);
+							if (matchedTag) {
+								activePostTag = matchedTag;
+								postSearch = "";
+								search.value = "";
+							}
 							loadStats();
 							loadPosts(1);
 						}
@@ -5975,8 +6014,9 @@
 						};
 						try {
 							result = await apiGet("/api/posts?search=" + encodeURIComponent(postSearch) + "&page=" +
-								page + "&perPage=" + perPage + (activePostTag && activePostTag !== "全部" ?
-									"&tag=" + encodeURIComponent(activePostTag) : ""));
+								page + "&perPage=" + perPage + (activePostTag && activePostTag !== "全部" && activePostTag !== "其它" ?
+									"&tag=" + encodeURIComponent(activePostTag) : "") + (currentUser ?
+									"&userId=" + currentUser.id : ""));
 						} catch {
 							return {
 								posts: [],
@@ -6056,7 +6096,10 @@
 						totalPostCount = pageData.count || 0;
 						renderPager();
 						if (token !== currentLoadToken) return;
-						const posts = pageData.posts || [];
+						let posts = pageData.posts || [];
+						if (activePostTag === "其它") {
+							posts = posts.filter(p => !p.tag || ![...defaultTags, "公告"].includes(p.tag));
+						}
 						container.innerHTML = "";
 						if (!posts.length) {
 							container.innerHTML =
@@ -6170,6 +6213,16 @@
 								});
 								postDiv.querySelector(".like").onclick = () => likePost(p.id, postDiv);
 								postDiv.querySelector(".dislike").onclick = () => dislikePost(p.id, postDiv);
+								const postTagEl = postDiv.querySelector(".postTag");
+								if (postTagEl) postTagEl.onclick = e => {
+									e.stopPropagation();
+									activePostTag = postTagEl.dataset.tag;
+									postSearch = "";
+									$("postSearch").value = "";
+									renderPostFilters();
+									loadStats();
+									loadPosts(1);
+								};
 								const delBtn = postDiv.querySelector("[data-del]");
 								if (delBtn) delBtn.onclick = () => deletePost(p.id);
 								const shareBtn = postDiv.querySelector("[data-share]");
@@ -6374,7 +6427,7 @@
 							liker: currentUser.id,
 							type: targetType
 						});
-						await changeCoins(currentUser.id, hasLike ? -1 : (hasDislike ? 2 : 1));
+						if (postDiv.dataset.authorId != currentUser.id) await changeCoins(currentUser.id, hasLike ? -1 : (hasDislike ? 2 : 1));
 					} catch (e) {
 						console.error(e);
 						likeNumEl.textContent = prevLikeCount;
@@ -6417,7 +6470,7 @@
 							liker: currentUser.id,
 							type: targetType
 						});
-						await changeCoins(currentUser.id, hasDislike ? 1 : (hasLike ? -2 : -1));
+						if (postDiv.dataset.authorId != currentUser.id) await changeCoins(currentUser.id, hasDislike ? 1 : (hasLike ? -2 : -1));
 					} catch (e) {
 						console.error(e);
 						likeNumEl.textContent = prevLikeCount;
